@@ -16,10 +16,12 @@ RUN apt-get clean && \
 RUN apt-get update
 RUN apt update
 
+COPY --from=golang:1.13-alpine /usr/local/go/ /usr/local/go/
+
 #FROM golang
 
 RUN apt-get -y install make
-RUN apt -y install golang-go
+#RUN apt -y install golang-go
 
 
 ENV NAME=/copilot
