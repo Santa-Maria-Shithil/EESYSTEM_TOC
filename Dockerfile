@@ -12,8 +12,7 @@ RUN echo 'root:root' |chpasswd
 RUN apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-COPY --from=golang:1.13-alpine /usr/local/go/ /usr/local/go/
-ENV PATH="/usr/local/go/bin:${PATH}"
+RUN apk add --no-cache git make musl-dev go
 
 # install basic libraries
 RUN apt-get update
