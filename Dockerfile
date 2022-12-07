@@ -40,7 +40,7 @@ ENV TYPE ""
 
 WORKDIR $NAME
 
-make
+RUN make
 
 RUN ls
 
