@@ -12,12 +12,14 @@ RUN echo 'root:root' |chpasswd
 RUN apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
+COPY --from=golang:1.13-alpine /usr/local/go/ /usr/local/go/
+ENV PATH="/usr/local/go/bin:${PATH}"
+
 # install basic libraries
 RUN apt-get update
 RUN apt update
 
-COPY --from=golang:1.13-alpine /usr/local/go/ /usr/local/go/
-ENV PATH="/usr/local/go/bin:${PATH}"
+
 
 #FROM golang
 
