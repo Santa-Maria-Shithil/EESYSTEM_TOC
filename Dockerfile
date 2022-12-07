@@ -1,16 +1,16 @@
 # syntax=docker/dockerfile:1
+FROM alpine:latest
+#FROM ubuntu:20.04
 
-FROM ubuntu:20.04
+#ENV TZ=Europe/Kiev
+#RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-ENV TZ=Europe/Kiev
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+#RUN apt-get update
 
-RUN apt-get update
+#RUN echo 'root:root' |chpasswd
 
-RUN echo 'root:root' |chpasswd
-
-RUN apt-get clean && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+#RUN apt-get clean && \
+ #   rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 RUN apk add --no-cache git make musl-dev go
 
