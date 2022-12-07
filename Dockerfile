@@ -19,7 +19,7 @@ RUN apt update
 #FROM golang
 
 RUN apt-get -y install make
-RUN apt-get -y install golang-go
+RUN apt -y install golang-go
 
 
 ENV NAME=/copilot
