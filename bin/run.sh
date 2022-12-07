@@ -23,7 +23,7 @@ if [ "${TYPE}" == "master" ]; then
     #arguments must be according to the order of the master.go file
 
     echo "master mode: ${args}"
-    ${DIR}/master ${args}
+    ./bin/master ${args}
 fi
 
 # Usage of ./bin/server:
