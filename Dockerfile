@@ -42,6 +42,7 @@ ENV TYPE ""
 
 
 WORKDIR $NAME
+RUN go version
 
 RUN make
 
