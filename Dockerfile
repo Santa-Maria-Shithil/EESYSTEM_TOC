@@ -15,14 +15,14 @@ FROM alpine:latest
 RUN apk add --no-cache git make musl-dev go
 
 # install basic libraries
-RUN apt-get update
-RUN apt update
+#RUN apt-get update
+#RUN apt update
 
 
 
 #FROM golang
 
-RUN apt-get -y install make
+#RUN apt-get -y install make
 #RUN apt -y install golang-go
 
 
