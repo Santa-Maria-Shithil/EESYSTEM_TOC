@@ -1,8 +1,24 @@
 # syntax=docker/dockerfile:1
 
-FROM golang
+FROM ubuntu:20.04
 
+ENV TZ=Europe/Kiev
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
+RUN apt-get update
+
+RUN echo 'root:root' |chpasswd
+
+RUN apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# install basic libraries
+RUN apt-get update
+RUN apt update
+
+#FROM golang
+
+RUN apt-get install make
 
 
 ENV NAME=/copilot
