@@ -22,5 +22,5 @@ clientol:
 
 .PHONY: clean
 
-clean:
-	rm -rf bin pkg
+#clean:
+#	rm -rf bin pkg
