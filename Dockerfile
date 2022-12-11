@@ -52,8 +52,6 @@ WORKDIR $NAME/bin
 
 RUN ls
 
-WORKDIR $NAME
-
 ENV TYPE master
 
 # env variables for master------------------
