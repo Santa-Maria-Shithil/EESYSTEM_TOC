@@ -48,7 +48,11 @@ RUN go version
 
 RUN make
 
+WORKDIR $NAME/bin
+
 RUN ls
+
+WORKDIR $NAME
 
 ENV TYPE master
 
