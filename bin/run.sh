@@ -2,6 +2,8 @@
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+echo ${DIR}
+
 if [ "${TYPE}" == "" ]; then
     echo "usage: define env variables, as listed below
     TYPE = [master,server,client] # type of instance
