@@ -48,7 +48,7 @@ RUN go version
 
 RUN make
 
-WORKDIR $NAME\bin
+WORKDIR /copilot/bin/
 
 RUN ls
 
