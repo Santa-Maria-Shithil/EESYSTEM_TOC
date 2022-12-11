@@ -50,6 +50,8 @@ RUN make
 
 WORKDIR /copilot/bin/
 
+RUN pw
+
 RUN ls
 
 ENV TYPE master
