@@ -2,7 +2,7 @@
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-echo ${DIR}
+echo "sdjfsdklfj"
 
 if [ "${TYPE}" == "" ]; then
     echo "usage: define env variables, as listed below
