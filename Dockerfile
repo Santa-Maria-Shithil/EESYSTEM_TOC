@@ -52,6 +52,7 @@ RUN make
 
 
 RUN pwd
+RUN echo $PATH
 
 RUN ls
 
