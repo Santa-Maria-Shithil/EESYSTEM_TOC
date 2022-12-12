@@ -7,7 +7,7 @@ FROM alpine:latest
 
 #RUN apt-get update
 
-#RUN echo 'root:root' |chpasswd
+RUN echo 'root:root' |chpasswd
 
 #RUN apt-get clean && \
  #   rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
