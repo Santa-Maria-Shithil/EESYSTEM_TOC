@@ -96,6 +96,6 @@ ENV NCLIENTS 1
 
 
 
-RUN sudo run.sh
-#CMD run.sh
+#RUN run.sh
+CMD run.sh
 #CMD ["bash", "bin/run.sh"]
