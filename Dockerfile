@@ -27,6 +27,7 @@ RUN apk add --no-cache git make musl-dev go
 
 
 ENV NAME=/copilot
+ENV PATH=$PATH:/copilot/bin
 #ENV NAME=/go/epaxos
 RUN mkdir $NAME
 
