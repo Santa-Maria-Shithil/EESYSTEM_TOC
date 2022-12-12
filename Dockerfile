@@ -48,7 +48,7 @@ RUN go version
 
 RUN make
 
-WORKDIR /copilot/bin/
+
 
 RUN pwd
 
