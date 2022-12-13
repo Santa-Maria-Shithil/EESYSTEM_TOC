@@ -99,5 +99,5 @@ ENV NCLIENTS 1
 
 #RUN run.sh
 #CMD bin/run.sh
-CMD ["//bin/bash", "bin/run.sh"]
+CMD ["//bin/sh", "bin/run.sh"]
 #CMD ["bin/run.sh"]
