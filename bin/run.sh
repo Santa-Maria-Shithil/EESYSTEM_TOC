@@ -1,6 +1,6 @@
-#!/bin/bash
+#!/bin/sh
 
-DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+DIR="$(cd "$(dirname "${SH_SOURCE[0]}")" && pwd)"
 #DIR=bin
 
 echo "sdjfsdklfj"
