@@ -8,7 +8,7 @@ FROM alpine:latest
 #RUN apt-get update
 
 RUN echo 'root:root' |chpasswd
-RUN ["chmod", "+x", "/usr/local/bin/docker-entrypoint.sh"]
+RUN ["chmod", "+x", "bin/docker-entrypoint.sh"]
 
 #RUN apt-get clean && \
  #   rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
