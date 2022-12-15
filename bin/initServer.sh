@@ -3,7 +3,7 @@
 MIP="172.77.0.2"
 MASTERNAME="master2"
 MASTERPORT=6087
-SERVERNAME="server2.2"  #modify serer name
+SERVERNAME="server2.1"  #modify serer name
 SERVERIP="172.77.0.4" #ip start with IP address 172.76.0.4
 SERVERPORT=6090 #port start with 5090
 docker rm ${SERVERNAME}
