@@ -1,14 +1,14 @@
 #!/bin/bash
 #bash bin/initServer.sh
-MIP="172.79.0.2"
-MASTERNAME="master4"
-MASTERPORT=8087
-SERVERNAME="server4.5"  #modify serer name
-SERVERIP="172.79.0.8" #ip start with IP address 172.76.0.4
-SERVERPORT=8094 #port start with 5090
+MIP="172.80.0.2"
+MASTERNAME="master5"
+MASTERPORT=9087
+SERVERNAME="server5.1"  #modify serer name
+SERVERIP="172.80.0.4" #ip start with IP address 172.76.0.4
+SERVERPORT=9090 #port start with 5090
 docker rm ${SERVERNAME}
 docker rmi ${SERVERNAME}
 docker build --tag ${SERVERNAME} .
 
-#update cpus 27-34
-docker run --cpuset-cpus="35-42" --memory="32g" --net Paxos_Network4 --ip=${SERVERIP} -p ${SERVERPORT}:${SERVERPORT} -e MADDR=${MIP} -e MPORT=${MASTERPORT} -e SADDR=${SERVERIP} -e SPORT=${SERVERPORT} -e TYPE="server" --name ${SERVERNAME} ${SERVERNAME}
+#update cpus 35-42
+docker run --cpuset-cpus="35-42" --memory="32g" --net Paxos_Network5 --ip=${SERVERIP} -p ${SERVERPORT}:${SERVERPORT} -e MADDR=${MIP} -e MPORT=${MASTERPORT} -e SADDR=${SERVERIP} -e SPORT=${SERVERPORT} -e TYPE="server" --name ${SERVERNAME} ${SERVERNAME}
