@@ -5,7 +5,7 @@ MASTERNAME="master3"
 MASTERPORT=6087
 CLIENTNAME="client2"  #modify client name
 CLIENTIP="172.77.0.20" #ip start with IP address 172.75.0.200
-CLIENTPORT=8090 #port start with 7270
+CLIENTPORT=6098 #port start with 7270
 NCLIENTS=20 # minimum 1
 NREQ=50000 # total number of req per client
 docker stop ${CLIENTNAME}
