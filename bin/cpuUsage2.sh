@@ -6,11 +6,11 @@ while true; do
         #docker stats --format "{{.Container}}: {{.CPUPerc}}"
         #sudo docker stats --format "{{.Name}}: {{.CPUPerc}}" 2>&1 | tee -a cpuUsage.txt 
 
-        sudo docker stats server1.1 --no-stream --format "{{.CPUPerc}}" 2>&1 | tee -a server1_1.txt 
-        sudo docker stats server1.2 --no-stream --format "{{.CPUPerc}}" 2>&1 | tee -a server1_2.txt 
-        sudo docker stats server1.3 --no-stream --format "{{.CPUPerc}}" 2>&1 | tee -a server1_3.txt 
-        sudo docker stats server1.4 --no-stream --format "{{.CPUPerc}}" 2>&1 | tee -a server1_4.txt 
-        sudo docker stats server1.5 --no-stream --format "{{.CPUPerc}}" 2>&1 | tee -a server1_5.txt 
+        sudo docker stats server1.1  --format "{{.CPUPerc}}" 2>&1 | tee -a server1_1.txt 
+        sudo docker stats server1.2  --format "{{.CPUPerc}}" 2>&1 | tee -a server1_2.txt 
+        sudo docker stats server1.3  --format "{{.CPUPerc}}" 2>&1 | tee -a server1_3.txt 
+        sudo docker stats server1.4  --format "{{.CPUPerc}}" 2>&1 | tee -a server1_4.txt 
+        sudo docker stats server1.5  --format "{{.CPUPerc}}" 2>&1 | tee -a server1_5.txt 
         #sleep 1
        # echo q | htop -d 10| aha --black --line-fix > cpuInfo/htop${i}.html
        # ((i=i+1))
