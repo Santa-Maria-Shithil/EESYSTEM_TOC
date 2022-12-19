@@ -6,7 +6,7 @@ while true; do
         #docker stats --format "{{.Container}}: {{.CPUPerc}}"
         #sudo docker stats --format "{{.Name}}: {{.CPUPerc}}" 2>&1 | tee -a cpuUsage.txt 
 
-        sudo docker stats --no-stream --format "{{.Name}}:{.CPUPerc}}" 2>&1 | tee -a server1_1.txt 
+        sudo docker stats server1.2 --no-stream --format "{{.CPUPerc}}" 2>&1 | tee -a server1_2.txt 
         
         #sleep 1
        # echo q | htop -d 10| aha --black --line-fix > cpuInfo/htop${i}.html
