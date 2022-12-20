@@ -5,7 +5,7 @@ MASTERNAME="master1"
 MASTERPORT=5087
 SERVERNAME="server1.1"  #modify serer name
 SERVERIP="172.76.0.10" #ip start with IP address 172.76.0.4
-SERVERPORT=5091 #port start with 5090
+SERVERPORT=5090 #port start with 5090
 docker rm ${SERVERNAME}
 docker rmi ${SERVERNAME}
 docker build --tag ${SERVERNAME} .
