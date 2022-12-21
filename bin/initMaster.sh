@@ -3,7 +3,7 @@
 
 MIP="172.76.0.2"
 MASTERNAME="master1"
-PORT=7087
+PORT=5087
 SUBNET=172.76.0.0/16
 NET=Paxos_Network1
 
