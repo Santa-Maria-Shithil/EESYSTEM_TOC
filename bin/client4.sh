@@ -7,8 +7,8 @@ MASTERPORT=8087
 CLIENTNAME="client4"  #modify client name
 CLIENTIP="172.79.0.20" #ip start with IP address 172.75.0.200
 CLIENTPORT=8098 #port start with 7270
-NCLIENTS=100 # minimum 1
-NREQ=100000 # total number of req per client
+NCLIENTS=30 # minimum 1
+NREQ=50000 # total number of req per client
 docker stop ${CLIENTNAME}
 docker rm ${CLIENTNAME}
 docker rmi ${CLIENTNAME}
