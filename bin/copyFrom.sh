@@ -1,5 +1,5 @@
 #!/bin/bash
-for i in {1..90}
+for i in {1..100}
 do
    sudo docker cp client1:/copilot/client-${i}.throughput.txt /home/users/sshithil/copilot/logs/client-${i}.throughput.txt
    sudo docker cp client1:/copilot/client-${i}.latency.all.txt /home/users/sshithil/copilot/logs/client-${i}.latency.all.txt
