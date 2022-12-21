@@ -2,10 +2,10 @@
 #bash bin/initServer.sh
 MIP="172.76.0.2"
 MASTERNAME="master1"
-MASTERPORT=7087
-SERVERNAME="server1.1"  #modify serer name
-SERVERIP="172.76.0.8" #ip start with IP address 172.76.0.4
-SERVERPORT=7094 #port start with 5090
+MASTERPORT=5087
+SERVERNAME="server1.2"  #modify serer name
+SERVERIP="172.76.0.4" #ip start with IP address 172.76.0.4
+SERVERPORT=5090 #port start with 5090
 NET=Paxos_Network1 #network name start with Paxos_Network1
 
 docker rm ${SERVERNAME}
