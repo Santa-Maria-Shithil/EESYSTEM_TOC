@@ -3,9 +3,9 @@
 MIP="172.80.0.2"
 MASTERNAME="master5"
 MASTERPORT=9087
-SERVERNAME="server5.2"  #modify serer name
-SERVERIP="172.80.0.9" #ip start with IP address 172.76.0.4
-SERVERPORT=9092 #port start with 5090
+SERVERNAME="server5.3"  #modify serer name
+SERVERIP="172.80.0.10" #ip start with IP address 172.76.0.4
+SERVERPORT=9093 #port start with 5090
 NET=Paxos_Network5 #network name start with Paxos_Network1
 
 docker rm ${SERVERNAME}
@@ -13,4 +13,4 @@ docker rmi ${SERVERNAME}
 docker build --tag ${SERVERNAME} .
 
 #update cpus 35-42
-docker run --cpuset-cpus="7-10" --memory="8g" --net ${NET} --ip=${SERVERIP} -p ${SERVERPORT}:${SERVERPORT} -e MADDR=${MIP} -e MPORT=${MASTERPORT} -e SADDR=${SERVERIP} -e SPORT=${SERVERPORT} -e TYPE="server" --name ${SERVERNAME} ${SERVERNAME}
+docker run --cpuset-cpus="11-14" --memory="8g" --net ${NET} --ip=${SERVERIP} -p ${SERVERPORT}:${SERVERPORT} -e MADDR=${MIP} -e MPORT=${MASTERPORT} -e SADDR=${SERVERIP} -e SPORT=${SERVERPORT} -e TYPE="server" --name ${SERVERNAME} ${SERVERNAME}
