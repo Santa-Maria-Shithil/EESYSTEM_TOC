@@ -1,11 +1,11 @@
 #!/bin/bash
 #bash bin/initMaster.sh
 
-MIP="172.78.0.2"
-MASTERNAME="master3"
-PORT=7087
-SUBNET=172.78.0.0/16
-NET=Paxos_Network3
+MIP="172.79.0.2"
+MASTERNAME="master4"
+PORT=8087
+SUBNET=172.79.0.0/16
+NET=Paxos_Network4
 
 docker rm ${MASTERNAME}
 docker rmi ${MASTERNAME}
