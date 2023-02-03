@@ -4,7 +4,7 @@ MIP="172.80.0.2"
 MASTERNAME="master5"
 MASTERPORT=9087
 SERVERNAME="server1"  #modify serer name
-SERVERIP="172.76.0.4" #ip start with IP address 172.76.0.4
+SERVERIP="172.80.0.4" #ip start with IP address 172.76.0.4
 SERVERPORT=5090 #port start with 5090
 NET=Paxos_Network5 #network name start with Paxos_Network1
 
