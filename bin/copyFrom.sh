@@ -15,8 +15,7 @@ sudo docker cp client1:/copilot/client-${i}.timestamps.orig.txt /home/users/sshi
 sudo docker cp client1:/copilot/client-${i}.tputlat.txt /home/users/sshithil/copilot/logs1/client-${i}.tputlat.txt
 done
 
-for i in {1..100}
-do
+##o
    sudo docker cp client2:/copilot/client-${i}.throughput.txt /home/users/sshithil/copilot/logs2/client-${i}.throughput.txt
    sudo docker cp client2:/copilot/client-${i}.latency.all.txt /home/users/sshithil/copilot/logs2/client-${i}.latency.all.txt
    sudo docker cp client2:/copilot/client-${i}.latency.orig.txt /home/users/sshithil/copilot/logs2/client-${i}.latency.orig.txt
