@@ -36,7 +36,7 @@ var thrifty *bool = flag.Bool("thrifty", false, "Use only as many messages as st
 var exec *bool = flag.Bool("exec", true, "Execute commands.")
 var dreply *bool = flag.Bool("dreply", false, "Reply to client only after command has been executed.")
 var beacon *bool = flag.Bool("beacon", false, "Send beacons to other replicas to compare their relative speeds.")
-var durable *bool = flag.Bool("durable", true, "Log to a stable store (i.e., a file in the current dir).")
+var durable *bool = flag.Bool("durable", false, "Log to a stable store (i.e., a file in the current dir).")
 var rreply *bool = flag.Bool("rreply", false, "Non-leader replicas reply to client.")
 
 func main() {
