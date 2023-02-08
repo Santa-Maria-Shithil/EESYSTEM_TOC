@@ -1047,7 +1047,7 @@ func (r *Replica) startPhase1(replica int32, instance int32, ballot int32, propo
 
 		//r.bcastPreAccept(r.Id, instance, 0, cpMarker, r.maxSeq, deps)
 
-		r.bcastCommit(R.Id, Instance, cmds, r.maxSeq, deps) //changed @sshithil
+		r.bcastCommit(r.Id, instance, cmds, r.maxSeq, deps) //changed @sshithil
 
 	}
 }
