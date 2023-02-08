@@ -1000,6 +1000,19 @@ func (r *Replica) startPhase1(replica int32, instance int32, ballot int32, propo
 		r.maxSeq = seq + 1
 	}
 
+
+
+	for i := 0; i < len(inst.lb.clientProposals); i++ {
+		r.ReplyProposeTS(
+			&genericsmrproto.ProposeReplyTS{
+				TRUE,
+				inst.lb.clientProposals[i].CommandId,
+				state.NIL,
+				inst.lb.clientProposals[i].Timestamp},
+			inst.lb.clientProposals[i].Reply)
+	}
+
+
 	r.recordInstanceMetadata(r.InstanceSpace[r.Id][instance])
 	r.recordCommands(cmds)
 	r.sync()
