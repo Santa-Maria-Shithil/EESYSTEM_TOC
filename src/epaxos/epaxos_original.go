@@ -988,7 +988,7 @@ func (r *Replica) startPhase1(replica int32, instance int32, ballot int32, propo
 	r.InstanceSpace[r.Id][instance] = &Instance{
 		cmds,
 		ballot,
-		epaxosproto.COMMITTED,  //@sshithil
+		epaxosproto.PREACCEPTED,
 		seq,
 		deps,
 		&LeaderBookkeeping{proposals, 0, 0, true, 0, 0, 0, deps, comDeps, nil, false, false, nil, 0}, 0, 0,
@@ -1004,11 +1004,7 @@ func (r *Replica) startPhase1(replica int32, instance int32, ballot int32, propo
 	r.recordCommands(cmds)
 	r.sync()
 
-	//r.bcastPreAccept(r.Id, instance, ballot, cmds, seq, deps)
-	r.bcastCommit(r.Id, instance, cmds, seq, deps)  //changed @sshithil
-
-
-
+	r.bcastPreAccept(r.Id, instance, ballot, cmds, seq, deps)
 
 	cpcounter += batchSize
 
@@ -1028,7 +1024,7 @@ func (r *Replica) startPhase1(replica int32, instance int32, ballot int32, propo
 		r.InstanceSpace[r.Id][instance] = &Instance{
 			cpMarker,
 			0,
-			epaxosproto.COMMITTED, //changed @sshithil
+			epaxosproto.PREACCEPTED,
 			r.maxSeq,
 			deps,
 			&LeaderBookkeeping{nil, 0, 0, true, 0, 0, 0, deps, nil, nil, false, false, nil, 0},
@@ -1045,10 +1041,7 @@ func (r *Replica) startPhase1(replica int32, instance int32, ballot int32, propo
 		r.recordInstanceMetadata(r.InstanceSpace[r.Id][instance])
 		r.sync()
 
-		//r.bcastPreAccept(r.Id, instance, 0, cpMarker, r.maxSeq, deps)
-
-		r.bcastCommit(R.Id, Instance, cmds, r.maxSeq, deps) //changed @sshithil
-
+		r.bcastPreAccept(r.Id, instance, 0, cpMarker, r.maxSeq, deps)
 	}
 }
 
