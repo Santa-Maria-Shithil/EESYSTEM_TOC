@@ -1000,6 +1000,7 @@ func (r *Replica) startPhase1(replica int32, instance int32, ballot int32, propo
 		r.maxSeq = seq + 1
 	}
 
+	inst := r.InstanceSpace[r.Id][instance]
 
 
 	for i := 0; i < len(inst.lb.clientProposals); i++ {
