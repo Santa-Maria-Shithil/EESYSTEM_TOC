@@ -25,7 +25,7 @@ import (
 
 const REQUEST_TIMEOUT = 100 * time.Millisecond
 const GET_VIEW_TIMEOUT = 100 * time.Millisecond
-const GC_DEBUG_ENABLED = false
+const GC_DEBUG_ENABLED = true
 const PRINT_STATS = false
 
 var masterAddr *string = flag.String("maddr", "", "Master address. Defaults to localhost")
