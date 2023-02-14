@@ -11,4 +11,6 @@ while true; do
         #sleep 1
        # echo q | htop -d 10| aha --black --line-fix > cpuInfo/htop${i}.html
        # ((i=i+1))
+
+       for i in {1..4}; do sleep 1 && top -b -p 8981,842397 -n 1 | tail -1 ; done >> cron.txt
     done
