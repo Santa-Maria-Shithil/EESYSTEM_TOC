@@ -650,7 +650,7 @@ func waitRepliesRandomLeader2(readers []*bufio.Reader, n int, done chan int32, c
 					successful[i]++
 					//done <- &Response{OpId: reply.CommandId, rcvingTime: time.Now()}
 					done <- reply.CommandId
-					conflict_chan <- int64(reply.Value)
+					conflict_chan <- reply.Value
 				}
 				break
 			default:
