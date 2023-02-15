@@ -481,8 +481,8 @@ func main() {
 			for true {
 				select {
 				case e := <-leaderReplyChan:
-					conflict := <-conflictReplyChan
-					log.Printf("Amount of conflict %d\n", conflict)
+					//conflict := <-conflictReplyChan
+					//log.Printf("Amount of conflict %d\n", conflict)
 					repliedCmdId = e
 					rcvingTime = time.Now()
 				default:
