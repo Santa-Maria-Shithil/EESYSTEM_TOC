@@ -47,8 +47,9 @@ for x in range(0,1000):
     sum4.append(0.0)
     sum5.append(0.0)
 
-path="E:\\effects of load\\low load"
-nclient=4
+path="E:\\effects of conflict\\tfconflict"
+nclient=30
+filename="cpu_usage_median_tfconflict.txt"
 
 
 j=0
@@ -72,7 +73,7 @@ for i in range(1,6):
         
         
         try: 
-            if float(client[0])<5000.00:
+            if float(client[0])<500.00:
                 #print(client[0])
                 continue
 
@@ -107,7 +108,7 @@ for i in range(1,6):
     myfile.close()
   
 #print(sum1)
-myfile = open("cpu_usage_median_lowload.txt","w")
+myfile = open(filename,"w")
 
 for x in range(0,700):
     sorted_array[0]=sum1[x]
@@ -119,7 +120,8 @@ for x in range(0,700):
     sorted_array.sort()
     
    # print(sorted_array)
+    myfile.write(str((sum1[x]+sum2[x]+sum3[x]+sum4[x]+sum5[x])/5)+"\n")
     
-    myfile.write(str(sorted_array[3])+"\n")
+    #myfile.write(str(sorted_array[3])+"\n")
                      
 myfile.close()
