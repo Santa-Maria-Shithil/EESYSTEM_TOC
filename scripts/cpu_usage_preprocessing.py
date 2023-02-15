@@ -29,8 +29,8 @@ d=[]
 d.append(0.0)
 
 client=[]
-client.append("0")
-client.append("1")
+client.append(0.0)
+client.append(1)
 
 
 sum1=[]
@@ -48,6 +48,7 @@ for x in range(0,1000):
     sum5.append(0.0)
 
 j=0
+
 for i in range(1,6):
     myfile = open("E:\\tf_conflict\\run"+str(i)+"\cpuUsage.txt")
     j=0
@@ -63,7 +64,7 @@ for i in range(1,6):
         if latency[0]=="client1":
             client = latency[1].split("%")
         
-
+        #print(client[0])
         
         
         try: 
@@ -72,7 +73,7 @@ for i in range(1,6):
                 continue
 
             if latency[0]!="master5" and latency[0]!="client1":
-                print(client[0])
+               
                 l=latency[1].split("%")
                # print(client)
                 if i==1:
@@ -87,7 +88,10 @@ for i in range(1,6):
                 if i==5:
                     sum5[j]=sum5[j]+float(l[0])
             else:
-                j=j+1
+                #print(client[0])
+                #print(latency[0])
+                if latency[0]=="master5":
+                    j=j+1
 
         except Exception as e:
             print("Oops!", e.__class__, "occurred.")
@@ -98,7 +102,7 @@ for i in range(1,6):
     # plotting the points 
     myfile.close()
   
-#print(sum5)
+#print(sum1)
 myfile = open("cpu_usage_median.txt","w")
 
 for x in range(0,700):
