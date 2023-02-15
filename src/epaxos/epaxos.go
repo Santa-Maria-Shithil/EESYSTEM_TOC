@@ -1267,7 +1267,7 @@ func (r *Replica) handlePreAcceptOK(pareply *epaxosproto.PreAcceptOK) {
 					&genericsmrproto.ProposeReplyTS{
 						TRUE,
 						inst.lb.clientProposals[i].CommandId,
-						10,
+						0,
 						inst.lb.clientProposals[i].Timestamp},
 					inst.lb.clientProposals[i].Reply)
 			}
@@ -1382,7 +1382,7 @@ func (r *Replica) handleAcceptReply(areply *epaxosproto.AcceptReply) {
 					&genericsmrproto.ProposeReplyTS{
 						TRUE,
 						inst.lb.clientProposals[i].CommandId,
-						5,
+						1,
 						inst.lb.clientProposals[i].Timestamp},
 					inst.lb.clientProposals[i].Reply)
 			}

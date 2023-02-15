@@ -499,9 +499,9 @@ func main() {
 						rsp[id] = true
 					}
 					reqsCount++
-					//if conflict == 1 {
-					conflictCount = conflict
-					//}
+					if conflict == 1 {
+						conflictCount++
+					}
 
 					break
 				}
