@@ -286,6 +286,7 @@ func main() {
 	// with pre-specified leader, we know which reader to check reply
 	if !*twoLeaders {
 		leaderReplyChan = make(chan int32, *reqsNb)
+		conflictReplyChan = make(chan int64, *reqsNb)
 		if isRandomLeader {
 			go waitRepliesRandomLeader2(readers, N, leaderReplyChan, conflictReplyChan)
 		} else {
@@ -481,8 +482,8 @@ func main() {
 			for true {
 				select {
 				case e := <-leaderReplyChan:
-					//conflict := <-conflictReplyChan
-					//log.Printf("Amount of conflict %d\n", conflict)
+					conflict := <-conflictReplyChan
+					log.Printf("Amount of conflict %d\n", conflict)
 					repliedCmdId = e
 					rcvingTime = time.Now()
 				default:
@@ -642,7 +643,7 @@ func waitRepliesRandomLeader2(readers []*bufio.Reader, n int, done chan int32, c
 					successful[i]++
 					//done <- &Response{OpId: reply.CommandId, rcvingTime: time.Now()}
 					done <- reply.CommandId
-					//conflict_chan <- int64(reply.Value)
+					conflict_chan <- int64(reply.Value)
 				}
 				break
 			default:
