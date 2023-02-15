@@ -43,9 +43,10 @@ e=[]
 #e.append(0.0)
 #e.append(200.0)
 
-path="E:\\effects of conflict\\tfconflict"
-nclient=30
-filename="tput_median_tfconflict.txt"
+#path="E:\\effects of conflict\\hconflict"
+path="E:\\effect of different consistency\\weak consistency"
+nclient=100
+filename="tput_median_wconsistency.txt"
 
 
 
@@ -187,9 +188,9 @@ for x in range(0,1000):
     
     print(sorted_array)
 
-    myfile.write(str((sum1[x]+sum2[x]+sum3[x]+sum4[x]+sum5[x])/5)+"\n")
+    #myfile.write(str((sum1[x]+sum2[x]+sum3[x]+sum4[x]+sum5[x])/5)+"\n")
     
-    #myfile.write(str(sorted_array[3])+"\n")
+    myfile.write(str(sorted_array[3])+"\n")
                      
 myfile.close()
 

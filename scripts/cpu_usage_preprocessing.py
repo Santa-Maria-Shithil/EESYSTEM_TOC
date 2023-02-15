@@ -47,9 +47,11 @@ for x in range(0,1000):
     sum4.append(0.0)
     sum5.append(0.0)
 
-path="E:\\effects of conflict\\tfconflict"
-nclient=30
-filename="cpu_usage_median_tfconflict.txt"
+#path="E:\\effects of conflict\\hconflict"
+path="E:\\effect of different consistency\\weak consistency"
+nclient=100
+filename="cpu_usage_median_wconsistency.txt"
+client_cpu_usage_limit=5000
 
 
 j=0
@@ -73,7 +75,7 @@ for i in range(1,6):
         
         
         try: 
-            if float(client[0])<500.00:
+            if float(client[0])<client_cpu_usage_limit:
                 #print(client[0])
                 continue
 
