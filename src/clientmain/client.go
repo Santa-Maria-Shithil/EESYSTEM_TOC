@@ -14,6 +14,7 @@ import (
 	"os"
 	"os/signal"
 	filepath2 "path/filepath"
+	"reflect"
 	"runtime"
 	"runtime/debug"
 	"runtime/pprof"
@@ -652,8 +653,8 @@ func waitRepliesRandomLeader2(readers []*bufio.Reader, n int, done chan int32, c
 					successful[i]++
 					//done <- &Response{OpId: reply.CommandId, rcvingTime: time.Now()}
 					done <- reply.CommandId
-					//conflict_chan <- reflect.ValueOf(reply.Value).Int()
-					conflict_chan <- int64(reply.Value)
+					conflict_chan <- reflect.ValueOf(reply.Value).Int()
+					//conflict_chan <- int64(reply.Value)
 
 				}
 				break
