@@ -14,7 +14,6 @@ import (
 	"os"
 	"os/signal"
 	filepath2 "path/filepath"
-	"reflect"
 	"runtime"
 	"runtime/debug"
 	"runtime/pprof"
@@ -486,7 +485,7 @@ func main() {
 			for true {
 				select {
 				case e := <-leaderReplyChan:
-					conflict := <-conflictReplyChan
+					conft := <-conflictReplyChan
 					log.Printf("Amount of conflict %d\n", conflict)
 					repliedCmdId = e
 					rcvingTime = time.Now()
@@ -499,7 +498,7 @@ func main() {
 					}
 					reqsCount++
 					//if conflict == 1 {
-					conflictCount = conflict
+					conflictCount = conft
 					//}
 
 					break
@@ -651,7 +650,8 @@ func waitRepliesRandomLeader2(readers []*bufio.Reader, n int, done chan int32, c
 					successful[i]++
 					//done <- &Response{OpId: reply.CommandId, rcvingTime: time.Now()}
 					done <- reply.CommandId
-					conflict_chan <- reflect.ValueOf(reply.Value).Int()
+					//conflict_chan <- reflect.ValueOf(reply.Value).Int()
+					conflict_chan <- int64(reply.Value)
 
 				}
 				break
