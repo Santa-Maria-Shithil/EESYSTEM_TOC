@@ -47,11 +47,11 @@ for x in range(0,1000):
     sum4.append(0.0)
     sum5.append(0.0)
 
-#path="E:\\effects of conflict\\hconflict"
-path="E:\\effect of different consistency\\weak consistency"
-nclient=100
-filename="cpu_usage_median_wconsistency.txt"
-client_cpu_usage_limit=5000
+path="E:\\effects of conflict\\hconflict"
+#path="E:\effect of durable log\without durable"
+nclient=30
+filename="cpu_usage_median_hconflict.txt"
+client_cpu_usage_limit=3000
 
 
 j=0
@@ -109,7 +109,7 @@ for i in range(1,6):
     # plotting the points 
     myfile.close()
   
-#print(sum1)
+print(sum3)
 myfile = open(filename,"w")
 
 for x in range(0,700):
@@ -122,7 +122,8 @@ for x in range(0,700):
     sorted_array.sort()
     
    # print(sorted_array)
-    myfile.write(str((sum1[x]+sum2[x]+sum3[x]+sum4[x]+sum5[x])/5)+"\n")
+    myfile.write(str((sum1[x]+sum2[x]+sum3[x]+sum4[x]+sum5[x])/3)+"\n")
+    #myfile.write(str((sum1[x]+sum2[x]+sum3[x])/3)+"\n")
     
     #myfile.write(str(sorted_array[3])+"\n")
                      
