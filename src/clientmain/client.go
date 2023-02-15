@@ -822,7 +822,7 @@ func getLatencyPercentiles(latencies []int64, shouldTrim bool) []int64 {
 func processAndPrintThroughputs(throughputs []DataPoint) (error, string) {
 	var overallTput string = "NaN"
 	var instTput string = "NaN"
-	var overallConflict string = "NaN"
+	//var overallConflict string = "NaN"
 	var instConflict string = "NaN"
 
 	filename := fmt.Sprintf("client-%d.throughput.txt", clientId)
@@ -840,7 +840,7 @@ func processAndPrintThroughputs(throughputs []DataPoint) (error, string) {
 		instTput = "NaN"
 		if p.elapse > time.Duration(0) {
 			overallTput = strconv.FormatInt(int64(float64(p.reqsCount)*float64(time.Second)/float64(p.elapse)), 10)
-			overallConflict = strconv.FormatInt(int64(float64(p.conflictCount)*float64(time.Second)/float64(p.elapse)), 10)
+			//overallConflict = strconv.FormatInt(int64(float64(p.conflictCount)*float64(time.Second)/float64(p.elapse)), 10)
 
 		}
 
