@@ -498,7 +498,7 @@ func main() {
 					}
 					reqsCount++
 					//if conflict == 1 {
-					conflictCount++
+					conflictCount = conflict
 					//}
 
 					break
