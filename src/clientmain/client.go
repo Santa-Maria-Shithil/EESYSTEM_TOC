@@ -76,9 +76,10 @@ var writelatencies []int64
 var timestamps []time.Time
 
 type DataPoint struct {
-	elapse    time.Duration
-	reqsCount int64
-	t         time.Time
+	elapse        time.Duration
+	reqsCount     int64
+	conflictCount int64
+	t             time.Time
 }
 
 type Response struct {
@@ -309,6 +310,7 @@ func main() {
 	throughputs = make([]DataPoint, 0, 600)
 
 	var reqsCount int64 = 0
+	var conflictCount int64 = 0
 
 	before_total := time.Now()
 	lastThroughputTime := before_total
@@ -447,6 +449,7 @@ func main() {
 							rsp[id] = true
 						}
 						reqsCount++
+
 						break
 					} else if toFired {
 						break
@@ -494,6 +497,10 @@ func main() {
 						rsp[id] = true
 					}
 					reqsCount++
+					if conflict == 1 {
+						conflictCount++
+					}
+
 					break
 				}
 			}
@@ -520,7 +527,7 @@ func main() {
 		currentTime := time.Now()
 		// Throughput every interval
 		if currentTime.Sub(lastThroughputTime) >= tput_interval_in_sec {
-			p := DataPoint{elapse: currentTime.Sub(before_total), reqsCount: reqsCount, t: currentTime}
+			p := DataPoint{elapse: currentTime.Sub(before_total), reqsCount: reqsCount, conflictCount: conflictCount, t: currentTime}
 			throughputs = append(throughputs, p)
 
 			if *verbose && readings != nil {
@@ -815,6 +822,8 @@ func getLatencyPercentiles(latencies []int64, shouldTrim bool) []int64 {
 func processAndPrintThroughputs(throughputs []DataPoint) (error, string) {
 	var overallTput string = "NaN"
 	var instTput string = "NaN"
+	var overallConflict string = "NaN"
+	var instConflict string = "NaN"
 
 	filename := fmt.Sprintf("client-%d.throughput.txt", clientId)
 	filepath := filepath2.Join(*prefix, filename)
@@ -831,17 +840,23 @@ func processAndPrintThroughputs(throughputs []DataPoint) (error, string) {
 		instTput = "NaN"
 		if p.elapse > time.Duration(0) {
 			overallTput = strconv.FormatInt(int64(float64(p.reqsCount)*float64(time.Second)/float64(p.elapse)), 10)
+			overallConflict = strconv.FormatInt(int64(float64(p.conflictCount)*float64(time.Second)/float64(p.elapse)), 10)
 
 		}
 
 		if i == 0 {
 			instTput = strconv.FormatInt(p.reqsCount, 10)
+			instConflict = strconv.FormatInt(p.conflictCount, 10)
 		} else if p.elapse > throughputs[i-1].elapse {
 			instTput = strconv.FormatInt(int64(
 				float64(p.reqsCount-throughputs[i-1].reqsCount)*float64(time.Second)/
 					float64(p.elapse-throughputs[i-1].elapse)), 10)
+
+			instConflict = strconv.FormatInt(int64(
+				float64(p.conflictCount-throughputs[i-1].conflictCount)*float64(time.Second)/
+					float64(p.elapse-throughputs[i-1].elapse)), 10)
 		}
-		line := fmt.Sprintf("%.1f\t%d\t%v\t%v\t%.1f\n", float64(p.elapse)/float64(time.Second), p.reqsCount, overallTput, instTput, float64(p.t.UnixNano())*float64(time.Nanosecond)/float64(time.Second))
+		line := fmt.Sprintf("%.1f\t%d\t%v\t%v\t%v\t%v\t%.1f\n", float64(p.elapse)/float64(time.Second), p.reqsCount, overallTput, instTput, overallConflict, instConflict, float64(p.t.UnixNano())*float64(time.Nanosecond)/float64(time.Second))
 		_, err = f.WriteString(line)
 		fmt.Printf(line)
 	}
