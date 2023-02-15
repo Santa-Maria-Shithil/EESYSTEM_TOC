@@ -67,6 +67,7 @@ var successful []int
 var rsp []bool
 
 // var rarray []int
+var conflict int64
 
 var latencies []int64
 var readlatencies []int64
@@ -278,6 +279,7 @@ func main() {
 	}
 
 	var leaderReplyChan chan int32
+	var conflictReplyChan chan int64
 	var pilot0ReplyChan chan Response
 	var viewChangeChan chan *View
 
@@ -285,7 +287,7 @@ func main() {
 	if !*twoLeaders {
 		leaderReplyChan = make(chan int32, *reqsNb)
 		if isRandomLeader {
-			go waitRepliesRandomLeader(readers, N, leaderReplyChan)
+			go waitRepliesRandomLeader2(readers, N, leaderReplyChan, conflictReplyChan)
 		} else {
 			go waitReplies(readers, leader, *reqsNb, leaderReplyChan, *reqsNb)
 		}
@@ -479,6 +481,8 @@ func main() {
 			for true {
 				select {
 				case e := <-leaderReplyChan:
+					conflict := <-conflictReplyChan
+					log.Printf("Amount of conflict %d\n", conflict)
 					repliedCmdId = e
 					rcvingTime = time.Now()
 				default:
@@ -614,6 +618,36 @@ func waitReplies(readers []*bufio.Reader, leader int, n int, done chan int32, ex
 			break
 		default:
 			break
+		}
+	}
+}
+
+func waitRepliesRandomLeader2(readers []*bufio.Reader, n int, done chan int32, conflict_chan chan int64) {
+	var msgType byte
+	var err error
+	reply := new(genericsmrproto.ProposeReplyTS)
+
+	for true {
+		for i := 0; i < n; i++ {
+			if msgType, err = readers[i].ReadByte(); err != nil {
+				continue
+			}
+
+			switch msgType {
+			case genericsmrproto.PROPOSE_REPLY:
+				if err = reply.Unmarshal(readers[i]); err != nil {
+					continue
+				}
+				if reply.OK != 0 {
+					successful[i]++
+					//done <- &Response{OpId: reply.CommandId, rcvingTime: time.Now()}
+					done <- reply.CommandId
+					conflict_chan <- int64(reply.Value)
+				}
+				break
+			default:
+				break
+			}
 		}
 	}
 }
