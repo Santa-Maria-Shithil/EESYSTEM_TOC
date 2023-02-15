@@ -47,10 +47,14 @@ for x in range(0,1000):
     sum4.append(0.0)
     sum5.append(0.0)
 
+path="E:\\effects of load\\low load"
+nclient=4
+
+
 j=0
 
 for i in range(1,6):
-    myfile = open("E:\\tf_conflict\\run"+str(i)+"\cpuUsage.txt")
+    myfile = open(path+"\\run"+str(i)+"\cpuUsage.txt")
     j=0
     for line in myfile:
         line.strip()
@@ -103,7 +107,7 @@ for i in range(1,6):
     myfile.close()
   
 #print(sum1)
-myfile = open("cpu_usage_median.txt","w")
+myfile = open("cpu_usage_median_lowload.txt","w")
 
 for x in range(0,700):
     sorted_array[0]=sum1[x]
