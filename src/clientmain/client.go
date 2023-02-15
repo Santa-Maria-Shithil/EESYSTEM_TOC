@@ -856,7 +856,7 @@ func processAndPrintThroughputs(throughputs []DataPoint) (error, string) {
 				float64(p.conflictCount-throughputs[i-1].conflictCount)*float64(time.Second)/
 					float64(p.elapse-throughputs[i-1].elapse)), 10)
 		}
-		line := fmt.Sprintf("%.1f\t%d\t%v\t%v\t%v\t%v\t%.1f\n", float64(p.elapse)/float64(time.Second), p.reqsCount, overallTput, instTput, overallConflict, instConflict, float64(p.t.UnixNano())*float64(time.Nanosecond)/float64(time.Second))
+		line := fmt.Sprintf("%.1f\t%d\t%v\t%v\t%v\t%v\t%.1f\n", float64(p.elapse)/float64(time.Second), p.reqsCount, overallTput, instTput, p.conflictCount, instConflict, float64(p.t.UnixNano())*float64(time.Nanosecond)/float64(time.Second))
 		_, err = f.WriteString(line)
 		fmt.Printf(line)
 	}
