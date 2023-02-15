@@ -485,10 +485,12 @@ func main() {
 			for true {
 				select {
 				case e := <-leaderReplyChan:
-					conft := <-conflictReplyChan
+
 					log.Printf("Amount of conflict %d\n", conflict)
 					repliedCmdId = e
 					rcvingTime = time.Now()
+				case conft := <-conflictReplyChan:
+					conflict = conft
 				default:
 				}
 
@@ -498,7 +500,7 @@ func main() {
 					}
 					reqsCount++
 					//if conflict == 1 {
-					conflictCount = conft
+					conflictCount = conflict
 					//}
 
 					break
