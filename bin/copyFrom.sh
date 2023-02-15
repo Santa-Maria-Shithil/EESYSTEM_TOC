@@ -1,6 +1,6 @@
 #!/bin/bash
-sudo rm -r logs1
-sudo mkdir logs1
+sudo rm -r logs
+sudo mkdir logs
 #sudo mkdir logs2
 #sudo mkdir logs3
 #sudo mkdir logs4
