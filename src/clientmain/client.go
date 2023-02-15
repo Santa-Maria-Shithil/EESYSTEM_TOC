@@ -483,13 +483,13 @@ func main() {
 			}
 			to = time.NewTimer(REQUEST_TIMEOUT)
 			for true {
+				conft := <-conflictReplyChan
 				select {
 				case e := <-leaderReplyChan:
 
 					log.Printf("Amount of conflict %d\n", conflict)
 					repliedCmdId = e
 					rcvingTime = time.Now()
-				case conft := <-conflictReplyChan:
 					conflict = conft
 				default:
 				}
