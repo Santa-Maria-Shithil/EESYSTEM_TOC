@@ -28,6 +28,11 @@ d=[]
 
 d.append(0.0)
 
+client=[]
+client.append("0")
+client.append("1")
+
+
 sum1=[]
 sum2=[]
 sum3=[]
@@ -54,12 +59,22 @@ for i in range(1,6):
 
         #latency[2].lstrip(" ")
         #print(latency[0])
+        
+        if latency[0]=="client1":
+            client = latency[1].split("%")
+        
 
+        
+        
         try: 
-            if latency[0]!="master5" and latency[0]!="client1":
+            if float(client[0])<5000.00:
+                #print(client[0])
+                continue
 
+            if latency[0]!="master5" and latency[0]!="client1":
+                print(client[0])
                 l=latency[1].split("%")
-                #print(i)
+               # print(client)
                 if i==1:
                     #print(l[0])
                     sum1[j]=sum1[j]+float(l[0])
@@ -95,7 +110,7 @@ for x in range(0,700):
     
     sorted_array.sort()
     
-    print(sorted_array)
+   # print(sorted_array)
     
     myfile.write(str(sorted_array[3])+"\n")
                      

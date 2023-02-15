@@ -43,11 +43,15 @@ e=[]
 #e.append(0.0)
 #e.append(200.0)
 
+path="E:\\effects of load\\high load"
+nclient=100
 
 
-for x in range(1, 30):
+
+for x in range(1, nclient):
+
     i=0
-    myfile = open("E:\\tf_conflict\\run1\logs1\logs1\client-"+str(x)+".throughput.txt")
+    myfile = open(path+"\\run1\logs1\logs1\client-"+str(x)+".throughput.txt")
 
     for line in myfile:
         line.strip()
@@ -71,9 +75,9 @@ for x in range(1, 30):
 
 
 
-for x in range(1, 30):
+for x in range(1, nclient):
     i=0
-    myfile = open("E:\\tf_conflict\\run2\logs1\logs1\client-"+str(x)+".throughput.txt")
+    myfile = open(path+"\\run2\logs1\logs1\client-"+str(x)+".throughput.txt")
     for line in myfile:
         line.strip()
         print(line)
@@ -95,9 +99,9 @@ for x in range(1, 30):
     myfile.close() 
 
 
-for x in range(1, 30):
+for x in range(1, nclient):
     i=0
-    myfile = open("E:\\tf_conflict\\run3\logs1\logs1\client-"+str(x)+".throughput.txt")
+    myfile = open(path+"\\run3\logs1\logs1\client-"+str(x)+".throughput.txt")
     for line in myfile:
         line.strip()
         #print(line)
@@ -119,9 +123,9 @@ for x in range(1, 30):
     myfile.close() 
 #print(sum3)
 
-for x in range(1, 30):
+for x in range(1, nclient):
     i=0
-    myfile = open("E:\\tf_conflict\\run4\logs1\logs1\client-"+str(x)+".throughput.txt")
+    myfile = open(path+"\\run4\logs1\logs1\client-"+str(x)+".throughput.txt")
     for line in myfile:
         line.strip()
         #print(line)
@@ -145,9 +149,9 @@ for x in range(1, 30):
 #print(sum4)
 
 
-for x in range(1, 30):
+for x in range(1, nclient):
     i=0
-    myfile = open("E:\\tf_conflict\\run5\logs1\logs1\client-"+str(x)+".throughput.txt")
+    myfile = open(path+"\\run5\logs1\logs1\client-"+str(x)+".throughput.txt")
     for line in myfile:
         line.strip()
        # print(line)
@@ -169,7 +173,7 @@ for x in range(1, 30):
     myfile.close() 
 #print(sum5)
 
-myfile = open("tput_median.txt","w")
+myfile = open("tput_median_highload.txt","w")
 
 for x in range(0,1000):
     sorted_array[0]=sum1[x]
