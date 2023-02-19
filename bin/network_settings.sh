@@ -27,15 +27,11 @@ sudo sysctl -w net.core.wmem_max=12582912
 
 sudo sysctl -w net.core.rmem_max=12582912
 
-sudo sysctl -w net.ipv4.tcp_rmem_min= 10240  
+sudo sysctl -w net.ipv4.tcp_rmem_min = 10240 87380 12582912
 
-sudo sysctl -w net.ipv4.tcp_rmem_default= 87380
+#sudo sysctl -w net.ipv4.tcp_wmem= 10240 87380 12582912
 
-sudo sysctl -w net.ipv4.tcp_rmem_max=12582912
-
-sudo sysctl -w net.ipv4.tcp_wmem= 10240 87380 12582912
-
-sudo sysctl -w net.ipv4.udp_mem= 10240 87380 12582912
+#sudo sysctl -w net.ipv4.udp_mem= 10240 87380 12582912
 
 sudo sysctl -w net.ipv4.tcp_window_scaling = 1
 
