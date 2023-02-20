@@ -20,6 +20,8 @@ RUN apk add --no-cache git make musl-dev go
 
 RUN apk add iproute2
 
+RUN tc qdisc replace dev eth0 root  pfifo_fast
+
 # install basic libraries
 #RUN apt-get update
 #RUN apt update
