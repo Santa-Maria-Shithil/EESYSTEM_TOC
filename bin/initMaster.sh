@@ -12,6 +12,6 @@ docker rmi ${MASTERNAME}
 docker network rm ${NET}
 docker build --tag ${MASTERNAME} .
 docker network create --subnet=${SUBNET} ${NET}
-docker pull gaiadocker/iproute2
+
 docker run --cpuset-cpus="1,2" --memory="8g" --net ${NET} --ip=${MIP} -p ${PORT}:${PORT} -e TYPE="master" -e MADDR=${MIP} -e MPORT=${PORT} -e NREPLICAS=5 --name ${MASTERNAME} ${MASTERNAME} 
 #gaiadocker/iproute2 qdisc del dev eth0 root netem
