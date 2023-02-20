@@ -15,6 +15,9 @@ RUN echo 'root:root' |chpasswd
 
 RUN apk add --no-cache git make musl-dev go
 
+ 
+bash -c "apt-get update && apt-get -y install iproute2"
+
 #RUN apt install iproute2
 
 # install basic libraries
