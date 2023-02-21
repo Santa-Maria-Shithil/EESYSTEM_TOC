@@ -319,6 +319,8 @@ func main() {
 	var pilotErr, pilotErr1 error
 	var lastGVSent0, lastGVSent1 time.Time
 
+	log.Printf("stop sending timer: %d", time.Duration(*maxRuntime))
+
 	stopSendingTimer := time.NewTimer(time.Duration(*maxRuntime) * time.Second)
 	//log.Printf("stopSendingTiemr %f", stopSendingTimer)
 	exptTimer := time.NewTimer(time.Duration(*maxRuntime+5) * time.Second)
