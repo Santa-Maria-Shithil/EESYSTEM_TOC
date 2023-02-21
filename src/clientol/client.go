@@ -366,6 +366,7 @@ func main() {
 			exptDone = true
 
 		case <-stopSendingTimer.C:
+			log.Printf("inside  case stopSendingTimer")
 			stopSending = true
 
 		case <-printChan:
