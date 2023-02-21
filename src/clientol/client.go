@@ -341,6 +341,7 @@ func main() {
 				interval_in_ns = time.Duration(0)
 			}
 			if nextReqId == *reqsNb {
+				log.Printf("inside  go function")
 				stopSending = true
 			}
 			lastReqGenTime = time.Now()
