@@ -20,7 +20,9 @@ RUN apk add --no-cache git make musl-dev go
 
 RUN apk add iproute2
 
-#RUN tc qdisc replace dev eth0 root  pfifo_fast
+#RUN sysctl -w net.ipv4.tcp_max_syn_backlog = 12582912
+
+RUN tc qdisc replace dev eth0 root  pfifo_fast
 
 # install basic libraries
 #RUN apt-get update
