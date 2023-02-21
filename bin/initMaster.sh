@@ -1,7 +1,7 @@
 #!/bin/bash
 #bash bin/initMaster.sh
 
-MIP="10.0.1.2"
+MIP="10.0.1.100"
 MASTERNAME="master5"
 PORT=9087
 SUBNET=10.0.1.0/24
