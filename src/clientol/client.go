@@ -331,6 +331,7 @@ func main() {
 	viewServer := N - 1          // pick random server to ask new view
 	go func() {
 		for !stopSending {
+			log.Printf("nextReqId %d", nextReqId)
 			time.Sleep(interval_in_ns)
 			reqsChan <- nextReqId
 			nextReqId++
