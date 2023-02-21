@@ -322,7 +322,7 @@ func main() {
 	log.Printf("stop sending timer: %d", time.Duration(*maxRuntime))
 
 	stopSendingTimer := time.NewTimer(time.Duration(*maxRuntime) * time.Second)
-	//log.Printf("stopSendingTiemr %f", stopSendingTimer)
+	//log.Printf("stopSendingTiemr %d", stopSendingTimer.)
 	exptTimer := time.NewTimer(time.Duration(*maxRuntime+5) * time.Second)
 	exptDone := false
 	stopSending := false
