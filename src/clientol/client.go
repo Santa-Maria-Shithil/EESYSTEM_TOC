@@ -412,6 +412,8 @@ func main() {
 
 			//checkAndUpdateViews(viewChangeChan, views)
 
+			log.Printf("still ok")
+
 			// get random server to ask about new view
 			if views[0].Active {
 				leader = int(views[0].ReplicaId)
