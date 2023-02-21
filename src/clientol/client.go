@@ -320,7 +320,7 @@ func main() {
 	var lastGVSent0, lastGVSent1 time.Time
 
 	stopSendingTimer := time.NewTimer(time.Duration(*maxRuntime) * time.Second)
-	log.Printf("stopSendingTiemr %f", stopSendingTimer)
+	//log.Printf("stopSendingTiemr %f", stopSendingTimer)
 	exptTimer := time.NewTimer(time.Duration(*maxRuntime+5) * time.Second)
 	exptDone := false
 	stopSending := false
