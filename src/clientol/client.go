@@ -24,7 +24,7 @@ import (
 )
 
 // const REQUEST_TIMEOUT = 1 * time.Second
-const REQUEST_TIMEOUT = 1000 * time.Millisecond
+const REQUEST_TIMEOUT = 100 * time.Millisecond
 const GET_VIEW_TIMEOUT = 100 * time.Millisecond
 const GC_DEBUG_ENABLED = false
 const PRINT_STATS = true
@@ -45,7 +45,7 @@ var s = flag.Float64("s", 2, "Zipfian s parameter")
 var v = flag.Float64("v", 1, "Zipfian v parameter")
 var cid *int = flag.Int("id", -1, "Client ID.")
 var cpuProfile *string = flag.String("cpuprofile", "", "Name of file for CPU profile. If empty, no profile is created.")
-var maxRuntime *int = flag.Int("runtime", -1, "Max duration to run experiment in second. If negative, stop after sending up to reqsNb requests")
+var maxRuntime *int = flag.Int("runtime", 10, "Max duration to run experiment in second. If negative, stop after sending up to reqsNb requests")
 
 // var debug *bool = flag.Bool("debug", true, "Enable debug output.")
 var trim *float64 = flag.Float64("trim", 0.25, "Exclude some fraction of data at the beginning and at the end.")
@@ -56,7 +56,7 @@ var numKeys *uint64 = flag.Uint64("numKeys", 10000000, "Number of keys in simula
 var proxyReplica *int = flag.Int("proxy", -1, "Replica Id to proxy requests to. If id < 0, use request Id mod N as default.")
 var sendOnce *bool = flag.Bool("once", false, "Send request to only one leader.")
 var tput_interval *float64 = flag.Float64("tput_interval_in_sec", 1, "Time interval to record and print throughput")
-var target_rps *int = flag.Int("target_rps", 40, "Target request per sec for open-loop client")
+var target_rps *int = flag.Int("target_rps", 4000, "Target request per sec for open-loop client")
 
 // GC debug
 var garPercent = flag.Int("garC", 50, "Collect info about GC")
