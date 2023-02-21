@@ -38,6 +38,7 @@ RUN apk add iproute2
 
 ENV NAME=/copilot
 ENV PATH="/copilot/bin:${PATH}"
+#export GOPATH=$HOME/copilot
 #ENV NAME=/go/epaxos
 RUN mkdir $NAME
 
