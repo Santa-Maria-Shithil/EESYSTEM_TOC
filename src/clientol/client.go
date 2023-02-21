@@ -331,7 +331,7 @@ func main() {
 	viewServer := N - 1          // pick random server to ask new view
 	go func() {
 		for !stopSending {
-			log.Printf("nextReqId %d", nextReqId)
+			log.Printf("inside loop nextReqId %d", nextReqId)
 			time.Sleep(interval_in_ns)
 			reqsChan <- nextReqId
 			nextReqId++
@@ -344,6 +344,7 @@ func main() {
 			}
 			lastReqGenTime = time.Now()
 		}
+		log.Printf("outside loop nextReqId %d", nextReqId)
 	}()
 	tput_interval_in_sec := time.Duration(*tput_interval * 1e9)
 	if *verbose {
