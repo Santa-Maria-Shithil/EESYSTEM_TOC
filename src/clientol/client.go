@@ -378,6 +378,8 @@ func main() {
 
 		case i := <-reqsChan:
 			if stopSending {
+				log.Printf("inside  case reqschan")
+
 				break
 			}
 			/* Prepare proposal */
