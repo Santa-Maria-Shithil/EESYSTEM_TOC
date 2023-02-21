@@ -382,7 +382,7 @@ func main() {
 			}
 			/* Prepare proposal */
 			id := int32(i)
-			dlog.Printf("Sending proposal %d\n", id)
+			log.Printf("Sending proposal %d\n", id)
 
 			args := genericsmrproto.Propose{id, state.Command{ClientId: clientId, OpId: id, Op: state.PUT, K: 0, V: 0}, time.Now().UnixNano()}
 
