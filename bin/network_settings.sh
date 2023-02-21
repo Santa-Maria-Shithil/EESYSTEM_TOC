@@ -43,3 +43,4 @@ sudo sysctl -w net.core.netdev_max_backlog=100000
 
 #sudo ip link show
 #sudo tc qdisc replace dev veth39b1e09 root  pfifo_fast
+#ip link set eth0 qlen 100000
