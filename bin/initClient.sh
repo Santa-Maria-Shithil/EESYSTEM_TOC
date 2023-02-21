@@ -1,6 +1,6 @@
 #!/bin/bash
 #bash bin/initClient.sh
-MIP="10.0.1.2"
+MIP="10.0.1.100"
 MASTERNAME="master5"
 MASTERPORT=9087
 CLIENTNAME="client1"  #modify client name

@@ -1,6 +1,6 @@
 #!/bin/bash
 #bash bin/initServer.sh
-MIP="10.0.1.2"
+MIP="10.0.1.100"
 MASTERNAME="master5"
 MASTERPORT=9087
 SERVERNAME="server1"  #modify serer name
