@@ -331,10 +331,11 @@ func main() {
 	viewServer := N - 1          // pick random server to ask new view
 	go func() {
 		for !stopSending {
-			log.Printf("inside loop nextReqId %d", nextReqId)
+
 			time.Sleep(interval_in_ns)
 			reqsChan <- nextReqId
 			nextReqId++
+			log.Printf("inside loop nextReqId %d", nextReqId)
 			interval_in_ns = time.Duration(rand.ExpFloat64()/target_rpns) - time.Since(lastReqGenTime) + interval_in_ns
 			if interval_in_ns < 0 {
 				interval_in_ns = time.Duration(0)
