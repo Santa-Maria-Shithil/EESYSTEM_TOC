@@ -321,7 +321,7 @@ func main() {
 
 	stopSendingTimer := time.NewTimer(time.Duration(*maxRuntime) * time.Second)
 	//log.Printf("stopSendingTiemr %f", stopSendingTimer)
-	exptTimer := time.NewTimer(time.Duration(*maxRuntime+5) * time.Second)
+	exptTimer := time.NewTimer(time.Duration(*maxRuntime+15) * time.Second)
 	exptDone := false
 	stopSending := false
 	interval_in_ns := time.Duration(rand.ExpFloat64() / target_rpns)
