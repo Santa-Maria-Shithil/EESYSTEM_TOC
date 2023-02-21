@@ -9,7 +9,7 @@ NET=overnet
 
 docker rm ${MASTERNAME}
 docker rmi ${MASTERNAME}
-docker network rm ${NET}
+docker network rm -d ${NET}
 docker build --tag ${MASTERNAME} .
 #docker network create --subnet=${SUBNET} ${NET}
 docker network create  -d overlay --attachable overnet
