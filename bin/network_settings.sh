@@ -81,3 +81,7 @@ sudo docker network inspect overnet
 #  ip link set eth0 qlen 500000
 
 #  sysctl -w net.ipv4.tcp_max_syn_backlog = 12582912
+
+#nload
+
+#tmux 
