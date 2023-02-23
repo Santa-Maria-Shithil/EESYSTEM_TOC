@@ -106,7 +106,14 @@ if [ "${TYPE}" == "client" ]; then
     
 
     for i in $(seq 1 ${NCLIENTS}); do
-        ${DIR}/eclientol -maddr ${MADDR} -mport ${MPORT} -q ${Q} -id ${i} 2>&1 | tee -a logs/c_${i}.txt ${ALL} >/dev/null &
+        #open loop   
+        ${DIR}/eclientol -maddr ${MADDR} -mport ${MPORT} -q ${Q} -id ${i} -runtime ${NRUNTIME} 2>&1 | tee -a logs/c_${i}.txt ${ALL} >/dev/null &
+        
+        
+        
+        #close loop
+        #${DIR}/eclientol -maddr ${MADDR} -mport ${MPORT} -q ${Q} -id ${i}  2>&1 | tee -a logs/c_${i}.txt ${ALL} >/dev/null &
+
         #${DIR}/clientmain ${args} -id  2>&1 | tee -a logs/c_${i}.txt ${ALL} >/dev/null &
         echo "> Client $i of ${NCLIENTS} started!"
     done
