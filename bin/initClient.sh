@@ -15,7 +15,7 @@ docker rmi ${CLIENTNAME}
 docker build --tag ${CLIENTNAME} .
 #docker run --cpuset-cpus="13-63" --memory="8g" --net Paxos_Network5 --ip=${CLIENTIP} -p ${CLIENTPORT}:${CLIENTPORT} -e MADDR=${MIP} -e MPORT=${MASTERPORT} -e Q=${NREQ} -e NCLIENTS=${NCLIENTS} -e TYPE="client" --name ${CLIENTNAME} ${CLIENTNAME}
 #docker run --privileged --cap-add=NET_ADMIN --net overnet --ip=${CLIENTIP} -p ${CLIENTPORT}:${CLIENTPORT} -e MADDR=${MIP} -e MPORT=${MASTERPORT} -e Q=${NREQ} -e NCLIENTS=${NCLIENTS} -e TYPE="client"  --name ${CLIENTNAME} ${CLIENTNAME}
-docker run --privileged --cap-add=NET_ADMIN --net overnet --ip=${CLIENTIP} -p ${CLIENTPORT}:${CLIENTPORT} --sysctl=net.core.somaxconn=12582912 -e MADDR=${MIP} -e MPORT=${MASTERPORT} -e Q=${NREQ} -e NCLIENTS=${NCLIENTS} -e NRUNTIME=${NRUNTIME} -e TYPE="client"  --name ${CLIENTNAME} ${CLIENTNAME}
+docker run --privileged --cap-add=NET_ADMIN --net overnet --ip=${CLIENTIP} -p ${CLIENTPORT}:${CLIENTPORT} --sysctl=net.core.somaxconn=16096 -e MADDR=${MIP} -e MPORT=${MASTERPORT} -e Q=${NREQ} -e NCLIENTS=${NCLIENTS} -e NRUNTIME=${NRUNTIME} -e TYPE="client"  --name ${CLIENTNAME} ${CLIENTNAME}
 
 
 
