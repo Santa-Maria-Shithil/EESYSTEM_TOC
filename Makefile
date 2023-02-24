@@ -4,7 +4,7 @@ export GOPATH=$(CURR_DIR)
 #export PATH=$(CURR_DIR)/$(BIN_DIR)
 GO_BUILD = GOBIN=$(CURR_DIR)/$(BIN_DIR) go install $@
 
-all: server master clientmain clientol
+all: server master clientmain clientol eclientol
 
 server:
 	$(GO_BUILD)
