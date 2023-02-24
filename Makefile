@@ -21,6 +21,9 @@ clientmain:
 clientol:
 	$(GO_BUILD)
 
+eclientol:
+	$(GO_BUILD)
+
 .PHONY: clean
 
 clean:
