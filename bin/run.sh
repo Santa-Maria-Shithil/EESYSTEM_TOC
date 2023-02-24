@@ -3,7 +3,7 @@
 #DIR="$(cd "$(dirname "${SH_SOURCE[0]}")" && pwd)"
 DIR="/copilot/bin"
 
-echo "sdjfsdklfj"
+echo ${NRUNTIME}
 
 if [ "${TYPE}" == "" ]; then
     echo "usage: define env variables, as listed below
