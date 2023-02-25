@@ -85,3 +85,6 @@ sudo docker network inspect overnet
 #nload
 
 #tmux 
+
+
+#ss -plnt sport 5020 to see
