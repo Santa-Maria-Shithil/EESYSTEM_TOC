@@ -1206,7 +1206,7 @@ func (r *Replica) handlePreAcceptReply(pareply *epaxosproto.PreAcceptReply) {
 					&genericsmrproto.ProposeReplyTS{
 						TRUE,
 						inst.lb.clientProposals[i].CommandId,
-						state.NIL,
+						0,
 						inst.lb.clientProposals[i].Timestamp},
 					inst.lb.clientProposals[i].Reply)
 			}
