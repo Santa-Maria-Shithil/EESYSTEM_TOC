@@ -14,6 +14,7 @@ import (
 	"os"
 	"os/signal"
 	filepath2 "path/filepath"
+	"reflect"
 	"runtime"
 	"runtime/debug"
 	"runtime/pprof"
@@ -68,6 +69,8 @@ var clientId uint32
 var successful []int
 var rsp []bool
 
+var conflict int64
+
 // var rarray []int
 
 var latencies []int64
@@ -81,8 +84,9 @@ type DataPoint struct {
 	//prevElapse time.Duration
 	elapse time.Duration
 	//prevReqsCount int64
-	reqsCount int64
-	t         time.Time
+	reqsCount     int64
+	conflictCount int64
+	t             time.Time
 }
 
 type Response struct {
@@ -280,12 +284,15 @@ func main() {
 	var leaderReplyChan chan *Response
 	var pilot0ReplyChan chan *Response
 	var viewChangeChan chan *View
+	var conflictReplyChan chan int64
 
 	// with pre-specified leader, we know which reader to check reply
 	if !*twoLeaders {
 		leaderReplyChan = make(chan *Response, *reqsNb)
+		conflictReplyChan = make(chan int64, *reqsNb)
 		for i := 0; i < N; i++ {
-			go waitReplies(readers, i, leaderReplyChan, *reqsNb)
+			go waitReplies2(readers, i, leaderReplyChan, *reqsNb, conflictReplyChan) //to track coflict over the time
+			//go waitReplies(readers, i, leaderReplyChan, *reqsNb)
 		}
 	} else {
 		// with another pre-specified leader, we need to check other reply channel, and another reader
@@ -304,6 +311,7 @@ func main() {
 	throughputs = make([]DataPoint, 0, 600)
 
 	var reqsCount int64 = 0
+	var conflictCount int64 = 0
 
 	// incoming request channel
 	reqsChan := make(chan int, 100000) /*keep max outstanding requests at 100000*/
@@ -367,7 +375,7 @@ func main() {
 		case <-printChan:
 			t := time.Now()
 			//p := DataPoint{elapse: time.Since(before_total), reqsCount: reqsCount}
-			p := DataPoint{elapse: t.Sub(before_total), reqsCount: reqsCount, t: t}
+			p := DataPoint{elapse: t.Sub(before_total), reqsCount: reqsCount, conflictCount: conflictCount, t: t}
 			throughputs = append(throughputs, p)
 			if *verbose && readings != nil {
 				readings <- &p
@@ -454,8 +462,13 @@ func main() {
 			break
 
 		case e := <-leaderReplyChan:
+			conft := <-conflictReplyChan
 			lat := int64(e.rcvingTime.Sub(timestamps[e.OpId]) / time.Microsecond)
 			if latencies[e.OpId] == int64(0) { /*1st response*/
+				conflict = conft
+				if conflict == 1 {
+					conflictCount++
+				}
 				reqsCount++
 			}
 			if latencies[e.OpId] == int64(0) || latencies[e.OpId] > lat {
@@ -532,6 +545,36 @@ func checkAndUpdateViews(viewChangeChan chan *View, views []*View) {
 			views[newView.PilotId].ReplicaId = newView.ReplicaId
 			views[newView.PilotId].ViewId = newView.ViewId
 			views[newView.PilotId].Active = true
+		}
+	}
+}
+
+func waitReplies2(readers []*bufio.Reader, leader int, done chan *Response, expected int, conflict_chan chan int64) {
+	var msgType byte
+	var err error
+	reply := new(genericsmrproto.ProposeReplyTS)
+
+	for true {
+		if msgType, err = readers[leader].ReadByte(); err != nil {
+			break
+		}
+
+		switch msgType {
+		case genericsmrproto.PROPOSE_REPLY:
+			if err = reply.Unmarshal(readers[leader]); err != nil {
+				break
+			}
+			if reply.OK != 0 {
+				successful[leader]++
+				done <- &Response{OpId: reply.CommandId, rcvingTime: time.Now()}
+				conflict_chan <- reflect.ValueOf(reply.Value).Int()
+				if expected == successful[leader] {
+					return
+				}
+			}
+			break
+		default:
+			break
 		}
 	}
 }
@@ -763,6 +806,74 @@ func processAndPrintThroughputs(throughputs []DataPoint) (error, string) {
 
 }
 
+func processAndPrintThroughputs2(throughputs []DataPoint) (error, string) {
+	var overallTput string = "NaN"
+	var instTput string = "NaN"
+	var overallConflict string = "NaN"
+	var instConflict string = "NaN"
+
+	filename := fmt.Sprintf("client-%d.throughput.txt", clientId)
+	filepath := filepath2.Join(*prefix, filename)
+	f, err := os.Create(filepath)
+
+	if err != nil {
+		return err, overallTput
+	}
+
+	defer f.Close()
+
+	for i, p := range throughputs {
+		overallTput = "NaN"
+		instTput = "NaN"
+		if p.elapse > time.Duration(0) {
+			overallTput = strconv.FormatInt(int64(float64(p.reqsCount)*float64(time.Second)/float64(p.elapse)), 10)
+			overallConflict = strconv.FormatInt(int64(float64(p.conflictCount)*float64(time.Second)/float64(p.elapse)), 10)
+
+		}
+
+		if i == 0 {
+			instTput = strconv.FormatInt(p.reqsCount, 10)
+			instConflict = strconv.FormatInt(p.conflictCount, 10)
+		} else if p.elapse > throughputs[i-1].elapse {
+			instTput = strconv.FormatInt(int64(
+				float64(p.reqsCount-throughputs[i-1].reqsCount)*float64(time.Second)/
+					float64(p.elapse-throughputs[i-1].elapse)), 10)
+
+			instConflict = strconv.FormatInt(int64(
+				float64(p.conflictCount-throughputs[i-1].conflictCount)*float64(time.Second)/
+					float64(p.elapse-throughputs[i-1].elapse)), 10)
+		}
+		line := fmt.Sprintf("%.1f\t%d\t%v\t%v\t%v\t%v\t%.1f\n", float64(p.elapse)/float64(time.Second), p.reqsCount, overallTput, instTput, overallConflict, instConflict, float64(p.t.UnixNano())*float64(time.Nanosecond)/float64(time.Second))
+		_, err = f.WriteString(line)
+		fmt.Printf(line)
+	}
+
+	// Trimming
+	trimmedOverallTput := "NaN"
+	trimLength := int(float64(len(throughputs)) * *trim)
+	throughputs = throughputs[trimLength : len(throughputs)-trimLength]
+	newlen := len(throughputs)
+	if newlen == 1 {
+		trimmedOverallTput = strconv.FormatInt(int64(
+			float64(throughputs[0].reqsCount)*float64(time.Second)/float64(throughputs[0].elapse)), 10)
+	} else if newlen > 1 && throughputs[newlen-1].elapse > throughputs[0].elapse {
+		trimmedOverallTput = strconv.FormatInt(int64(
+			float64(throughputs[newlen-1].reqsCount-throughputs[0].reqsCount)*float64(time.Second)/
+				float64(throughputs[newlen-1].elapse-throughputs[0].elapse)), 10)
+	}
+
+	fmt.Printf("%s\n", overallTput)
+	fmt.Printf("%s\n", trimmedOverallTput)
+
+	_, err = f.WriteString(fmt.Sprintf("%s\n", overallTput))
+	_, err = f.WriteString(fmt.Sprintf("%s\n", trimmedOverallTput))
+
+	f.Sync()
+
+	return err, trimmedOverallTput
+
+}
+
 func catchKill(interrupt chan os.Signal) {
 	<-interrupt
 	if *cpuProfile != "" {
@@ -922,7 +1033,7 @@ func writeDataToFiles() {
 	writeTimestampsToFile(timestamps, latencies)
 
 	/* Output throughputs */
-	_, throughput := processAndPrintThroughputs(throughputs)
+	_, throughput := processAndPrintThroughputs2(throughputs)
 
 	/* Output latencies */
 	percentiles := writeLatenciesToFile2(latencies, "")
