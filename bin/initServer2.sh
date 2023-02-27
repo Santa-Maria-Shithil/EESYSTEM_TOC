@@ -14,7 +14,7 @@ docker build --tag ${SERVERNAME} .
 
 #update cpus 19-22,3-7,7-10,15-18,11-14
 #docker run --cpuset-cpus="11-12" --memory="8g" --net ${NET} --ip=${SERVERIP} -p ${SERVERPORT}:${SERVERPORT} -e MADDR=${MIP} -e MPORT=${MASTERPORT} -e SADDR=${SERVERIP} -e SPORT=${SERVERPORT} -e TYPE="server" --name ${SERVERNAME} ${SERVERNAME}
-docker run --privileged --cap-add=NET_ADMIN --net ${NET} --ip=${SERVERIP} -p ${SERVERPORT}:${SERVERPORT} --detach --sysctl=net.core.somaxconn=12582912 -e MADDR=${MIP} -e MPORT=${MASTERPORT} -e SADDR=${SERVERIP} -e SPORT=${SERVERPORT} -e TYPE="server" --name ${SERVERNAME} ${SERVERNAME}
+docker run --privileged --cap-add=NET_ADMIN --net ${NET} --ip=${SERVERIP} -p ${SERVERPORT}:${SERVERPORT} --detach --sysctl=net.core.somaxconn=12582912  --sysctl=net.ipv4.tcp_max_syn_backlog=12582912 -e MADDR=${MIP} -e MPORT=${MASTERPORT} -e SADDR=${SERVERIP} -e SPORT=${SERVERPORT} -e TYPE="server" --name ${SERVERNAME} ${SERVERNAME}
 
 
 SERVERNAME="server2"  #modify serer name
@@ -28,7 +28,7 @@ docker build --tag ${SERVERNAME} .
 
 #update cpus 19-22,3-7,7-10,15-18,11-14
 #docker run --cpuset-cpus="11-12" --memory="8g" --net ${NET} --ip=${SERVERIP} -p ${SERVERPORT}:${SERVERPORT} -e MADDR=${MIP} -e MPORT=${MASTERPORT} -e SADDR=${SERVERIP} -e SPORT=${SERVERPORT} -e TYPE="server" --name ${SERVERNAME} ${SERVERNAME}
-docker run --privileged --cap-add=NET_ADMIN --net ${NET} --ip=${SERVERIP} -p ${SERVERPORT}:${SERVERPORT} --detach --sysctl=net.core.somaxconn=12582912 -e MADDR=${MIP} -e MPORT=${MASTERPORT} -e SADDR=${SERVERIP} -e SPORT=${SERVERPORT} -e TYPE="server" --name ${SERVERNAME} ${SERVERNAME}
+docker run --privileged --cap-add=NET_ADMIN --net ${NET} --ip=${SERVERIP} -p ${SERVERPORT}:${SERVERPORT} --detach --sysctl=net.core.somaxconn=12582912 --sysctl=net.ipv4.tcp_max_syn_backlog=12582912 -e MADDR=${MIP} -e MPORT=${MASTERPORT} -e SADDR=${SERVERIP} -e SPORT=${SERVERPORT} -e TYPE="server" --name ${SERVERNAME} ${SERVERNAME}
 
 SERVERNAME="server3"  #modify serer name
 SERVERIP="10.0.1.6" #ip start with IP address 172.76.0.4
@@ -41,7 +41,7 @@ docker build --tag ${SERVERNAME} .
 
 #update cpus 19-22,3-7,7-10,15-18,11-14
 #docker run --cpuset-cpus="11-12" --memory="8g" --net ${NET} --ip=${SERVERIP} -p ${SERVERPORT}:${SERVERPORT} -e MADDR=${MIP} -e MPORT=${MASTERPORT} -e SADDR=${SERVERIP} -e SPORT=${SERVERPORT} -e TYPE="server" --name ${SERVERNAME} ${SERVERNAME}
-docker run --privileged --cap-add=NET_ADMIN --net ${NET} --ip=${SERVERIP} -p ${SERVERPORT}:${SERVERPORT} --detach --sysctl=net.core.somaxconn=12582912  -e MADDR=${MIP} -e MPORT=${MASTERPORT} -e SADDR=${SERVERIP} -e SPORT=${SERVERPORT} -e TYPE="server" --name ${SERVERNAME} ${SERVERNAME}
+docker run --privileged --cap-add=NET_ADMIN --net ${NET} --ip=${SERVERIP} -p ${SERVERPORT}:${SERVERPORT} --detach --sysctl=net.core.somaxconn=12582912  --sysctl=net.ipv4.tcp_max_syn_backlog=12582912 -e MADDR=${MIP} -e MPORT=${MASTERPORT} -e SADDR=${SERVERIP} -e SPORT=${SERVERPORT} -e TYPE="server" --name ${SERVERNAME} ${SERVERNAME}
 
 SERVERNAME="server4"  #modify serer name
 SERVERIP="10.0.1.7" #ip start with IP address 172.76.0.4
@@ -54,7 +54,7 @@ docker build --tag ${SERVERNAME} .
 
 #update cpus 19-22,3-7,7-10,15-18,11-14
 #docker run --cpuset-cpus="11-12" --memory="8g" --net ${NET} --ip=${SERVERIP} -p ${SERVERPORT}:${SERVERPORT} -e MADDR=${MIP} -e MPORT=${MASTERPORT} -e SADDR=${SERVERIP} -e SPORT=${SERVERPORT} -e TYPE="server" --name ${SERVERNAME} ${SERVERNAME}
-docker run --privileged --cap-add=NET_ADMIN --net ${NET} --ip=${SERVERIP} -p ${SERVERPORT}:${SERVERPORT} --detach  --sysctl=net.core.somaxconn=12582912  -e MADDR=${MIP} -e MPORT=${MASTERPORT} -e SADDR=${SERVERIP} -e SPORT=${SERVERPORT} -e TYPE="server" --name ${SERVERNAME} ${SERVERNAME}
+docker run --privileged --cap-add=NET_ADMIN --net ${NET} --ip=${SERVERIP} -p ${SERVERPORT}:${SERVERPORT} --detach  --sysctl=net.core.somaxconn=12582912  --sysctl=net.ipv4.tcp_max_syn_backlog=12582912 -e MADDR=${MIP} -e MPORT=${MASTERPORT} -e SADDR=${SERVERIP} -e SPORT=${SERVERPORT} -e TYPE="server" --name ${SERVERNAME} ${SERVERNAME}
 
 SERVERNAME="server5"  #modify serer name
 SERVERIP="10.0.1.8" #ip start with IP address 172.76.0.4
@@ -67,4 +67,4 @@ docker build --tag ${SERVERNAME} .
 
 #update cpus 19-22,3-7,7-10,15-18,11-14
 #docker run --cpuset-cpus="11-12" --memory="8g" --net ${NET} --ip=${SERVERIP} -p ${SERVERPORT}:${SERVERPORT} -e MADDR=${MIP} -e MPORT=${MASTERPORT} -e SADDR=${SERVERIP} -e SPORT=${SERVERPORT} -e TYPE="server" --name ${SERVERNAME} ${SERVERNAME}
-docker run --privileged --cap-add=NET_ADMIN --net ${NET} --ip=${SERVERIP} -p ${SERVERPORT}:${SERVERPORT} --sysctl=net.core.somaxconn=12582912 -e MADDR=${MIP} -e MPORT=${MASTERPORT} -e SADDR=${SERVERIP} -e SPORT=${SERVERPORT} -e TYPE="server" --name ${SERVERNAME} ${SERVERNAME}
+docker run --privileged --cap-add=NET_ADMIN --net ${NET} --ip=${SERVERIP} -p ${SERVERPORT}:${SERVERPORT} --sysctl=net.core.somaxconn=12582912 --sysctl=net.ipv4.tcp_max_syn_backlog=12582912 -e MADDR=${MIP} -e MPORT=${MASTERPORT} -e SADDR=${SERVERIP} -e SPORT=${SERVERPORT} -e TYPE="server" --name ${SERVERNAME} ${SERVERNAME}
