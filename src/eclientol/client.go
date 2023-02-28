@@ -469,7 +469,9 @@ func main() {
 				//conflict = conft
 				log.Printf("Conflict:%d, amount: %d", e.value, conflictCount)
 
-				conflictCount++
+				if e.value != 0 {
+					conflictCount++
+				}
 
 				reqsCount++
 			}
