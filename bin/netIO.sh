@@ -6,7 +6,7 @@ i=0
 #!/bin/bash
 
 multiLine="";
-format="table {{.Name}}\t{{.CPUPerc}}\t{{.NetIO}";
+format="table {{.Name}}\t{{.CPUPerc}}\t{{.NetIO}}";
 docker stats --all --format "$format" --no-trunc | (while read line; do
     sedLine=$(echo "$line" | sed "s/^.*name.*cpu.*mem.*$/_divider_/i")
     if [ "$sedLine" != "_divider_" ];
