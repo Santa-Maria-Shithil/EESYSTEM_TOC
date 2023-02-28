@@ -78,7 +78,7 @@ sudo docker network inspect overnet
 
 #sudo ip link show
 #sudo tc qdisc replace dev eth0 root  pfifo_fast
-#  
+# sudo ip link set eno1 qlen 50000
 
 
 #  sysctl -w net.ipv4.tcp_max_syn_backlog = 12582912
