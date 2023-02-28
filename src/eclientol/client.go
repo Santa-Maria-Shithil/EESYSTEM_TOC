@@ -474,6 +474,8 @@ func main() {
 				}
 
 				reqsCount++
+
+				log.Printf("Conflict:%v, amount: %v", e.value, conflictCount)
 			}
 			if latencies[e.OpId] == int64(0) || latencies[e.OpId] > lat {
 				latencies[e.OpId] = lat
