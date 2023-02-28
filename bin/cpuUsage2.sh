@@ -1,5 +1,5 @@
 sudo rm -r cpuUsage.txt
-sudo rm -r Overall_cpuUsage.txt 
+
 
 i=0
 while true; do
@@ -10,7 +10,7 @@ while true; do
 
         sudo docker stats --no-stream --format "{{.Name}}:{{.CPUPerc}}" 2>&1 | tee -a  cpuUsage.txt 
 
-        sudo top -bn1 | grep "Cpu(s)" |sed "s/.*, *\([0-9.]*\)%* id.*/\1/" |awk '{print 100 - $1}' 2>&1 | tee -a Overall_cpuUsage.txt 
+        #sudo top -bn1 | grep "Cpu(s)" |sed "s/.*, *\([0-9.]*\)%* id.*/\1/" |awk '{print 100 - $1}' 2>&1 | tee -a Overall_cpuUsage.txt 
         
         #sleep 1
        # echo q | htop -d 10| aha --black --line-fix > cpuInfo/htop${i}.html
