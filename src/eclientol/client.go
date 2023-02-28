@@ -467,7 +467,7 @@ func main() {
 			if latencies[e.OpId] == int64(0) { /*1st response*/
 				conflict = conft
 				log.Printf("Conflict:%d, amount: %d", conflict, conflictCount)
-				if conflict == 1 {
+				if conflict != 0 {
 					conflictCount++
 				}
 				reqsCount++
