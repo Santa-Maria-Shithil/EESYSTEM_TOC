@@ -6,7 +6,7 @@ sudo mkdir logs1
 #sudo mkdir logs4
 #sudo mkdir logs5
 
-for i in {1..100}
+for i in {1..30}
 do
    sudo docker cp client1:/copilot/client-${i}.throughput.txt /home/users/sshithil/copilot/logs1/client-${i}.throughput.txt
    sudo docker cp client1:/copilot/client-${i}.latency.all.txt /home/users/sshithil/copilot/logs1/client-${i}.latency.all.txt
