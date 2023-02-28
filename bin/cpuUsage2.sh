@@ -1,5 +1,6 @@
 sudo rm -r cpuUsage.txt
 sudo rm -r Overall_cpuUsage.txt 
+sudo rm -r all_logs
 sudo mkdir all_logs
 i=0
 while true; do
