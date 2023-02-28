@@ -467,7 +467,7 @@ func main() {
 			lat := int64(e.rcvingTime.Sub(timestamps[e.OpId]) / time.Microsecond)
 			if latencies[e.OpId] == int64(0) { /*1st response*/
 				//conflict = conft
-				log.Printf("Conflict:%d, amount: %d", e.value, reqsCount)
+				log.Printf("Conflict:%d, amount: %d", e.value, conflictCount)
 
 				conflictCount++
 
