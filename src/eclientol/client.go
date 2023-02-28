@@ -92,6 +92,7 @@ type DataPoint struct {
 type Response struct {
 	OpId       int32
 	rcvingTime time.Time
+	value      int64
 	timestamp  int64
 }
 
@@ -284,14 +285,14 @@ func main() {
 	var leaderReplyChan chan *Response
 	var pilot0ReplyChan chan *Response
 	var viewChangeChan chan *View
-	var conflictReplyChan chan int64
+	//var conflictReplyChan chan int64
 
 	// with pre-specified leader, we know which reader to check reply
 	if !*twoLeaders {
 		leaderReplyChan = make(chan *Response, *reqsNb)
-		conflictReplyChan = make(chan int64, *reqsNb)
+		//conflictReplyChan = make(chan int64, *reqsNb)
 		for i := 0; i < N; i++ {
-			go waitReplies2(readers, i, leaderReplyChan, *reqsNb, conflictReplyChan) //to track coflict over the time
+			go waitReplies2(readers, i, leaderReplyChan, *reqsNb) //to track coflict over the time
 			//go waitReplies(readers, i, leaderReplyChan, *reqsNb)
 		}
 	} else {
@@ -462,14 +463,14 @@ func main() {
 			break
 
 		case e := <-leaderReplyChan:
-			conft := <-conflictReplyChan
+			//conft := <-conflictReplyChan
 			lat := int64(e.rcvingTime.Sub(timestamps[e.OpId]) / time.Microsecond)
 			if latencies[e.OpId] == int64(0) { /*1st response*/
-				conflict = conft
-				log.Printf("Conflict:%d, amount: %d", conflict, conflictCount)
-				if conflict != 0 {
-					conflictCount++
-				}
+				//conflict = conft
+				log.Printf("Conflict:%d, amount: %d", e.value, conflictCount)
+
+				conflictCount++
+
 				reqsCount++
 			}
 			if latencies[e.OpId] == int64(0) || latencies[e.OpId] > lat {
@@ -550,7 +551,7 @@ func checkAndUpdateViews(viewChangeChan chan *View, views []*View) {
 	}
 }
 
-func waitReplies2(readers []*bufio.Reader, leader int, done chan *Response, expected int, conflict_chan chan int64) {
+func waitReplies2(readers []*bufio.Reader, leader int, done chan *Response, expected int) {
 	var msgType byte
 	var err error
 	reply := new(genericsmrproto.ProposeReplyTS)
@@ -567,8 +568,8 @@ func waitReplies2(readers []*bufio.Reader, leader int, done chan *Response, expe
 			}
 			if reply.OK != 0 {
 				successful[leader]++
-				done <- &Response{OpId: reply.CommandId, rcvingTime: time.Now()}
-				conflict_chan <- reflect.ValueOf(reply.Value).Int()
+				done <- &Response{OpId: reply.CommandId, value: reflect.ValueOf(reply.Value).Int(), rcvingTime: time.Now()}
+				//conflict_chan <- reflect.ValueOf(reply.Value).Int()
 				if expected == successful[leader] {
 					return
 				}
