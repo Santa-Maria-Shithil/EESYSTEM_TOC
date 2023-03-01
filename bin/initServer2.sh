@@ -17,7 +17,7 @@ docker build --tag ${SERVERNAME} .
 #docker run --cpuset-cpus="11-12" --memory="8g" --net ${NET} --ip=${SERVERIP} -p ${SERVERPORT}:${SERVERPORT} -e MADDR=${MIP} -e MPORT=${MASTERPORT} -e SADDR=${SERVERIP} -e SPORT=${SERVERPORT} -e TYPE="server" --name ${SERVERNAME} ${SERVERNAME}
 docker run --privileged --cap-add=NET_ADMIN --net ${NET} --ip=${SERVERIP} -p ${SERVERPORT}:${SERVERPORT} --detach --sysctl=net.core.somaxconn=${MSIZE}   --sysctl=net.ipv4.tcp_max_syn_backlog=${MSIZE}  -e MADDR=${MIP} -e MPORT=${MASTERPORT} -e SADDR=${SERVERIP} -e SPORT=${SERVERPORT} -e TYPE="server" --name ${SERVERNAME} ${SERVERNAME}
 
-
+NET=overnet 
 SERVERNAME="server2"  #modify serer name
 SERVERIP="10.0.1.5" #ip start with IP address 172.76.0.4
 SERVERPORT=5091 #port start with 5090
@@ -31,6 +31,7 @@ docker build --tag ${SERVERNAME} .
 #docker run --cpuset-cpus="11-12" --memory="8g" --net ${NET} --ip=${SERVERIP} -p ${SERVERPORT}:${SERVERPORT} -e MADDR=${MIP} -e MPORT=${MASTERPORT} -e SADDR=${SERVERIP} -e SPORT=${SERVERPORT} -e TYPE="server" --name ${SERVERNAME} ${SERVERNAME}
 docker run --privileged --cap-add=NET_ADMIN --net ${NET} --ip=${SERVERIP} -p ${SERVERPORT}:${SERVERPORT} --detach --sysctl=net.core.somaxconn=${MSIZE}  --sysctl=net.ipv4.tcp_max_syn_backlog=${MSIZE}  -e MADDR=${MIP} -e MPORT=${MASTERPORT} -e SADDR=${SERVERIP} -e SPORT=${SERVERPORT} -e TYPE="server" --name ${SERVERNAME} ${SERVERNAME}
 
+NET=overnet 
 SERVERNAME="server3"  #modify serer name
 SERVERIP="10.0.1.6" #ip start with IP address 172.76.0.4
 SERVERPORT=5092 #port start with 5090
@@ -44,6 +45,7 @@ docker build --tag ${SERVERNAME} .
 #docker run --cpuset-cpus="11-12" --memory="8g" --net ${NET} --ip=${SERVERIP} -p ${SERVERPORT}:${SERVERPORT} -e MADDR=${MIP} -e MPORT=${MASTERPORT} -e SADDR=${SERVERIP} -e SPORT=${SERVERPORT} -e TYPE="server" --name ${SERVERNAME} ${SERVERNAME}
 docker run --privileged --cap-add=NET_ADMIN --net ${NET} --ip=${SERVERIP} -p ${SERVERPORT}:${SERVERPORT} --detach --sysctl=net.core.somaxconn=${MSIZE}   --sysctl=net.ipv4.tcp_max_syn_backlog=${MSIZE}  -e MADDR=${MIP} -e MPORT=${MASTERPORT} -e SADDR=${SERVERIP} -e SPORT=${SERVERPORT} -e TYPE="server" --name ${SERVERNAME} ${SERVERNAME}
 
+NET=overnet 
 SERVERNAME="server4"  #modify serer name
 SERVERIP="10.0.1.7" #ip start with IP address 172.76.0.4
 SERVERPORT=5093 #port start with 5090
@@ -57,6 +59,7 @@ docker build --tag ${SERVERNAME} .
 #docker run --cpuset-cpus="11-12" --memory="8g" --net ${NET} --ip=${SERVERIP} -p ${SERVERPORT}:${SERVERPORT} -e MADDR=${MIP} -e MPORT=${MASTERPORT} -e SADDR=${SERVERIP} -e SPORT=${SERVERPORT} -e TYPE="server" --name ${SERVERNAME} ${SERVERNAME}
 docker run --privileged --cap-add=NET_ADMIN --net ${NET} --ip=${SERVERIP} -p ${SERVERPORT}:${SERVERPORT} --detach  --sysctl=net.core.somaxconn=${MSIZE}   --sysctl=net.ipv4.tcp_max_syn_backlog=${MSIZE}  -e MADDR=${MIP} -e MPORT=${MASTERPORT} -e SADDR=${SERVERIP} -e SPORT=${SERVERPORT} -e TYPE="server" --name ${SERVERNAME} ${SERVERNAME}
 
+NET=overnet 
 SERVERNAME="server5"  #modify serer name
 SERVERIP="10.0.1.8" #ip start with IP address 172.76.0.4
 SERVERPORT=5094 #port start with 5090
