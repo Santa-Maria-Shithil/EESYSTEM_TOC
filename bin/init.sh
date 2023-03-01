@@ -1,4 +1,4 @@
-sudo ip link set eno1 qlen 200000
+sudo ip link set eno1 qlen 50000
 sudo sysctl -w  net.core.somaxconn=16777216  #32MB
 sudo sysctl -w net.core.netdev_max_backlog=16777216
 sudo sysctl -w net.ipv4.tcp_max_syn_backlog=16777216
