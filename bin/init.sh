@@ -11,8 +11,6 @@ sudo sysctl -w net.ipv4.tcp_rmem="10240 12582912 134217728"
 
 sudo sysctl -w net.ipv4.tcp_wmem="10240 12582912 134217728"
 
-sudo sysctl -w net.ipv4.udp_mem="10240 12582912 134217728"
-
 sudo sysctl -w net.ipv4.tcp_window_scaling=1
 
 sudo sysctl -w net.ipv4.tcp_sack=1
