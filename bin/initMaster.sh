@@ -6,6 +6,7 @@ MASTERNAME="master5"
 PORT=9087
 SUBNET=10.0.1.0/24
 NET=overnet
+MSIZE=134217728
 
 docker rm ${MASTERNAME}
 docker rmi ${MASTERNAME}
@@ -15,6 +16,6 @@ docker build --tag ${MASTERNAME} .
 #docker network create  -d overlay --attachable overnet
 
 
-docker run  --privileged --cpuset-cpus="1,2" --memory="8g" --net ${NET} --ip=${MIP} -p ${PORT}:${PORT} --cap-add=NET_ADMIN --sysctl=net.core.somaxconn=33554432 --sysctl=net.ipv4.tcp_max_syn_backlog=3554432 -e TYPE="master" -e MADDR=${MIP} -e MPORT=${PORT} -e NREPLICAS=5 --name ${MASTERNAME} ${MASTERNAME} 
+docker run  --privileged --cpuset-cpus="1,2" --memory="8g" --net ${NET} --ip=${MIP} -p ${PORT}:${PORT} --cap-add=NET_ADMIN --sysctl=net.core.somaxconn=${MSIZE} --sysctl=net.ipv4.tcp_max_syn_backlog=${MSIZE} -e TYPE="master" -e MADDR=${MIP} -e MPORT=${PORT} -e NREPLICAS=5 --name ${MASTERNAME} ${MASTERNAME} 
 #gaiadocker/iproute2 qdisc del dev eth0 root netem
 
