@@ -1,19 +1,19 @@
 #!/bin/bash
 
 #running swarm init and making zoo-003 the manager
-sudo docker swarm init
+docker swarm init
 
 #copy the joining command from zoo-003 and run it to zoo-004 to make it
 #member of swarm
 
 #check the number of node in the swarm .we have to run it inzoo-003
-sudo docker node ls
+docker node ls
 
 #creating the network in zoo-003
-sudo docker network create -d overlay --attachable overnet
+docker network create -d overlay --attachable overnet
 
 #inspecting the overnet network in zoo-003
-sudo docker network inspect overnet
+docker network inspect overnet
 
 
 
@@ -78,11 +78,9 @@ sudo docker network inspect overnet
 
 #sudo ip link show
 #sudo tc qdisc replace dev eth0 root  pfifo_fast
-# sudo ip link set eno1 qlen 50000
-
+#  ip link set eth0 qlen 500000
 
 #  sysctl -w net.ipv4.tcp_max_syn_backlog = 12582912
-#sudo sysctl -w net.core.somaxconn="12582912"
 
 #nload
 
