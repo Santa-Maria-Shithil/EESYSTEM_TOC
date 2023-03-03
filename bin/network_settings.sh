@@ -88,3 +88,11 @@ docker network inspect overnet
 
 
 #ss -plnt sport 5020 to see
+
+#sudo ethtool -g eno1   see the interface ring buffer size
+#sudo ethtool -G eno1 tx 511      setting the interface ring buffer size
+#sudo ethtool -c eno1  seeing the coalesce parameter
+#sudo ethtool -C eno1 rx-usecs 72  setting the value of the rx-usecs
+
+#sudo ethtool -C eno1 tx-usecs 122      standard value
+#sudo ethtool -C eno1 rx-usecs 62
