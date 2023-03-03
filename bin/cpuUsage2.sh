@@ -8,7 +8,9 @@ while true; do
         #docker stats --format "{{.Container}}: {{.CPUPerc}}"
         #sudo docker stats --format "{{.Name}}: {{.CPUPerc}}" 2>&1 | tee -a cpuUsage.txt 
 
-        sudo docker stats --no-stream --format "{{.Name}}:{{.CPUPerc}}" 2>&1 | tee -a  cpuUsage.txt 
+        #sudo docker stats --no-stream --format "{{.Name}}:{{.CPUPerc}}" 2>&1 | tee -a  cpuUsage.txt 
+
+        sudo top -bn1 -u sshithil | grep "top" 2>&1 | tee -a  cpuUsage.txt 
 
         #sudo top -bn1 | grep "Cpu(s)" |sed "s/.*, *\([0-9.]*\)%* id.*/\1/" |awk '{print 100 - $1}' 2>&1 | tee -a Overall_cpuUsage.txt 
         
