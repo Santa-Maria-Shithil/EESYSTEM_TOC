@@ -20,7 +20,7 @@ sudo sysctl  net.ipv4.tcp_rmem="4096 262144 16777216"  #new
 
 sudo sysctl  net.ipv4.tcp_wmem="4096 262144 16777216"   #new
 
-sudo syctl net.ipv4.tcp_timestamps=1 #new  // may need to stop
+sudo sysctl net.ipv4.tcp_timestamps=1 #new  // may need to stop
 
 #sudo sysctl net.ipv4.tcp_window_scaling=1
 
