@@ -1,7 +1,7 @@
-sudo ip link set eno1 qlen 100000
-sudo sysctl  net.core.somaxconn=100000 #16777216  #32MB
-sudo sysctl net.core.netdev_max_backlog=100000 #16777216
-sudo sysctl net.ipv4.tcp_max_syn_backlog=100000 #16777216
+sudo ip link set eno1 qlen 200000
+sudo sysctl  net.core.somaxconn=200000 #16777216  #32MB
+sudo sysctl net.core.netdev_max_backlog=200000 #16777216
+sudo sysctl net.ipv4.tcp_max_syn_backlog=200000 #16777216
 
 #sudo sysctl  net.core.wmem_max=134217728
 
