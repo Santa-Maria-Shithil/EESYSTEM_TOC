@@ -15,6 +15,37 @@ sudo docker cp client1:/copilot/client-${i}.latency.percentiles.txt /home/users/
 sudo docker cp client1:/copilot/client-${i}.timestamps.orig.txt /home/users/sshithil/copilot/logs1/client-${i}.timestamps.orig.txt
 sudo docker cp client1:/copilot/client-${i}.tputlat.txt /home/users/sshithil/copilot/logs1/client-${i}.tputlat.txt
 done
+
+sudo mv cpu_intr_info_client.txt ./logs1
+sudo mv -r cpuUsage_server.txt ./logs1
+sudo mv -r mem_usage_server.txt ./logs1
+sudo mv -r netIO_server.txt ./logs1
+sudo mv -r nic_info_server.txt ./logs1
+sudo mv -r cpu_intr_info_server.txt ./logs1 
+sudo mv -r softIQR_info_server.txt ./logs1
+sudo mv -r netstat_statistics_server.txt ./logs1
+sudo mv -r netstat_eno1_statistics_server.txt ./logs1
+sudo mv -r SR_queue_server.txt ./logs1
+sudo mv -r Overall_cpuUsage_server.txt ./logs1
+sudo mv -r Overall_mem_usage_server.txt ./logs1
+sudo mv -r Overall_netIO_server.txt ./logs1
+
+sudo mv -r cpuUsage_client.txt ./logs1
+sudo mv -r mem_usage_client.txt ./logs1
+sudo mv -r netIO_client.txt ./logs1
+sudo mv -r nic_info_client.txt ./logs1
+sudo mv -r cpu_intr_info_client.txt ./logs1
+sudo mv -r softIQR_info_client.txt ./logs1
+sudo mv -r netstat_statistics_client.txt ./logs1
+sudo mv-r netstat_eno1_statistics_client.txt ./logs1
+sudo mv -r SR_queue_client.txt ./logs1
+sudo mv -r Overall_cpuUsage_client.txt ./logs1
+sudo mv -r Overall_mem_usage_client.txt ./logs1
+sudo mv -r Overall_netIO_client.txt ./logs1
+
+
+
+
 :'
 for i in {1..100}
 do
