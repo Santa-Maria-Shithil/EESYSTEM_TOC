@@ -10,7 +10,7 @@ while true; do
 sudo ethtool --statistics eno1 | grep "tx_discards" 2>&1 | tee -a nic_info.txt #need to run it separately
 sudo ethtool --statistics eno1 | grep "rx_discards" 2>&1 | tee -a nic_info.txt
 
-sudo egrep "CPU|eth0" /proc/interrupts  2>&1 | tee -a cpu_intr_info.txt
+sudo egrep "CPU|eno1" /proc/interrupts  2>&1 | tee -a cpu_intr_info.txt
 
 sudo cat /proc/net/softnet_stat  2>&1 | tee -a softIQR_info.txt
 
