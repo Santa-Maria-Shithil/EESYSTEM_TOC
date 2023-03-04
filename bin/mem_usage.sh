@@ -1,4 +1,4 @@
-sudo rm -r mem_usage.txt
+#sudo rm -r mem_usage.txt
 
 
 i=0
