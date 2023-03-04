@@ -1,5 +1,5 @@
 
-sudo rm -r Overall_cpuUsage.txt 
+#sudo rm -r Overall_cpuUsage.txt 
 
 i=0
 while true; do

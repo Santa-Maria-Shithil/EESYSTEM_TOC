@@ -1,9 +1,9 @@
-sudo rm -r nic_info.txt
-sudo rm -r cpu_intr_info.txt
-sudo rm -r softIQR_info.txt
-sudo rm -r netstat_statistics.txt
-sudo rm -r netstat_eno1_statistics.txt
-sudo rm -r SR_queue.txt
+#sudo rm -r nic_info.txt
+#sudo rm -r cpu_intr_info.txt
+#sudo rm -r softIQR_info.txt
+#sudo rm -r netstat_statistics.txt
+#sudo rm -r netstat_eno1_statistics.txt
+#sudo rm -r SR_queue.txt
 
 while true; do        
 ##sudo vnstat -l -i eno1 2>&1 | tee -a Overall_netIO.txt #need to run it separately

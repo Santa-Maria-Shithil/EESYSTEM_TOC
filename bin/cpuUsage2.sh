@@ -1,4 +1,4 @@
-sudo rm -r cpuUsage.txt
+#sudo rm -r cpuUsage.txt
 
 
 i=0

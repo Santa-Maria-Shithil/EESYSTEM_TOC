@@ -1,4 +1,4 @@
-sudo rm -r netIO.txt
+#sudo rm -r netIO.txt
 
 i=0
 while true; do
