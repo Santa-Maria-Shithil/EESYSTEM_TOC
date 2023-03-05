@@ -31,8 +31,8 @@ const PRINT_STATS = true
 
 var masterAddr *string = flag.String("maddr", "", "Master address. Defaults to localhost")
 var masterPort *int = flag.Int("mport", 7087, "Master port.  Defaults to 7077.")
-var reqsNb *int = flag.Int("q", 5000, "Total number of requests. Defaults to 5000.")
-var writes *int = flag.Int("w", 100, "Percentage of updates (writes). Defaults to 100%.")
+var reqsNb *int = flag.Int("q", 500000, "Total number of requests. Defaults to 5000.")
+var writes *int = flag.Int("w", 50, "Percentage of updates (writes). Defaults to 100%.")
 var noLeader *bool = flag.Bool("e", true, "Egalitarian (no leader). Defaults to false.")
 var twoLeaders *bool = flag.Bool("twoLeaders", false, "Two leaders for slowdown tolerance. Defaults to false.")
 var fast *bool = flag.Bool("f", false, "Fast Paxos: send message directly to all replicas. Defaults to false.")
@@ -40,14 +40,14 @@ var rounds *int = flag.Int("r", 1, "Split the total number of requests into this
 var procs *int = flag.Int("p", 2, "GOMAXPROCS. Defaults to 2")
 var check = flag.Bool("check", false, "Check that every expected reply was received exactly once.")
 var eps *int = flag.Int("eps", 0, "Send eps more messages per round than the client will wait for (to discount stragglers). Defaults to 0.")
-var conflicts *int = flag.Int("c", 0, "Percentage of conflicts. Defaults to 0%")
+var conflicts *int = flag.Int("c", 25, "Percentage of conflicts. Defaults to 0%")
 var s = flag.Float64("s", 2, "Zipfian s parameter")
 var v = flag.Float64("v", 1, "Zipfian v parameter")
 var cid *int = flag.Int("id", -1, "Client ID.")
 var cpuProfile *string = flag.String("cpuprofile", "", "Name of file for CPU profile. If empty, no profile is created.")
-var maxRuntime *int = flag.Int("runtime", -1, "Max duration to run experiment in second. If negative, stop after sending up to reqsNb requests")
+var maxRuntime *int = flag.Int("runtime", 10, "Max duration to run experiment in second. If negative, stop after sending up to reqsNb requests")
 
-// var debug *bool = flag.Bool("debug", false, "Enable debug output.")
+// var debug *bool = flag.Bool("debug", true, "Enable debug output.")
 var trim *float64 = flag.Float64("trim", 0.25, "Exclude some fraction of data at the beginning and at the end.")
 var prefix *string = flag.String("prefix", "", "Path prefix for filenames.")
 var hook *bool = flag.Bool("hook", true, "Add shutdown hook.")
@@ -319,7 +319,10 @@ func main() {
 	var pilotErr, pilotErr1 error
 	var lastGVSent0, lastGVSent1 time.Time
 
+	log.Printf("stop sending timer: %d", time.Duration(*maxRuntime))
+
 	stopSendingTimer := time.NewTimer(time.Duration(*maxRuntime) * time.Second)
+	//log.Printf("stopSendingTiemr %d", stopSendingTimer.)
 	exptTimer := time.NewTimer(time.Duration(*maxRuntime+5) * time.Second)
 	exptDone := false
 	stopSending := false
@@ -331,18 +334,22 @@ func main() {
 	viewServer := N - 1          // pick random server to ask new view
 	go func() {
 		for !stopSending {
+
 			time.Sleep(interval_in_ns)
 			reqsChan <- nextReqId
 			nextReqId++
+			log.Printf("inside loop nextReqId %d", nextReqId)
 			interval_in_ns = time.Duration(rand.ExpFloat64()/target_rpns) - time.Since(lastReqGenTime) + interval_in_ns
 			if interval_in_ns < 0 {
 				interval_in_ns = time.Duration(0)
 			}
 			if nextReqId == *reqsNb {
+				log.Printf("inside  go function")
 				stopSending = true
 			}
 			lastReqGenTime = time.Now()
 		}
+		log.Printf("outside loop nextReqId %d", nextReqId)
 	}()
 	tput_interval_in_sec := time.Duration(*tput_interval * 1e9)
 	if *verbose {
@@ -363,6 +370,7 @@ func main() {
 			exptDone = true
 
 		case <-stopSendingTimer.C:
+			log.Printf("inside  case stopSendingTimer")
 			stopSending = true
 
 		case <-printChan:
@@ -375,11 +383,13 @@ func main() {
 
 		case i := <-reqsChan:
 			if stopSending {
+				log.Printf("inside  case reqschan")
+
 				break
 			}
 			/* Prepare proposal */
 			id := int32(i)
-			dlog.Printf("Sending proposal %d\n", id)
+			log.Printf("Sending proposal %d\n", id)
 
 			args := genericsmrproto.Propose{id, state.Command{ClientId: clientId, OpId: id, Op: state.PUT, K: 0, V: 0}, time.Now().UnixNano()}
 
@@ -403,6 +413,8 @@ func main() {
 			} /* else {}: this is a retry */
 
 			//checkAndUpdateViews(viewChangeChan, views)
+
+			log.Printf("still ok")
 
 			// get random server to ask about new view
 			if views[0].Active {

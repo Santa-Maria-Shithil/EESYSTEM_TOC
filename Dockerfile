@@ -15,6 +15,15 @@ RUN echo 'root:root' |chpasswd
 
 RUN apk add --no-cache git make musl-dev go
 
+ 
+#RUN /bin/sh -c "apt-get update && apt-get -y install iproute2"
+
+RUN apk add iproute2
+
+#RUN sysctl -w net.ipv4.tcp_max_syn_backlog = 12582912
+
+#RUN tc qdisc replace dev eth0 root  pfifo_fast
+
 # install basic libraries
 #RUN apt-get update
 #RUN apt update
@@ -29,6 +38,8 @@ RUN apk add --no-cache git make musl-dev go
 
 ENV NAME=/copilot
 ENV PATH="/copilot/bin:${PATH}"
+#export GOPATH=$HOME/copilot  for server wihout docker
+#go install ./src/eclientol   installing eclientol using go without docker (inside copilot folder)
 #ENV NAME=/go/epaxos
 RUN mkdir $NAME
 
@@ -94,6 +105,7 @@ ENV CONFLICTS -1
 ENV S 2
 ENV V 1
 ENV NCLIENTS 1
+ENV NRUNTIME 400
 
 
 

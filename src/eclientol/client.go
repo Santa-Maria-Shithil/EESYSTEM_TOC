@@ -14,6 +14,7 @@ import (
 	"os"
 	"os/signal"
 	filepath2 "path/filepath"
+	"reflect"
 	"runtime"
 	"runtime/debug"
 	"runtime/pprof"
@@ -23,7 +24,7 @@ import (
 	"time"
 )
 
-//const REQUEST_TIMEOUT = 1 * time.Second
+// const REQUEST_TIMEOUT = 1 * time.Second
 const REQUEST_TIMEOUT = 100 * time.Millisecond
 const GET_VIEW_TIMEOUT = 100 * time.Millisecond
 const GC_DEBUG_ENABLED = false
@@ -31,32 +32,32 @@ const PRINT_STATS = true
 
 var masterAddr *string = flag.String("maddr", "", "Master address. Defaults to localhost")
 var masterPort *int = flag.Int("mport", 7087, "Master port.  Defaults to 7077.")
-var reqsNb *int = flag.Int("q", 5000, "Total number of requests. Defaults to 5000.")
-var writes *int = flag.Int("w", 100, "Percentage of updates (writes). Defaults to 100%.")
-var noLeader *bool = flag.Bool("e", false, "Egalitarian (no leader). Defaults to false.")
-var twoLeaders *bool = flag.Bool("twoLeaders", true, "Two leaders for slowdown tolerance. Defaults to false.")
+var reqsNb *int = flag.Int("q", 500000, "Total number of requests. Defaults to 5000.")
+var writes *int = flag.Int("w", 50, "Percentage of updates (writes). Defaults to 100%.")
+var noLeader *bool = flag.Bool("e", true, "Egalitarian (no leader). Defaults to false.")
+var twoLeaders *bool = flag.Bool("twoLeaders", false, "Two leaders for slowdown tolerance. Defaults to false.")
 var fast *bool = flag.Bool("f", false, "Fast Paxos: send message directly to all replicas. Defaults to false.")
 var rounds *int = flag.Int("r", 1, "Split the total number of requests into this many rounds, and do rounds sequentially. Defaults to 1.")
 var procs *int = flag.Int("p", 2, "GOMAXPROCS. Defaults to 2")
 var check = flag.Bool("check", false, "Check that every expected reply was received exactly once.")
 var eps *int = flag.Int("eps", 0, "Send eps more messages per round than the client will wait for (to discount stragglers). Defaults to 0.")
-var conflicts *int = flag.Int("c", 0, "Percentage of conflicts. Defaults to 0%")
+var conflicts *int = flag.Int("c", 25, "Percentage of conflicts. Defaults to 0%")
 var s = flag.Float64("s", 2, "Zipfian s parameter")
 var v = flag.Float64("v", 1, "Zipfian v parameter")
 var cid *int = flag.Int("id", -1, "Client ID.")
 var cpuProfile *string = flag.String("cpuprofile", "", "Name of file for CPU profile. If empty, no profile is created.")
-var maxRuntime *int = flag.Int("runtime", -1, "Max duration to run experiment in second. If negative, stop after sending up to reqsNb requests")
+var maxRuntime *int = flag.Int("runtime", 300, "Max duration to run experiment in second. If negative, stop after sending up to reqsNb requests")
 
-//var debug *bool = flag.Bool("debug", false, "Enable debug output.")
+// var debug *bool = flag.Bool("debug", false, "Enable debug output.")
 var trim *float64 = flag.Float64("trim", 0.25, "Exclude some fraction of data at the beginning and at the end.")
 var prefix *string = flag.String("prefix", "", "Path prefix for filenames.")
 var hook *bool = flag.Bool("hook", true, "Add shutdown hook.")
 var verbose *bool = flag.Bool("verbose", true, "Print throughput to stdout.")
-var numKeys *uint64 = flag.Uint64("numKeys", 100000, "Number of keys in simulated store.")
+var numKeys *uint64 = flag.Uint64("numKeys", 10000000, "Number of keys in simulated store.")
 var proxyReplica *int = flag.Int("proxy", -1, "Replica Id to proxy requests to. If id < 0, use request Id mod N as default.")
 var sendOnce *bool = flag.Bool("once", false, "Send request to only one leader.")
 var tput_interval *float64 = flag.Float64("tput_interval_in_sec", 1, "Time interval to record and print throughput")
-var target_rps *int = flag.Int("target_rps", 4000, "Target request per sec for open-loop client")
+var target_rps *int = flag.Int("target_rps", 1000, "Target request per sec for open-loop client")
 
 // GC debug
 var garPercent = flag.Int("garC", 50, "Collect info about GC")
@@ -67,6 +68,8 @@ var clientId uint32
 
 var successful []int
 var rsp []bool
+
+var conflict int64
 
 // var rarray []int
 
@@ -81,13 +84,15 @@ type DataPoint struct {
 	//prevElapse time.Duration
 	elapse time.Duration
 	//prevReqsCount int64
-	reqsCount int64
-	t         time.Time
+	reqsCount     int64
+	conflictCount int64
+	t             time.Time
 }
 
 type Response struct {
 	OpId       int32
 	rcvingTime time.Time
+	value      int64
 	timestamp  int64
 }
 
@@ -280,12 +285,15 @@ func main() {
 	var leaderReplyChan chan *Response
 	var pilot0ReplyChan chan *Response
 	var viewChangeChan chan *View
+	//var conflictReplyChan chan int64
 
 	// with pre-specified leader, we know which reader to check reply
 	if !*twoLeaders {
 		leaderReplyChan = make(chan *Response, *reqsNb)
+		//conflictReplyChan = make(chan int64, *reqsNb)
 		for i := 0; i < N; i++ {
-			go waitReplies(readers, i, leaderReplyChan, *reqsNb)
+			go waitReplies2(readers, i, leaderReplyChan, *reqsNb) //to track coflict over the time
+			//go waitReplies(readers, i, leaderReplyChan, *reqsNb)
 		}
 	} else {
 		// with another pre-specified leader, we need to check other reply channel, and another reader
@@ -304,6 +312,7 @@ func main() {
 	throughputs = make([]DataPoint, 0, 600)
 
 	var reqsCount int64 = 0
+	var conflictCount int64 = 0
 
 	// incoming request channel
 	reqsChan := make(chan int, 100000) /*keep max outstanding requests at 100000*/
@@ -367,7 +376,7 @@ func main() {
 		case <-printChan:
 			t := time.Now()
 			//p := DataPoint{elapse: time.Since(before_total), reqsCount: reqsCount}
-			p := DataPoint{elapse: t.Sub(before_total), reqsCount: reqsCount, t: t}
+			p := DataPoint{elapse: t.Sub(before_total), reqsCount: reqsCount, conflictCount: conflictCount, t: t}
 			throughputs = append(throughputs, p)
 			if *verbose && readings != nil {
 				readings <- &p
@@ -454,9 +463,19 @@ func main() {
 			break
 
 		case e := <-leaderReplyChan:
+			//conft := <-conflictReplyChan
 			lat := int64(e.rcvingTime.Sub(timestamps[e.OpId]) / time.Microsecond)
 			if latencies[e.OpId] == int64(0) { /*1st response*/
+				//conflict = conft
+				//log.Printf("Conflict:%v, amount: %v", e.value, conflictCount)
+
+				if e.value != 0 {
+					conflictCount++
+				}
+
 				reqsCount++
+
+				//log.Printf("Conflict:%v, amount: %v", e.value, conflictCount)
 			}
 			if latencies[e.OpId] == int64(0) || latencies[e.OpId] > lat {
 				latencies[e.OpId] = lat
@@ -536,6 +555,36 @@ func checkAndUpdateViews(viewChangeChan chan *View, views []*View) {
 	}
 }
 
+func waitReplies2(readers []*bufio.Reader, leader int, done chan *Response, expected int) {
+	var msgType byte
+	var err error
+	reply := new(genericsmrproto.ProposeReplyTS)
+
+	for true {
+		if msgType, err = readers[leader].ReadByte(); err != nil {
+			break
+		}
+
+		switch msgType {
+		case genericsmrproto.PROPOSE_REPLY:
+			if err = reply.Unmarshal(readers[leader]); err != nil {
+				break
+			}
+			if reply.OK != 0 {
+				successful[leader]++
+				done <- &Response{OpId: reply.CommandId, value: reflect.ValueOf(reply.Value).Int(), rcvingTime: time.Now()}
+				//conflict_chan <- reflect.ValueOf(reply.Value).Int()
+				if expected == successful[leader] {
+					return
+				}
+			}
+			break
+		default:
+			break
+		}
+	}
+}
+
 func waitReplies(readers []*bufio.Reader, leader int, done chan *Response, expected int) {
 	var msgType byte
 	var err error
@@ -584,7 +633,7 @@ func waitRepliesPilot(readers []*bufio.Reader, leader int, done chan *Response, 
 			}
 			if reply.OK != 0 {
 				successful[leader]++
-				done <- &Response{reply.CommandId, time.Now(), reply.Timestamp}
+				done <- &Response{reply.CommandId, time.Now(), reflect.ValueOf(reply.Value).Int(), reply.Timestamp}
 				if expected == successful[leader] {
 					return
 				}
@@ -763,6 +812,74 @@ func processAndPrintThroughputs(throughputs []DataPoint) (error, string) {
 
 }
 
+func processAndPrintThroughputs2(throughputs []DataPoint) (error, string) {
+	var overallTput string = "NaN"
+	var instTput string = "NaN"
+	var overallConflict string = "NaN"
+	var instConflict string = "NaN"
+
+	filename := fmt.Sprintf("client-%d.throughput.txt", clientId)
+	filepath := filepath2.Join(*prefix, filename)
+	f, err := os.Create(filepath)
+
+	if err != nil {
+		return err, overallTput
+	}
+
+	defer f.Close()
+
+	for i, p := range throughputs {
+		overallTput = "NaN"
+		instTput = "NaN"
+		if p.elapse > time.Duration(0) {
+			overallTput = strconv.FormatInt(int64(float64(p.reqsCount)*float64(time.Second)/float64(p.elapse)), 10)
+			overallConflict = strconv.FormatInt(int64(float64(p.conflictCount)*float64(time.Second)/float64(p.elapse)), 10)
+
+		}
+
+		if i == 0 {
+			instTput = strconv.FormatInt(p.reqsCount, 10)
+			instConflict = strconv.FormatInt(p.conflictCount, 10)
+		} else if p.elapse > throughputs[i-1].elapse {
+			instTput = strconv.FormatInt(int64(
+				float64(p.reqsCount-throughputs[i-1].reqsCount)*float64(time.Second)/
+					float64(p.elapse-throughputs[i-1].elapse)), 10)
+
+			instConflict = strconv.FormatInt(int64(
+				float64(p.conflictCount-throughputs[i-1].conflictCount)*float64(time.Second)/
+					float64(p.elapse-throughputs[i-1].elapse)), 10)
+		}
+		line := fmt.Sprintf("%.1f\t%d\t%v\t%v\t%v\t%v\t%.1f\n", float64(p.elapse)/float64(time.Second), p.reqsCount, overallTput, instTput, overallConflict, instConflict, float64(p.t.UnixNano())*float64(time.Nanosecond)/float64(time.Second))
+		_, err = f.WriteString(line)
+		fmt.Printf(line)
+	}
+
+	// Trimming
+	trimmedOverallTput := "NaN"
+	trimLength := int(float64(len(throughputs)) * *trim)
+	throughputs = throughputs[trimLength : len(throughputs)-trimLength]
+	newlen := len(throughputs)
+	if newlen == 1 {
+		trimmedOverallTput = strconv.FormatInt(int64(
+			float64(throughputs[0].reqsCount)*float64(time.Second)/float64(throughputs[0].elapse)), 10)
+	} else if newlen > 1 && throughputs[newlen-1].elapse > throughputs[0].elapse {
+		trimmedOverallTput = strconv.FormatInt(int64(
+			float64(throughputs[newlen-1].reqsCount-throughputs[0].reqsCount)*float64(time.Second)/
+				float64(throughputs[newlen-1].elapse-throughputs[0].elapse)), 10)
+	}
+
+	fmt.Printf("%s\n", overallTput)
+	fmt.Printf("%s\n", trimmedOverallTput)
+
+	_, err = f.WriteString(fmt.Sprintf("%s\n", overallTput))
+	_, err = f.WriteString(fmt.Sprintf("%s\n", trimmedOverallTput))
+
+	f.Sync()
+
+	return err, trimmedOverallTput
+
+}
+
 func catchKill(interrupt chan os.Signal) {
 	<-interrupt
 	if *cpuProfile != "" {
@@ -922,7 +1039,7 @@ func writeDataToFiles() {
 	writeTimestampsToFile(timestamps, latencies)
 
 	/* Output throughputs */
-	_, throughput := processAndPrintThroughputs(throughputs)
+	_, throughput := processAndPrintThroughputs2(throughputs)
 
 	/* Output latencies */
 	percentiles := writeLatenciesToFile2(latencies, "")

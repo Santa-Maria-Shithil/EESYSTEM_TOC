@@ -8,6 +8,7 @@ import (
 )
 
 type Operation uint8
+
 //type OperationId int32
 
 const (
@@ -22,15 +23,16 @@ const (
 type Value int64
 
 const NIL Value = 0
+const CFT Value = 1
 
 type Key int64
 
 type Command struct {
 	ClientId uint32
-	OpId int32
-	Op Operation
-	K  Key
-	V  Value
+	OpId     int32
+	Op       Operation
+	K        Key
+	V        Value
 }
 
 type State struct {

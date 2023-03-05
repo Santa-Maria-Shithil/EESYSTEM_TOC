@@ -14,6 +14,7 @@ import (
 	"os"
 	"os/signal"
 	filepath2 "path/filepath"
+	"reflect"
 	"runtime"
 	"runtime/debug"
 	"runtime/pprof"
@@ -39,7 +40,7 @@ var rounds *int = flag.Int("r", 1, "Split the total number of requests into this
 var procs *int = flag.Int("p", 2, "GOMAXPROCS. Defaults to 2")
 var check = flag.Bool("check", false, "Check that every expected reply was received exactly once.")
 var eps *int = flag.Int("eps", 0, "Send eps more messages per round than the client will wait for (to discount stragglers). Defaults to 0.")
-var conflicts *int = flag.Int("c", 100, "Percentage of conflicts. Defaults to 0%")
+var conflicts *int = flag.Int("c", 25, "Percentage of conflicts. Defaults to 0%")
 var s = flag.Float64("s", 2, "Zipfian s parameter")
 var v = flag.Float64("v", 1, "Zipfian v parameter")
 var cid *int = flag.Int("id", -1, "Client ID.")
@@ -67,6 +68,7 @@ var successful []int
 var rsp []bool
 
 // var rarray []int
+var conflict int64
 
 var latencies []int64
 var readlatencies []int64
@@ -75,9 +77,10 @@ var writelatencies []int64
 var timestamps []time.Time
 
 type DataPoint struct {
-	elapse    time.Duration
-	reqsCount int64
-	t         time.Time
+	elapse        time.Duration
+	reqsCount     int64
+	conflictCount int64
+	t             time.Time
 }
 
 type Response struct {
@@ -278,14 +281,16 @@ func main() {
 	}
 
 	var leaderReplyChan chan int32
+	var conflictReplyChan chan int64
 	var pilot0ReplyChan chan Response
 	var viewChangeChan chan *View
 
 	// with pre-specified leader, we know which reader to check reply
 	if !*twoLeaders {
 		leaderReplyChan = make(chan int32, *reqsNb)
+		conflictReplyChan = make(chan int64, *reqsNb)
 		if isRandomLeader {
-			go waitRepliesRandomLeader(readers, N, leaderReplyChan)
+			go waitRepliesRandomLeader2(readers, N, leaderReplyChan, conflictReplyChan)
 		} else {
 			go waitReplies(readers, leader, *reqsNb, leaderReplyChan, *reqsNb)
 		}
@@ -306,6 +311,7 @@ func main() {
 	throughputs = make([]DataPoint, 0, 600)
 
 	var reqsCount int64 = 0
+	var conflictCount int64 = 0
 
 	before_total := time.Now()
 	lastThroughputTime := before_total
@@ -444,6 +450,7 @@ func main() {
 							rsp[id] = true
 						}
 						reqsCount++
+
 						break
 					} else if toFired {
 						break
@@ -477,10 +484,14 @@ func main() {
 			}
 			to = time.NewTimer(REQUEST_TIMEOUT)
 			for true {
+				conft := <-conflictReplyChan
 				select {
 				case e := <-leaderReplyChan:
+
+					log.Printf("Amount of conflict %d\n", conflict)
 					repliedCmdId = e
 					rcvingTime = time.Now()
+					conflict = conft
 				default:
 				}
 
@@ -489,6 +500,10 @@ func main() {
 						rsp[id] = true
 					}
 					reqsCount++
+					if conflict == 1 {
+						conflictCount++
+					}
+
 					break
 				}
 			}
@@ -515,7 +530,7 @@ func main() {
 		currentTime := time.Now()
 		// Throughput every interval
 		if currentTime.Sub(lastThroughputTime) >= tput_interval_in_sec {
-			p := DataPoint{elapse: currentTime.Sub(before_total), reqsCount: reqsCount, t: currentTime}
+			p := DataPoint{elapse: currentTime.Sub(before_total), reqsCount: reqsCount, conflictCount: conflictCount, t: currentTime}
 			throughputs = append(throughputs, p)
 
 			if *verbose && readings != nil {
@@ -614,6 +629,38 @@ func waitReplies(readers []*bufio.Reader, leader int, n int, done chan int32, ex
 			break
 		default:
 			break
+		}
+	}
+}
+
+func waitRepliesRandomLeader2(readers []*bufio.Reader, n int, done chan int32, conflict_chan chan int64) {
+	var msgType byte
+	var err error
+	reply := new(genericsmrproto.ProposeReplyTS)
+
+	for true {
+		for i := 0; i < n; i++ {
+			if msgType, err = readers[i].ReadByte(); err != nil {
+				continue
+			}
+
+			switch msgType {
+			case genericsmrproto.PROPOSE_REPLY:
+				if err = reply.Unmarshal(readers[i]); err != nil {
+					continue
+				}
+				if reply.OK != 0 {
+					successful[i]++
+					//done <- &Response{OpId: reply.CommandId, rcvingTime: time.Now()}
+					done <- reply.CommandId
+					conflict_chan <- reflect.ValueOf(reply.Value).Int()
+					//conflict_chan <- int64(reply.Value)
+
+				}
+				break
+			default:
+				break
+			}
 		}
 	}
 }
@@ -780,6 +827,8 @@ func getLatencyPercentiles(latencies []int64, shouldTrim bool) []int64 {
 func processAndPrintThroughputs(throughputs []DataPoint) (error, string) {
 	var overallTput string = "NaN"
 	var instTput string = "NaN"
+	var overallConflict string = "NaN"
+	var instConflict string = "NaN"
 
 	filename := fmt.Sprintf("client-%d.throughput.txt", clientId)
 	filepath := filepath2.Join(*prefix, filename)
@@ -796,17 +845,23 @@ func processAndPrintThroughputs(throughputs []DataPoint) (error, string) {
 		instTput = "NaN"
 		if p.elapse > time.Duration(0) {
 			overallTput = strconv.FormatInt(int64(float64(p.reqsCount)*float64(time.Second)/float64(p.elapse)), 10)
+			overallConflict = strconv.FormatInt(int64(float64(p.conflictCount)*float64(time.Second)/float64(p.elapse)), 10)
 
 		}
 
 		if i == 0 {
 			instTput = strconv.FormatInt(p.reqsCount, 10)
+			instConflict = strconv.FormatInt(p.conflictCount, 10)
 		} else if p.elapse > throughputs[i-1].elapse {
 			instTput = strconv.FormatInt(int64(
 				float64(p.reqsCount-throughputs[i-1].reqsCount)*float64(time.Second)/
 					float64(p.elapse-throughputs[i-1].elapse)), 10)
+
+			instConflict = strconv.FormatInt(int64(
+				float64(p.conflictCount-throughputs[i-1].conflictCount)*float64(time.Second)/
+					float64(p.elapse-throughputs[i-1].elapse)), 10)
 		}
-		line := fmt.Sprintf("%.1f\t%d\t%v\t%v\t%.1f\n", float64(p.elapse)/float64(time.Second), p.reqsCount, overallTput, instTput, float64(p.t.UnixNano())*float64(time.Nanosecond)/float64(time.Second))
+		line := fmt.Sprintf("%.1f\t%d\t%v\t%v\t%v\t%v\t%.1f\n", float64(p.elapse)/float64(time.Second), p.reqsCount, overallTput, instTput, overallConflict, instConflict, float64(p.t.UnixNano())*float64(time.Nanosecond)/float64(time.Second))
 		_, err = f.WriteString(line)
 		fmt.Printf(line)
 	}

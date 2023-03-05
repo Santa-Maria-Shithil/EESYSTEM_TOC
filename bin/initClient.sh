@@ -1,19 +1,22 @@
 #!/bin/bash
 #bash bin/initClient.sh
-MIP="172.80.0.2"
+MIP="10.0.1.100"
 MASTERNAME="master5"
 MASTERPORT=9087
 CLIENTNAME="client1"  #modify client name
-CLIENTIP="172.80.0.20" #ip start with IP address 172.75.0.200
+CLIENTIP="10.0.1.20" #ip start with IP address 172.75.0.200
 CLIENTPORT=5099 #port start with 5090
-NCLIENTS=30 # minimum 1
-NREQ=300000 # total number of req per client
+NCLIENTS=20 # minimum 1
+NREQ=200000 # total number of req per client
+NRUNTIME=500
+MSIZE=16777216
 docker stop ${CLIENTNAME}
 docker rm ${CLIENTNAME}
 docker rmi ${CLIENTNAME}
 docker build --tag ${CLIENTNAME} .
 #docker run --cpuset-cpus="13-63" --memory="8g" --net Paxos_Network5 --ip=${CLIENTIP} -p ${CLIENTPORT}:${CLIENTPORT} -e MADDR=${MIP} -e MPORT=${MASTERPORT} -e Q=${NREQ} -e NCLIENTS=${NCLIENTS} -e TYPE="client" --name ${CLIENTNAME} ${CLIENTNAME}
-docker run --net Paxos_Network5 --ip=${CLIENTIP} -p ${CLIENTPORT}:${CLIENTPORT} -e MADDR=${MIP} -e MPORT=${MASTERPORT} -e Q=${NREQ} -e NCLIENTS=${NCLIENTS} -e TYPE="client" --name ${CLIENTNAME} ${CLIENTNAME}
+#docker run --privileged --cap-add=NET_ADMIN --net overnet --ip=${CLIENTIP} -p ${CLIENTPORT}:${CLIENTPORT} -e MADDR=${MIP} -e MPORT=${MASTERPORT} -e Q=${NREQ} -e NCLIENTS=${NCLIENTS} -e TYPE="client"  --name ${CLIENTNAME} ${CLIENTNAME}
+docker run --privileged --cap-add=NET_ADMIN --net overnet --ip=${CLIENTIP} -p ${CLIENTPORT}:${CLIENTPORT} --sysctl=net.core.somaxconn=16777216  --sysctl=net.ipv4.tcp_max_syn_backlog=16777216 -e MADDR=${MIP} -e MPORT=${MASTERPORT} -e Q=${NREQ} -e NCLIENTS=${NCLIENTS} -e NRUNTIME=${NRUNTIME} -e TYPE="client"  --name ${CLIENTNAME} ${CLIENTNAME}
 
 
 
