@@ -43,10 +43,10 @@ e=[]
 #e.append(0.0)
 #e.append(200.0)
 
-path="E:\\open_loop_experiments\\30_client"
+path="E:\\open_loop\\effects_of_conflict\\100_conflict"
 #path="E:\effect of durable log\without durable"
-nclient=30
-filename=".\\scripts\\tput_median_thirty_client.txt"
+nclient=15
+filename=".\\scripts\\ol_tput_hundred_conflict.txt"
 
 
 
