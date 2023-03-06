@@ -10,7 +10,7 @@ docker swarm init
 docker node ls
 
 #creating the network in zoo-003
-docker network create -d overlay scope=swarm --attachable overnet
+docker network create -d overlay --scope=swarm --attachable overnet
 
 #inspecting the overnet network in zoo-003
 docker network inspect overnet
