@@ -47,10 +47,10 @@ for x in range(0,1000):
     sum4.append(0.0)
     sum5.append(0.0)
 
-path="E:\\open_loop\\effects_of_conflict\\100_conflict"
+path="E:\\open_loop\\effects_of_conflict\\0_conflict"
 #path="E:\effect of durable log\without durable"
 nclient=15
-filename=".\\scripts\ol_cpu_usage_median_hundred_conflict.txt"
+filename=".\\scripts\ol_cpu_usage_median_zero_conflict.txt"
 client_cpu_usage_limit=3000
 
 
