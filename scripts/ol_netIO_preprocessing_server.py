@@ -47,17 +47,17 @@ for x in range(0,1000):
     sum4.append(0.0)
     sum5.append(0.0)
 
-path="E:\\open_loop\\effects_of_conflict\\100_conflict"
+path="E:\\open_loop\\effects_of_conflict\\0_conflict"
 #path="E:\effect of durable log\without durable"
 nclient=15
-filename=".\\scripts\ol_cpu_usage_median_hundred_conflict_client.txt"
+filename=".\\scripts\ol_netIO_median_zero_conflict_client.txt"
 client_cpu_usage_limit=3000
 
 
 j=0
 
 for i in range(1,6):
-    myfile = open(path+"\\run"+str(i)+"\\logs1\\logs1\\cpuUsage_client.txt")
+    myfile = open(path+"\\run"+str(i)+"\\logs1\\logs1\\netIO_server.txt")
     j=0
     for line in myfile:
         try:
