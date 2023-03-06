@@ -10,7 +10,7 @@ docker swarm init
 docker node ls
 
 #creating the network in zoo-003
-docker network create -d overlay --attachable overnet
+docker network create -d overlay --scope=swarm --attachable overnet
 
 #inspecting the overnet network in zoo-003
 docker network inspect overnet
@@ -96,3 +96,6 @@ docker network inspect overnet
 
 #sudo ethtool -C eno1 tx-usecs 122      standard value
 #sudo ethtool -C eno1 rx-usecs 62        standard value
+
+
+#docker system prune   //to delete all unused docker info
