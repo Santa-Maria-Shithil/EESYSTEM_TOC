@@ -33,7 +33,7 @@ const PRINT_STATS = true
 var masterAddr *string = flag.String("maddr", "", "Master address. Defaults to localhost")
 var masterPort *int = flag.Int("mport", 7087, "Master port.  Defaults to 7077.")
 var reqsNb *int = flag.Int("q", 500000, "Total number of requests. Defaults to 5000.")
-var writes *int = flag.Int("w", 100, "Percentage of updates (writes). Defaults to 100%.")
+var writes *int = flag.Int("w", 50, "Percentage of updates (writes). Defaults to 100%.")
 var noLeader *bool = flag.Bool("e", true, "Egalitarian (no leader). Defaults to false.")
 var twoLeaders *bool = flag.Bool("twoLeaders", false, "Two leaders for slowdown tolerance. Defaults to false.")
 var fast *bool = flag.Bool("f", false, "Fast Paxos: send message directly to all replicas. Defaults to false.")
@@ -57,7 +57,7 @@ var numKeys *uint64 = flag.Uint64("numKeys", 10000000, "Number of keys in simula
 var proxyReplica *int = flag.Int("proxy", -1, "Replica Id to proxy requests to. If id < 0, use request Id mod N as default.")
 var sendOnce *bool = flag.Bool("once", false, "Send request to only one leader.")
 var tput_interval *float64 = flag.Float64("tput_interval_in_sec", 1, "Time interval to record and print throughput")
-var target_rps *int = flag.Int("target_rps", 1000, "Target request per sec for open-loop client")
+var target_rps *int = flag.Int("target_rps", 4000, "Target request per sec for open-loop client")
 
 // GC debug
 var garPercent = flag.Int("garC", 50, "Collect info about GC")
