@@ -57,7 +57,7 @@ var numKeys *uint64 = flag.Uint64("numKeys", 10000000, "Number of keys in simula
 var proxyReplica *int = flag.Int("proxy", -1, "Replica Id to proxy requests to. If id < 0, use request Id mod N as default.")
 var sendOnce *bool = flag.Bool("once", false, "Send request to only one leader.")
 var tput_interval *float64 = flag.Float64("tput_interval_in_sec", 1, "Time interval to record and print throughput")
-var target_rps *int = flag.Int("target_rps", 1000, "Target request per sec for open-loop client")
+var target_rps *int = flag.Int("target_rps", 1500, "Target request per sec for open-loop client")
 
 // GC debug
 var garPercent = flag.Int("garC", 50, "Collect info about GC")
