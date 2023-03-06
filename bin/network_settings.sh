@@ -98,4 +98,4 @@ docker network inspect overnet
 #sudo ethtool -C eno1 rx-usecs 62        standard value
 
 
-#docker system prune   to delete all unused docker info
+#docker system prune   //to delete all unused docker info
