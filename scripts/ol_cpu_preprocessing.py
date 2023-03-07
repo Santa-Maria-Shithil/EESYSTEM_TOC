@@ -47,10 +47,10 @@ for x in range(0,1000):
     sum4.append(0.0)
     sum5.append(0.0)
 
-path="E:\\open_loop\\effects_of_consistency\\weak_consistency"
+path="E:\\open_loop\\effects_of_load\\10_client"
 #path="E:\effect of durable log\without durable"
-nclient=20
-filename=".\\"
+nclient=10
+filename=".\\scripts\\"
 client_cpu_usage_limit=3000
 
 
@@ -108,7 +108,7 @@ for x in range(0,700):
     
     sorted_array.sort()
     
-   # print(sorted_array)
+    print(sorted_array)
     #myfile.write(str((sum1[x]+sum2[x]+sum3[x]+sum4[x]+sum5[x])/3)+"\n")
     #myfile.write(str((sum1[x]+sum2[x]+sum3[x])/3)+"\n")
     

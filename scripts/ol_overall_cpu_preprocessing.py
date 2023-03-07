@@ -47,10 +47,10 @@ for x in range(0,1000):
     sum4.append(0.0)
     sum5.append(0.0)
 
-path="E:\\open_loop\\effects_of_consistency\\weak_consistency"
+path="E:\\open_loop\\effects_of_load\\25_client"
 #path="E:\effect of durable log\without durable"
-nclient=20
-filename=".\\scripts\"
+nclient=25
+filename=".\\scripts\ol_overall_cpu_usage_server_twentyfive_client.txt"
 client_cpu_usage_limit=3000
 
 
