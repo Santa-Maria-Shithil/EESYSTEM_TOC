@@ -46,7 +46,7 @@ e=[]
 path="E:\\open_loop\\effects_of_load\\25_client"
 #path="E:\effect of durable log\without durable"
 nclient=25
-filename=".\\scripts\\"
+filename=".\\scripts\\ol_conflict_amount_server_twentyfive_client.txt"
 
 
 
@@ -63,7 +63,7 @@ for x in range(1, nclient):
 
         try: 
             #print(str(x)+":"+str(tput[3]))
-            sum1[i]=sum1[i]+float(tput[3])
+            sum1[i]=sum1[i]+float(tput[5])
     
 
 
