@@ -47,45 +47,37 @@ for x in range(0,1000):
     sum4.append(0.0)
     sum5.append(0.0)
 
-path="E:\\open_loop\\effects_of_load\\25_client"
+path="E:\\open_loop\\effects_of_conflict\\0_conflict_with_rps"
 #path="E:\effect of durable log\without durable"
-nclient=25
-filename=".\\scripts\\"
+nclient=15
+filename=".\\scripts\"
 client_cpu_usage_limit=3000
 
 
 j=0
 
 for i in range(1,6):
-    myfile = open(path+"\\run"+str(i)+"\\logs1\\logs1\\cpuUsage_server.txt")
+    myfile = open(path+"\\run"+str(i)+"\\logs1\\logs1\\cpuUsage_client.txt")
     j=0
     for line in myfile:
         try:
             line.strip()
-            #print(line)
             latency=line.split(":")
+            l=latency[1].split("%")
+            print(l)
 
-
-            #latency[2].lstrip(" ")
-            #print(latency[0])
-            
-            if latency[0]=="master5":
-                j=j+1
-            else:
-                l=latency[1].split("%")
-            # print(client)
-                if i==1:
-                    #print(l[0])
-                    sum1[j]=sum1[j]+float(l[0])
-                if i==2:
-                    sum2[j]=sum2[j]+float(l[0])
-                if i==3:
-                    sum3[j]=sum3[j]+float(l[0])
-                if i==4:
-                    sum4[j]=sum4[j]+float(l[0])
-                if i==5:
-                    sum5[j]=sum5[j]+float(l[0])
-     
+            if i==1:
+                #print(l)
+                sum1[j]=float(l[0])
+            if i==2:
+                sum2[j]=float(l[0])
+            if i==3:
+                sum3[j]=float(l[0])
+            if i==4:
+                sum4[j]=float(l[0])
+            if i==5:
+                sum5[j]=float(l[0])
+            j=j+1
 
         except Exception as e:
             print("Oops!", e.__class__, "occurred.")
@@ -96,7 +88,7 @@ for i in range(1,6):
     # plotting the points 
     myfile.close()
   
-print(sum3)
+print(sum1)
 myfile = open(filename,"w")
 
 for x in range(0,700):
@@ -108,7 +100,7 @@ for x in range(0,700):
     
     sorted_array.sort()
     
-    print(sorted_array)
+   # print(sorted_array)
     #myfile.write(str((sum1[x]+sum2[x]+sum3[x]+sum4[x]+sum5[x])/3)+"\n")
     #myfile.write(str((sum1[x]+sum2[x]+sum3[x])/3)+"\n")
     
