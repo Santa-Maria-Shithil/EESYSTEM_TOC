@@ -46,7 +46,7 @@ var s = flag.Float64("s", 2, "Zipfian s parameter")
 var v = flag.Float64("v", 1, "Zipfian v parameter")
 var cid *int = flag.Int("id", -1, "Client ID.")
 var cpuProfile *string = flag.String("cpuprofile", "", "Name of file for CPU profile. If empty, no profile is created.")
-var maxRuntime *int = flag.Int("runtime", 300, "Max duration to run experiment in second. If negative, stop after sending up to reqsNb requests")
+var maxRuntime *int = flag.Int("runtime", 400, "Max duration to run experiment in second. If negative, stop after sending up to reqsNb requests")
 
 // var debug *bool = flag.Bool("debug", false, "Enable debug output.")
 var trim *float64 = flag.Float64("trim", 0.25, "Exclude some fraction of data at the beginning and at the end.")
