@@ -99,3 +99,5 @@ docker network inspect overnet
 
 
 #docker system prune   //to delete all unused docker info
+
+# sudo tc qdisc add dev eno1 root netem delay 100ms
