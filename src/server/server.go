@@ -121,5 +121,5 @@ func catchKill(interrupt chan os.Signal) {
 		pprof.StopCPUProfile()
 	}
 	fmt.Println("Caught signal")
-	os.Exit(0)
+	//os.Exit(0)
 }
