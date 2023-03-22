@@ -59,10 +59,10 @@ for x in range(0,1000):
     outsum4.append(0.0)
     outsum5.append(0.0)
 
-path="E:\\open_loop\\effects_of_load\\25_client"
+path="E:\\open_loop\\updated_rps\\effects_of_load\\25_clients"
 #path="E:\effect of durable log\without durable"
 nclient=25
-filename=".\\scripts\ol_overall_netIO_preprocessing_serverside_25_clients.txt"
+filename=".\\scripts\\updated_rps\\"
 client_cpu_usage_limit=3000
 
 

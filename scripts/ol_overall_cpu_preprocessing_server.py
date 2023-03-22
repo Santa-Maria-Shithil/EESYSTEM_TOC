@@ -47,10 +47,10 @@ for x in range(0,1000):
     sum4.append(0.0)
     sum5.append(0.0)
 
-path="E:\\open_loop\\effects_of_conflict\\0_conflict_with_rps"
+path="E:\\open_loop\\updated_rps\\effects_of_load\\10_clients"
 #path="E:\effect of durable log\without durable"
-nclient=25
-filename=".\\scripts\ol_overall_cpu_usage_server_zero_conflict_rps.txt"
+nclient=10
+filename=".\\scripts\\updated_rps\\"
 client_cpu_usage_limit=3000
 
 

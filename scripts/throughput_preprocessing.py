@@ -43,10 +43,10 @@ e=[]
 #e.append(0.0)
 #e.append(200.0)
 
-path="E:\\open_loop\\effects_of_conflict\\0_conflict_with_rps"
+path="E:\\open_loop\\updated_rps\\effects_of_load\\35_clients"
 #path="E:\effect of durable log\without durable"
-nclient=15
-filename=".\\scripts\\ol_tput_zero_conflict_rps"
+nclient=35
+filename=".\\scripts\\updated_rps\ol_tput_35_clients.txt"
 
 
 
