@@ -43,17 +43,19 @@ e=[]
 #e.append(0.0)
 #e.append(200.0)
 
-path="E:\\open_loop\\updated_rps\\effects_of_load\\35_clients"
+path="E:\\open_loop\\updated_rps\\effects_of_conflict\\100_conflict"
 #path="E:\effect of durable log\without durable"
-nclient=35
-filename=".\\scripts\\updated_rps\ol_tput_35_clients.txt"
+nclient=20
+filename=".\\scripts\\updated_rps\"
+
+
 
 
 
 for x in range(1, nclient):
 
     i=0
-    myfile = open(path+"\\run1\logs1\logs1\client-"+str(x)+".throughput.txt")
+    myfile = open(path+"\\run1\\logs1\\logs1\\client-"+str(x)+".throughput.txt")
 
     for line in myfile:
         line.strip()
