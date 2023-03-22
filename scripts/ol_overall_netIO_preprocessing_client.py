@@ -62,7 +62,7 @@ for x in range(0,1000):
 path="E:\\open_loop\\updated_rps\\effects_of_load\\35_clients"
 #path="E:\effect of durable log\without durable"
 nclient=35
-filename=".\\scripts\\updated_rps\\ol_overall_netIO_median_clientside_35_clients.txt"
+filename=".\\scripts\\updated_rps\\"
 client_cpu_usage_limit=3000
 
 
