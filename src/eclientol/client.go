@@ -25,8 +25,8 @@ import (
 )
 
 // const REQUEST_TIMEOUT = 1 * time.Second
-const REQUEST_TIMEOUT = 200 * time.Millisecond
-const GET_VIEW_TIMEOUT = 200 * time.Millisecond
+const REQUEST_TIMEOUT = 100 * time.Millisecond
+const GET_VIEW_TIMEOUT = 100 * time.Millisecond
 const GC_DEBUG_ENABLED = false
 const PRINT_STATS = true
 
@@ -41,7 +41,7 @@ var rounds *int = flag.Int("r", 1, "Split the total number of requests into this
 var procs *int = flag.Int("p", 2, "GOMAXPROCS. Defaults to 2")
 var check = flag.Bool("check", false, "Check that every expected reply was received exactly once.")
 var eps *int = flag.Int("eps", 0, "Send eps more messages per round than the client will wait for (to discount stragglers). Defaults to 0.")
-var conflicts *int = flag.Int("c", 25, "Percentage of conflicts. Defaults to 0%")
+var conflicts *int = flag.Int("c", 50, "Percentage of conflicts. Defaults to 0%")
 var s = flag.Float64("s", 2, "Zipfian s parameter")
 var v = flag.Float64("v", 1, "Zipfian v parameter")
 var cid *int = flag.Int("id", -1, "Client ID.")
