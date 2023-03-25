@@ -45,7 +45,7 @@ var conflicts *int = flag.Int("c", 50, "Percentage of conflicts. Defaults to 0%"
 var s = flag.Float64("s", 2, "Zipfian s parameter")
 var v = flag.Float64("v", 1, "Zipfian v parameter")
 var cid *int = flag.Int("id", -1, "Client ID.")
-var cpuProfile *string = flag.String("cpuprofile", "", "Name of file for CPU profile. If empty, no profile is created.")
+var cpuProfile *string = flag.String("cpuprofile", "cpu_profile", "Name of file for CPU profile. If empty, no profile is created.")
 var maxRuntime *int = flag.Int("runtime", 400, "Max duration to run experiment in second. If negative, stop after sending up to reqsNb requests")
 
 // var debug *bool = flag.Bool("debug", false, "Enable debug output.")
