@@ -118,7 +118,7 @@ func registerWithMaster(masterAddr string) (int, []string) {
 func catchKill(interrupt chan os.Signal) {
 	<-interrupt
 	if *cpuprofile != "" {
-		defer pprof.StopCPUProfile()
+		pprof.StopCPUProfile()
 	}
 	//fmt.Println("Caught signal")
 	//os.Exit(0)
