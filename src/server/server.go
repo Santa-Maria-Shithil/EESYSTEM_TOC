@@ -53,7 +53,7 @@ func main() {
 
 		interrupt := make(chan os.Signal, 1)
 		signal.Notify(interrupt)
-		//go catchKill(interrupt)
+		go catchKill(interrupt)
 	}
 
 	log.Printf("Server starting on port %d\n", *portnum)
