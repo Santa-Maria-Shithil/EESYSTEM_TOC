@@ -146,7 +146,7 @@ func (r *Replica) ConnectToPeers() {
 	bs := b[:4]
 	done := make(chan bool)
 
-	go r.waitForPeerConnections(done)
+	//go r.waitForPeerConnections(done)
 
 	//connect to peers
 	for i := 0; i < int(r.Id); i++ {
@@ -174,7 +174,7 @@ func (r *Replica) ConnectToPeers() {
 		if int32(rid) == r.Id {
 			continue
 		}
-		go r.replicaListener(rid, reader)
+		//go r.replicaListener(rid, reader)
 	}
 }
 
