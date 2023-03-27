@@ -174,7 +174,7 @@ func (r *Replica) ConnectToPeers() {
 		if int32(rid) == r.Id {
 			continue
 		}
-		//go r.replicaListener(rid, reader)     @sshithil
+		go r.replicaListener(rid, reader)
 	}
 }
 
@@ -242,7 +242,7 @@ func (r *Replica) WaitForClientConnections() {
 			log.Println("Accept error:", err)
 			continue
 		}
-		//go r.clientListener(conn) @sshitihl
+		go r.clientListener(conn)
 
 		r.OnClientConnect <- true
 	}
