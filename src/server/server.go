@@ -51,7 +51,7 @@ func main() {
 		}
 		pprof.StartCPUProfile(f)
 
-		interrupt := make(chan os.Signal, 1)
+		interrupt := make(chan os.Signal, 2)
 		signal.Notify(interrupt)
 		go catchKill(interrupt)
 	}
