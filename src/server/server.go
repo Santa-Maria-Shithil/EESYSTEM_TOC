@@ -56,15 +56,6 @@ func main() {
 		go catchKill(interrupt)
 	}
 
-	/*if *cpuprofile != "" {
-		f, err := os.Create(*cpuprofile)
-		if err != nil {
-			log.Fatal(err)
-		}
-		pprof.StartCPUProfile(f)
-		pprof.StopCPUProfile()
-	}*/
-
 	log.Printf("Server starting on port %d\n", *portnum)
 
 	replicaId, nodeList := registerWithMaster(fmt.Sprintf("%s:%d", *masterAddr, *masterPort))
