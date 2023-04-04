@@ -59,9 +59,9 @@ func main() {
 
 	}*/
 
-	/*go func() {
+	go func() {
 		log.Println(http.ListenAndServe("localhost:6060", nil))
-	}()*/
+	}()
 
 	log.Printf("Server starting on port %d\n", *portnum)
 
