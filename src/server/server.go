@@ -44,6 +44,7 @@ func main() {
 
 	runtime.GOMAXPROCS(*procs)
 
+	//current_time := time.Now()
 	if *cpuprofile != "" {
 		f, err := os.Create(*cpuprofile)
 		if err != nil {
@@ -54,8 +55,8 @@ func main() {
 		interrupt := make(chan os.Signal, 1)
 		signal.Notify(interrupt)
 
-		time.Sleep(5 * time.Second)
 		go catchKill(interrupt)
+
 	}
 
 	log.Printf("Server starting on port %d\n", *portnum)
@@ -120,6 +121,8 @@ func registerWithMaster(masterAddr string) (int, []string) {
 func catchKill(interrupt chan os.Signal) {
 	<-interrupt
 	if *cpuprofile != "" {
+		theTime := <-time.After(time.Second * 5)
+		log.Println(theTime)
 		pprof.StopCPUProfile()
 	}
 	fmt.Println("Caught signal")
