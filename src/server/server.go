@@ -122,7 +122,7 @@ func catchKill(interrupt chan os.Signal) {
 	<-interrupt
 	if *cpuprofile != "" {
 		//theTime := <-time.After(time.Second * 5)
-		log.Println(theTime)
+		//log.Println(theTime)
 		pprof.StopCPUProfile()
 	}
 	fmt.Println("Caught signal")
