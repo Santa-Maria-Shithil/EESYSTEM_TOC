@@ -121,7 +121,7 @@ func registerWithMaster(masterAddr string) (int, []string) {
 func catchKill(interrupt chan os.Signal) {
 	<-interrupt
 	if *cpuprofile != "" {
-		theTime := <-time.After(time.Second * 5)
+		//theTime := <-time.After(time.Second * 5)
 		log.Println(theTime)
 		pprof.StopCPUProfile()
 	}
