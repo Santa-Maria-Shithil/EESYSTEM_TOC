@@ -12,9 +12,9 @@ import (
 	"mencius"
 	"net"
 	"net/http"
+	_ "net/http/pprof"
 	"net/rpc"
 	"os"
-	"os/signal"
 	"paxos"
 	"runtime"
 	"runtime/pprof"
@@ -45,7 +45,7 @@ func main() {
 	runtime.GOMAXPROCS(*procs)
 
 	//current_time := time.Now()
-	if *cpuprofile != "" {
+	/*if *cpuprofile != "" {
 		f, err := os.Create(*cpuprofile)
 		if err != nil {
 			log.Fatal(err)
@@ -57,7 +57,11 @@ func main() {
 
 		go catchKill(interrupt)
 
-	}
+	}*/
+
+	/*go func() {
+		log.Println(http.ListenAndServe("localhost:6060", nil))
+	}()*/
 
 	log.Printf("Server starting on port %d\n", *portnum)
 
@@ -97,6 +101,7 @@ func main() {
 	}
 
 	http.Serve(l, nil)
+	//http.ListenAndServe()
 }
 
 func registerWithMaster(masterAddr string) (int, []string) {
