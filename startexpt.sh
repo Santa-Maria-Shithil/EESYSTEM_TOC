@@ -3,11 +3,15 @@
 set -x
 
 # protocol to run: "copilot", "latentcopilot", "epaxos", "multipaxos" (default)
-proto=$1
+#proto=$1
+proto="epaxos"
 
-n=$2       # number of replicas
-clients=$3 # number of client threads
-cnodes=$4  # number of client machines
+#n=$2       # number of replicas
+n=5
+#clients=$3 # number of client threads
+clients=10
+#cnodes=$4  # number of client machines
+cnodes=1
 reqs=1000000
 exec="true"
 reply="true"
@@ -16,7 +20,7 @@ check="true"
 cpus=16
 #prefix="/proj/cops/$USER/slowdown" # path to copilot folder
 prefix=$(pwd) # path to copilot folder
-cpuprofile=""
+cpuprofile="cpu.prof"
 verbose="true"
 numkeys=100000
 length="180" # experiment length
