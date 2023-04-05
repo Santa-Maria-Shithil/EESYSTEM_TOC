@@ -62,7 +62,7 @@ func main() {
 	}*/
 	log.Println(*cpuprofile)
 
-	if *cpuprofile == "cpu.prof" {
+	if *cpuprofile != "noprofiling" {
 		go func() {
 			log.Println(http.ListenAndServe("localhost:6060", nil))
 			log.Println("Starting profiling...")
