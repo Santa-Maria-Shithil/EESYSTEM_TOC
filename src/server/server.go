@@ -28,7 +28,8 @@ var myAddr *string = flag.String("addr", "", "Server address (this machine). Def
 var doMencius *bool = flag.Bool("m", false, "Use Mencius as the replication protocol. Defaults to false.")
 var doGpaxos *bool = flag.Bool("g", false, "Use Generalized Paxos as the replication protocol. Defaults to false.")
 var doEpaxos *bool = flag.Bool("e", true, "Use EPaxos as the replication protocol. Defaults to false.")
-var doWeakEpaxos *bool = flag.Bool("we", false, "Use EPaxos as the replication protocol. Defaults to false.") //@sshithil
+
+// var doWeakEpaxos *bool = flag.Bool("we", false, "Use EPaxos as the replication protocol. Defaults to false.") //@sshithil
 var doCopilot *bool = flag.Bool("copilot", false, "Use Copilot as the replication protocol. Defaults to false.")
 var doLatentCopilot *bool = flag.Bool("latentcopilot", false, "Use Latent Copilot as the replication protocol. Defaults to false.")
 var procs *int = flag.Int("p", 2, "GOMAXPROCS. Defaults to 2")
@@ -73,10 +74,6 @@ func main() {
 	if *doEpaxos {
 		log.Println("Starting Egalitarian Paxos replica...")
 		rep := epaxos.NewReplica(replicaId, nodeList, *thrifty, *exec, *dreply, *beacon, *durable)
-		rpc.Register(rep)
-	} else if *doWeakEpaxos { //@shithil
-		log.Println("Starting Weak Egalitarian Paxos replica...")
-		rep := mencius.NewReplica(replicaId, nodeList, *thrifty, *exec, *dreply, *durable)
 		rpc.Register(rep)
 	} else if *doMencius {
 		log.Println("Starting Mencius replica...")
