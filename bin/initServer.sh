@@ -10,7 +10,7 @@ SERVERIP="10.0.1.4" #ip start with IP address 172.76.0.4
 SERVERPORT=5090 #port start with 5090
 NET=overnet #network name start with Paxos_Network1
 MSIZE=16777216
-CPUPROFILE=" "
+CPUPROFILE="noprofiling"
 
 docker rm ${SERVERNAME}
 docker rmi ${SERVERNAME}
