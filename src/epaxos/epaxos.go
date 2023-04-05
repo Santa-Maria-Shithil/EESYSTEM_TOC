@@ -938,9 +938,7 @@ func bfFromCommands(cmds []state.Command) *bloomfilter.Bloomfilter {
 
 /**********************************************************************
 
-
                             PHASE 1
-
 
 ***********************************************************************/
 
@@ -990,7 +988,7 @@ func (r *Replica) startPhase1(replica int32, instance int32, ballot int32, propo
 	r.InstanceSpace[r.Id][instance] = &Instance{
 		cmds,
 		ballot,
-		epaxosproto.COMMITTED, //@sshithil
+		epaxosproto.PREACCEPTED,
 		seq,
 		deps,
 		&LeaderBookkeeping{proposals, 0, 0, true, 0, 0, 0, deps, comDeps, nil, false, false, nil, 0}, 0, 0,
@@ -1002,24 +1000,11 @@ func (r *Replica) startPhase1(replica int32, instance int32, ballot int32, propo
 		r.maxSeq = seq + 1
 	}
 
-	inst := r.InstanceSpace[r.Id][instance]
-
-	for i := 0; i < len(inst.lb.clientProposals); i++ {
-		r.ReplyProposeTS(
-			&genericsmrproto.ProposeReplyTS{
-				TRUE,
-				inst.lb.clientProposals[i].CommandId,
-				state.NIL,
-				inst.lb.clientProposals[i].Timestamp},
-			inst.lb.clientProposals[i].Reply)
-	}
-
 	r.recordInstanceMetadata(r.InstanceSpace[r.Id][instance])
 	r.recordCommands(cmds)
 	r.sync()
 
-	//r.bcastPreAccept(r.Id, instance, ballot, cmds, seq, deps)
-	r.bcastCommit(r.Id, instance, cmds, seq, deps) //changed @sshithil
+	r.bcastPreAccept(r.Id, instance, ballot, cmds, seq, deps)
 
 	cpcounter += batchSize
 
@@ -1039,7 +1024,7 @@ func (r *Replica) startPhase1(replica int32, instance int32, ballot int32, propo
 		r.InstanceSpace[r.Id][instance] = &Instance{
 			cpMarker,
 			0,
-			epaxosproto.COMMITTED, //changed @sshithil
+			epaxosproto.PREACCEPTED,
 			r.maxSeq,
 			deps,
 			&LeaderBookkeeping{nil, 0, 0, true, 0, 0, 0, deps, nil, nil, false, false, nil, 0},
@@ -1056,10 +1041,7 @@ func (r *Replica) startPhase1(replica int32, instance int32, ballot int32, propo
 		r.recordInstanceMetadata(r.InstanceSpace[r.Id][instance])
 		r.sync()
 
-		//r.bcastPreAccept(r.Id, instance, 0, cpMarker, r.maxSeq, deps)
-
-		r.bcastCommit(r.Id, instance, cmds, r.maxSeq, deps) //changed @sshithil
-
+		r.bcastPreAccept(r.Id, instance, 0, cpMarker, r.maxSeq, deps)
 	}
 }
 
@@ -1310,9 +1292,7 @@ func (r *Replica) handlePreAcceptOK(pareply *epaxosproto.PreAcceptOK) {
 
 /**********************************************************************
 
-
                         PHASE 2
-
 
 ***********************************************************************/
 
@@ -1421,9 +1401,7 @@ func (r *Replica) handleAcceptReply(areply *epaxosproto.AcceptReply) {
 
 /**********************************************************************
 
-
                             COMMIT
-
 
 ***********************************************************************/
 
@@ -1523,9 +1501,7 @@ func (r *Replica) handleCommitShort(commit *epaxosproto.CommitShort) {
 
 /**********************************************************************
 
-
                       RECOVERY ACTIONS
-
 
 ***********************************************************************/
 
