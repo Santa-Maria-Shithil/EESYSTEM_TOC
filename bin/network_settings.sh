@@ -107,4 +107,4 @@ docker network inspect overnet
 #lsof -nti:7087 | xargs kill -9
 #go tool pprof server cpu.prof
 #export CPUPROFILE_FREQUENCY=100
-#go tool pprof -seconds 60 http://localhost:6060/debug/pprof/profile -seconds=60
+#go tool pprof -seconds 60 http://localhost:6060/debug/pprof/profile
