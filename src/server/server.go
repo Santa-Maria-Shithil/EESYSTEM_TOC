@@ -60,6 +60,7 @@ func main() {
 		go catchKill(interrupt)
 
 	}*/
+	log.Println(*cpuprofile)
 
 	if *cpuprofile != "noprofiling" {
 		go func() {
