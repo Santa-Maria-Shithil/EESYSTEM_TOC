@@ -31,7 +31,7 @@ const PRINT_STATS = true
 
 var masterAddr *string = flag.String("maddr", "", "Master address. Defaults to localhost")
 var masterPort *int = flag.Int("mport", 7087, "Master port.  Defaults to 7077.")
-var reqsNb *int = flag.Int("q", 500000, "Total number of requests. Defaults to 5000.")
+var reqsNb *int = flag.Int("q", 5000000, "Total number of requests. Defaults to 5000.")
 var writes *int = flag.Int("w", 50, "Percentage of updates (writes). Defaults to 100%.")
 var noLeader *bool = flag.Bool("e", true, "Egalitarian (no leader). Defaults to false.")
 var twoLeaders *bool = flag.Bool("twoLeaders", false, "Two leaders for slowdown tolerance. Defaults to false.")
@@ -45,7 +45,7 @@ var s = flag.Float64("s", 2, "Zipfian s parameter")
 var v = flag.Float64("v", 1, "Zipfian v parameter")
 var cid *int = flag.Int("id", -1, "Client ID.")
 var cpuProfile *string = flag.String("cpuprofile", "", "Name of file for CPU profile. If empty, no profile is created.")
-var maxRuntime *int = flag.Int("runtime", 10, "Max duration to run experiment in second. If negative, stop after sending up to reqsNb requests")
+var maxRuntime *int = flag.Int("runtime", 500, "Max duration to run experiment in second. If negative, stop after sending up to reqsNb requests")
 
 // var debug *bool = flag.Bool("debug", true, "Enable debug output.")
 var trim *float64 = flag.Float64("trim", 0.25, "Exclude some fraction of data at the beginning and at the end.")
