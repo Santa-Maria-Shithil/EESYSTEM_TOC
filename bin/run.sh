@@ -60,7 +60,7 @@ fi
 mkdir -p logs/
 
 if [ "${TYPE}" == "server" ]; then
-    args="-port ${SPORT} -addr ${SADDR} -mport ${MPORT} -maddr ${MADDR}"
+    args="-port ${SPORT} -addr ${SADDR} -mport ${MPORT} -maddr ${MADDR} -cpuprofile ${CPUPROFILE} "
     #arguments must be according to the order of the server.go file
 
 
@@ -107,7 +107,7 @@ if [ "${TYPE}" == "client" ]; then
 
     for i in $(seq 1 ${NCLIENTS}); do
         #open loop   
-        ${DIR}/eclientol -maddr ${MADDR} -mport ${MPORT} -q ${Q} -id ${i} -cpuprofile ${CPUPROFILE} -runtime ${NRUNTIME} 2>&1 | tee -a logs/c_${i}.txt ${ALL} >/dev/null &
+        ${DIR}/eclientol -maddr ${MADDR} -mport ${MPORT} -q ${Q} -id ${i} -runtime ${NRUNTIME} 2>&1 | tee -a logs/c_${i}.txt ${ALL} >/dev/null &
         
         
         
