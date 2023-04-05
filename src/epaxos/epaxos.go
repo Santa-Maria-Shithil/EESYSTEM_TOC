@@ -1007,7 +1007,7 @@ func (r *Replica) startPhase1(replica int32, instance int32, ballot int32, propo
 			&genericsmrproto.ProposeReplyTS{
 				TRUE,
 				inst.lb.clientProposals[i].CommandId,
-				state.NIL,
+				1,
 				inst.lb.clientProposals[i].Timestamp},
 			inst.lb.clientProposals[i].Reply)
 	}

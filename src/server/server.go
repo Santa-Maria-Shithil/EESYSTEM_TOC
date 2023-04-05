@@ -62,13 +62,13 @@ func main() {
 	}*/
 	log.Println(*cpuprofile)
 
-	/*if *cpuprofile != "noprofiling" {
+	if *cpuprofile != "noprofiling" {
 		go func() {
 			log.Println("Starting profiling...")
 			log.Println(http.ListenAndServe("localhost:6060", nil))
 
 		}()
-	}*/
+	}
 
 	log.Printf("Server starting on port %d\n", *portnum)
 
