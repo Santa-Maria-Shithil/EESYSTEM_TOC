@@ -281,9 +281,9 @@ func (r *Replica) run() {
 
 	go r.WaitForClientConnections()
 
-	if r.Exec {
-		go r.executeCommands()
-	}
+	//if r.Exec {
+	//	go r.executeCommands()
+	//}
 
 	if r.Id == 0 {
 		//init quorum read lease
