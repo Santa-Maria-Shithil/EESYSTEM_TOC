@@ -531,7 +531,9 @@ func (r *Replica) executeCommands() {
 	}
 	allFired := false
 
-	for !r.Shutdown { //@sshithil
+	//for !r.Shutdown { //@sshithil
+	if !r.Shutdown {
+
 		executed := false
 
 		if r.Id == 0 && INJECT_SLOWDOWN && !allFired {
