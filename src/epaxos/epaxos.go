@@ -282,9 +282,9 @@ func (r *Replica) run() {
 	go r.WaitForClientConnections()
 
 	//-----------@sshithil
-	/*if r.Exec {
+	if r.Exec {
 		go r.executeCommands()
-	}*/
+	}
 
 	if r.Id == 0 {
 		//init quorum read lease
@@ -385,12 +385,6 @@ func (r *Replica) run() {
 		case propose := <-onOffProposeChan:
 			//got a Propose from a client
 			dlog.Printf("Proposal with op %d\n", propose.Command.Op)
-
-			//-----------@sshithil
-			if r.Exec {
-				go r.executeCommands()
-			}
-
 			r.handlePropose(propose)
 			//deactivate new proposals channel to prioritize the handling of other protocol messages,
 			//and to allow commands to accumulate for batching
