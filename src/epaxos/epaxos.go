@@ -385,6 +385,12 @@ func (r *Replica) run() {
 		case propose := <-onOffProposeChan:
 			//got a Propose from a client
 			dlog.Printf("Proposal with op %d\n", propose.Command.Op)
+
+			//-----------@sshithil
+			if r.Exec {
+				go r.executeCommands()
+			}
+
 			r.handlePropose(propose)
 			//deactivate new proposals channel to prioritize the handling of other protocol messages,
 			//and to allow commands to accumulate for batching
@@ -531,8 +537,7 @@ func (r *Replica) executeCommands() {
 	}
 	allFired := false
 
-	//for !r.Shutdown { //@sshithil
-	if !r.Shutdown {
+	for !r.Shutdown { //@sshithil
 
 		executed := false
 
@@ -827,10 +832,6 @@ func (r *Replica) bcastCommit(replica int32, instance int32, cmds []state.Comman
 		}
 	}
 
-	///------------@sshithil
-	if r.Exec {
-		go r.executeCommands()
-	}
 }
 
 /******************************************************************
