@@ -8,7 +8,7 @@ CLIENTIP="10.0.1.20" #ip start with IP address 172.75.0.200
 CLIENTPORT=5099 #port start with 5090
 NCLIENTS=20 # minimum 1
 NREQ=100000 # total number of req per client
-NRUNTIME=500
+NRUNTIME=200  #best value 500
 MSIZE=16777216
 docker stop ${CLIENTNAME}
 docker rm ${CLIENTNAME}
