@@ -4,6 +4,7 @@ import (
 	//    "state"
 	"epaxosproto"
 	"genericsmrproto"
+	"log"
 	"sort"
 	"time"
 )
@@ -67,8 +68,10 @@ func (e *Exec) strongconnect(v *Instance, index *int) bool {
 
 	for q := int32(0); q < int32(e.r.N); q++ {
 		inst := v.Deps[q]
+		log.Printf("value of inst dependency: %d", inst)
 		for i := e.r.ExecedUpTo[q] + 1; i <= inst; i++ {
 			for e.r.InstanceSpace[q][i] == nil || e.r.InstanceSpace[q][i].Cmds == nil || v.Cmds == nil {
+				log.Printf("inside loop3")
 				time.Sleep(1000 * 1000)
 			}
 			/*        if !state.Conflict(v.Command, e.r.InstanceSpace[q][i].Command) {
@@ -79,6 +82,7 @@ func (e *Exec) strongconnect(v *Instance, index *int) bool {
 				continue
 			}
 			for e.r.InstanceSpace[q][i].Status != epaxosproto.COMMITTED {
+				log.Printf("inside loop4")
 				time.Sleep(1000 * 1000)
 			}
 			w := e.r.InstanceSpace[q][i]
