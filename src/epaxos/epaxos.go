@@ -1470,6 +1470,7 @@ func (r *Replica) handleCommit(commit *epaxosproto.Commit) {
 	r.ExecedUpTo[commit.Replica] = latest
 	log.Printf("Executed upto %d of replica %d", r.ExecedUpTo[commit.Replica], commit.Replica)
 	log.Printf(strconv.FormatBool(ok))
+	//-----@sshithil
 }
 
 func (r *Replica) handleCommitShort(commit *epaxosproto.CommitShort) {
@@ -1520,6 +1521,7 @@ func (r *Replica) handleCommitShort(commit *epaxosproto.CommitShort) {
 	r.ExecedUpTo[commit.Replica] = latest
 	log.Printf("Executed upto %d of replica %d", r.ExecedUpTo[commit.Replica], commit.Replica)
 	log.Printf(strconv.FormatBool(ok))
+	//-----@sshithil
 }
 
 /**********************************************************************

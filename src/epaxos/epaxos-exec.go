@@ -24,6 +24,14 @@ type SCComponent struct {
 	color int8
 }
 
+// -------@sshithil
+type instanceId struct {
+	replica  int32
+	instance int32
+}
+
+//-------@sshithil
+
 func (e *Exec) executeCommand(replica int32, instance int32) bool {
 	if e.r.InstanceSpace[replica][instance] == nil {
 		return false
@@ -83,6 +91,7 @@ func (e *Exec) strongconnect(v *Instance, index *int) bool {
 			}
 			for e.r.InstanceSpace[q][i].Status != epaxosproto.COMMITTED {
 				log.Printf("inside loop4")
+				e.r.instancesToRecover <- &instanceId{q, i} //@sshithil
 				time.Sleep(1000 * 1000)
 			}
 			w := e.r.InstanceSpace[q][i]
