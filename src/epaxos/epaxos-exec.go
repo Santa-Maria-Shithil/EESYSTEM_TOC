@@ -90,7 +90,7 @@ func (e *Exec) strongconnect(v *Instance, index *int) bool {
 				continue
 			}
 			for e.r.InstanceSpace[q][i].Status != epaxosproto.COMMITTED {
-				log.Printf("inside loop4")
+				log.Printf("inside loop4 and status: %d", e.r.InstanceSpace[q][i].Status)
 				//e.r.instancesToRecover <- &instanceId{q, i} //@sshithil
 				time.Sleep(1000 * 1000)
 			}
@@ -125,10 +125,11 @@ func (e *Exec) strongconnect(v *Instance, index *int) bool {
 		sort.Sort(nodeArray(list))
 		for _, w := range list {
 			for w.Cmds == nil {
+				log.Printf("inside loop6")
 				time.Sleep(1000 * 1000)
 			}
 			for idx := 0; idx < len(w.Cmds); idx++ {
-				log.Printf("inside loop6")
+				log.Printf("inside loop7")
 				val := w.Cmds[idx].Execute(e.r.State)
 				if e.r.Dreply && w.lb != nil && w.lb.clientProposals != nil {
 					e.r.ReplyProposeTS(
