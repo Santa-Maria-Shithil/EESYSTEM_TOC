@@ -1463,10 +1463,7 @@ func (r *Replica) handleCommit(commit *epaxosproto.Commit) {
 	r.recordCommands(commit.Command)
 
 	//-----@sshithil
-	for r.exec.executeCommand(commit.Replica, commit.Instance) == false {
-		log.Printf("waiting for long execution.")
-		time.Sleep(1000)
-	}
+	r.exec.executeCommand(commit.Replica, commit.Instance)
 }
 
 func (r *Replica) handleCommitShort(commit *epaxosproto.CommitShort) {
@@ -1511,10 +1508,7 @@ func (r *Replica) handleCommitShort(commit *epaxosproto.CommitShort) {
 	r.recordInstanceMetadata(r.InstanceSpace[commit.Replica][commit.Instance])
 
 	//-----@sshithil
-	for r.exec.executeCommand(commit.Replica, commit.Instance) == false {
-		log.Printf("waiting for short execution.")
-		time.Sleep(1000)
-	}
+	r.exec.executeCommand(commit.Replica, commit.Instance)
 }
 
 /**********************************************************************
