@@ -536,6 +536,7 @@ func (r *Replica) executeCommands() {
 		executed := false
 
 		if r.Id == 0 && INJECT_SLOWDOWN && !allFired {
+			log.Printf("Logging inside the if statement!!!!!!!!!!!")
 			select {
 			case <-timer05ms.C:
 				fmt.Printf("Replica %v: ExecTimer 0.5ms fired at %v\n", r.Id, time.Now())
@@ -621,7 +622,7 @@ func (r *Replica) executeCommands() {
 		}
 		//log.Println(r.ExecedUpTo, " ", r.crtInstance)
 	} //@sshithil
-	log.Printf("Breaking out from the loop!!!!!!!!!!!")
+	log.Printf("Breaking out from the main r.shutdown loop!!!!!!!!!!!")
 
 }
 
