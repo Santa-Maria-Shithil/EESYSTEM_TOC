@@ -282,9 +282,9 @@ func (r *Replica) run() {
 	go r.WaitForClientConnections()
 
 	//-----------@sshithil
-	if r.Exec {
-		go r.executeCommands()
-	}
+	//if r.Exec {
+	//	go r.executeCommands()
+	//}
 
 	if r.Id == 0 {
 		//init quorum read lease
@@ -1461,6 +1461,12 @@ func (r *Replica) handleCommit(commit *epaxosproto.Commit) {
 
 	r.recordInstanceMetadata(r.InstanceSpace[commit.Replica][commit.Instance])
 	r.recordCommands(commit.Command)
+
+	//-----@sshithil
+	for r.exec.executeCommand(commit.Replica, commit.Instance) == false {
+		log.Printf("waiting for execution.")
+		time.Sleep(1000)
+	}
 }
 
 func (r *Replica) handleCommitShort(commit *epaxosproto.CommitShort) {
@@ -1503,6 +1509,12 @@ func (r *Replica) handleCommitShort(commit *epaxosproto.CommitShort) {
 	r.updateCommitted(commit.Replica)
 
 	r.recordInstanceMetadata(r.InstanceSpace[commit.Replica][commit.Instance])
+
+	//-----@sshithil
+	for r.exec.executeCommand(commit.Replica, commit.Instance) == false {
+		log.Printf("waiting for execution.")
+		time.Sleep(1000)
+	}
 }
 
 /**********************************************************************
