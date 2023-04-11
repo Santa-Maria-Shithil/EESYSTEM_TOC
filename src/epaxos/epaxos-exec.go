@@ -91,8 +91,9 @@ func (e *Exec) strongconnect(v *Instance, index *int) bool {
 			}
 			for e.r.InstanceSpace[q][i].Status != epaxosproto.COMMITTED {
 				log.Printf("inside loop4 and status: %d, replica: %d, instance:%d committed info status: %d", e.r.InstanceSpace[q][i].Status, q, i, v.Status)
-				time.Sleep(10 * 1e9)
+
 				e.r.instancesToRecover <- &instanceId{q, i} //@sshithil
+				time.Sleep(10 * 1e9)
 
 			}
 			w := e.r.InstanceSpace[q][i]
