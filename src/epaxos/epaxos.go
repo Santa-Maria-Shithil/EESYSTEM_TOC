@@ -1464,7 +1464,11 @@ func (r *Replica) handleCommit(commit *epaxosproto.Commit) {
 	r.recordCommands(commit.Command)
 
 	//-----@sshithil
+	log.Printf("Executed upto %d of replica %d", r.ExecedUpTo[commit.Replica], commit.Replica)
 	ok := r.exec.executeCommand(commit.Replica, commit.Instance)
+	latest := r.ExecedUpTo[commit.Replica] + 1
+	r.ExecedUpTo[commit.Replica] = latest
+	log.Printf("Executed upto %d of replica %d", r.ExecedUpTo[commit.Replica], commit.Replica)
 	log.Printf(strconv.FormatBool(ok))
 }
 
@@ -1510,7 +1514,11 @@ func (r *Replica) handleCommitShort(commit *epaxosproto.CommitShort) {
 	r.recordInstanceMetadata(r.InstanceSpace[commit.Replica][commit.Instance])
 
 	//-----@sshithil
+	log.Printf("Executed upto %d of replica %d", r.ExecedUpTo[commit.Replica], commit.Replica)
 	ok := r.exec.executeCommand(commit.Replica, commit.Instance)
+	latest := r.ExecedUpTo[commit.Replica] + 1
+	r.ExecedUpTo[commit.Replica] = latest
+	log.Printf("Executed upto %d of replica %d", r.ExecedUpTo[commit.Replica], commit.Replica)
 	log.Printf(strconv.FormatBool(ok))
 }
 
