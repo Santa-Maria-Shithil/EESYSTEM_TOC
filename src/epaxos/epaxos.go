@@ -1464,7 +1464,7 @@ func (r *Replica) handleCommit(commit *epaxosproto.Commit) {
 
 	//-----@sshithil
 	for r.exec.executeCommand(commit.Replica, commit.Instance) == false {
-		log.Printf("waiting for execution.")
+		log.Printf("waiting for long execution.")
 		time.Sleep(1000)
 	}
 }
@@ -1512,7 +1512,7 @@ func (r *Replica) handleCommitShort(commit *epaxosproto.CommitShort) {
 
 	//-----@sshithil
 	for r.exec.executeCommand(commit.Replica, commit.Instance) == false {
-		log.Printf("waiting for execution.")
+		log.Printf("waiting for short execution.")
 		time.Sleep(1000)
 	}
 }
