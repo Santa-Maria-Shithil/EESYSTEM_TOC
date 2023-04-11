@@ -100,6 +100,7 @@ func (e *Exec) strongconnect(v *Instance, index *int) bool {
 				//e.strongconnect(w, index)
 				if !e.strongconnect(w, index) {
 					for j := l; j < len(stack); j++ {
+						log.Printf("inside loop5")
 						stack[j].Index = 0
 					}
 					stack = stack[0:l]
@@ -127,6 +128,7 @@ func (e *Exec) strongconnect(v *Instance, index *int) bool {
 				time.Sleep(1000 * 1000)
 			}
 			for idx := 0; idx < len(w.Cmds); idx++ {
+				log.Printf("inside loop6")
 				val := w.Cmds[idx].Execute(e.r.State)
 				if e.r.Dreply && w.lb != nil && w.lb.clientProposals != nil {
 					e.r.ReplyProposeTS(
