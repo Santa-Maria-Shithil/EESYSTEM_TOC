@@ -1463,7 +1463,7 @@ func (r *Replica) handleCommit(commit *epaxosproto.Commit) {
 	r.recordCommands(commit.Command)
 
 	//-----@sshithil
-	r.exec.executeCommand(commit.Replica, commit.Instance)
+	ok := r.exec.executeCommand(commit.Replica, commit.Instance)
 }
 
 func (r *Replica) handleCommitShort(commit *epaxosproto.CommitShort) {
@@ -1508,7 +1508,7 @@ func (r *Replica) handleCommitShort(commit *epaxosproto.CommitShort) {
 	r.recordInstanceMetadata(r.InstanceSpace[commit.Replica][commit.Instance])
 
 	//-----@sshithil
-	r.exec.executeCommand(commit.Replica, commit.Instance)
+	ok := r.exec.executeCommand(commit.Replica, commit.Instance)
 }
 
 /**********************************************************************
