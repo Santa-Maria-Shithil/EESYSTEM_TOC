@@ -1464,6 +1464,7 @@ func (r *Replica) handleCommit(commit *epaxosproto.Commit) {
 
 	//-----@sshithil
 	ok := r.exec.executeCommand(commit.Replica, commit.Instance)
+	log.Printf(ok)
 }
 
 func (r *Replica) handleCommitShort(commit *epaxosproto.CommitShort) {
@@ -1509,6 +1510,7 @@ func (r *Replica) handleCommitShort(commit *epaxosproto.CommitShort) {
 
 	//-----@sshithil
 	ok := r.exec.executeCommand(commit.Replica, commit.Instance)
+	log.Printf(ok)
 }
 
 /**********************************************************************
