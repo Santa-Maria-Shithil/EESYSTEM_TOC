@@ -89,11 +89,11 @@ func (e *Exec) strongconnect(v *Instance, index *int) bool {
 			if e.r.InstanceSpace[q][i].Status == epaxosproto.EXECUTED {
 				continue
 			}
-			for e.r.InstanceSpace[q][i].Status != epaxosproto.COMMITTED {
+			/*for e.r.InstanceSpace[q][i].Status != epaxosproto.COMMITTED {
 				log.Printf("inside loop4")
 				e.r.instancesToRecover <- &instanceId{q, i} //@sshithil
 				time.Sleep(1000 * 1000)
-			}
+			}*/
 			w := e.r.InstanceSpace[q][i]
 
 			if w.Index == 0 {
