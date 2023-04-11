@@ -25,10 +25,10 @@ type SCComponent struct {
 }
 
 // -------@sshithil
-type instanceId struct {
-	replica  int32
-	instance int32
-}
+//type instanceId struct {
+//	replica  int32
+//	instance int32
+//}
 
 //-------@sshithil
 
