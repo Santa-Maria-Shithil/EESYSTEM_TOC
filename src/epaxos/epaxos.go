@@ -494,6 +494,7 @@ func (r *Replica) run() {
 			weird, conflicted, slow, happy = 0, 0, 0, 0
 
 		case iid := <-r.instancesToRecover:
+			log.Printf("Recovering replica: %d, instance: %d", iid.replica, iid.instance)
 			r.startRecoveryForInstance(iid.replica, iid.instance)
 		}
 	}
