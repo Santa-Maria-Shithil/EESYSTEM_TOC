@@ -532,6 +532,7 @@ func (r *Replica) executeCommands() {
 	allFired := false
 
 	for !r.Shutdown {
+		log.Printf("Inside the main loop in epaxos.go")
 		executed := false
 
 		if r.Id == 0 && INJECT_SLOWDOWN && !allFired {
@@ -583,8 +584,10 @@ func (r *Replica) executeCommands() {
 		}
 
 		for q := 0; q < r.N; q++ {
+			log.Printf("inside the first inner loop in epaxos.go")
 			inst := int32(0)
 			for inst = r.ExecedUpTo[q] + 1; inst < r.crtInstance[q]; inst++ {
+				log.Printf("inside the second inner loop in epaxos.go")
 				if r.InstanceSpace[q][inst] != nil && r.InstanceSpace[q][inst].Status == epaxosproto.EXECUTED {
 					if inst == r.ExecedUpTo[q]+1 {
 						r.ExecedUpTo[q] = inst
