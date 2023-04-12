@@ -81,6 +81,7 @@ func (e *Exec) strongconnect(v *Instance, index *int) bool {
 			for e.r.InstanceSpace[q][i] == nil || e.r.InstanceSpace[q][i].Cmds == nil || v.Cmds == nil {
 				log.Printf("inside loop3")
 				time.Sleep(1000 * 1000)
+				return false
 			}
 			/*        if !state.Conflict(v.Command, e.r.InstanceSpace[q][i].Command) {
 			          continue
@@ -97,7 +98,7 @@ func (e *Exec) strongconnect(v *Instance, index *int) bool {
 				//id := <-e.r.instancesToRecover
 				//log.Printf("Vlaue of channel, replica:%d, instace:%d", id.replica, id.instance)
 
-				time.Sleep(10 * 5e9)
+				time.Sleep(1000 * 1000)
 				return false //@sshithl
 
 			}
