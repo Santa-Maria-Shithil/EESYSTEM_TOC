@@ -24,14 +24,6 @@ type SCComponent struct {
 	color int8
 }
 
-// -------@sshithil
-//type instanceId struct {
-//	replica  int32
-//	instance int32
-//}
-
-//-------@sshithil
-
 func (e *Exec) executeCommand(replica int32, instance int32) bool {
 	if e.r.InstanceSpace[replica][instance] == nil {
 		return false
@@ -95,8 +87,8 @@ func (e *Exec) strongconnect(v *Instance, index *int) bool {
 
 				e.r.instancesToRecover <- &instanceId{q, i} //@sshithil
 				//e.r.startRecoveryForInstance(q, i) //@sshithil
-				id := <-e.r.instancesToRecover
-				log.Printf("Vlaue of channel, replica:%d, instace:%d", id.replica, id.instance)
+				//id := <-e.r.instancesToRecover
+				//log.Printf("Vlaue of channel, replica:%d, instace:%d", id.replica, id.instance)
 
 				//time.Sleep(1000 * 1000)
 				time.Sleep(10 * 1e9) //10 seconds

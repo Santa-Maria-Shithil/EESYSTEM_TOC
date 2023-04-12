@@ -491,13 +491,12 @@ func (r *Replica) run() {
 		case <-r.OnClientConnect:
 			log.Printf("weird %d; conflicted %d; slow %d; happy %d\n", weird, conflicted, slow, happy)
 			weird, conflicted, slow, happy = 0, 0, 0, 0
-			//break
+			break
 
-		case <-r.instancesToRecover:
-			iid := <-r.instancesToRecover
+		case iid := <-r.instancesToRecover:
 			log.Printf("Recovering replica: %d, instance: %d", iid.replica, iid.instance)
 			r.startRecoveryForInstance(iid.replica, iid.instance)
-			//break
+			break
 
 		}
 	}
@@ -607,7 +606,7 @@ func (r *Replica) executeCommands() {
 						timeout[q] += SLEEP_TIME_NS
 						if timeout[q] >= COMMIT_GRACE_PERIOD {
 
-							r.instancesToRecover <- &instanceId{int32(q), inst}
+							//r.instancesToRecover <- &instanceId{int32(q), inst}
 							timeout[q] = 0
 						}
 					} else {
