@@ -93,7 +93,7 @@ func (e *Exec) strongconnect(v *Instance, index *int) bool {
 				log.Printf("inside loop4 and status: %d, replica: %d, instance:%d committed info status: %d", e.r.InstanceSpace[q][i].Status, q, i, v.Status)
 
 				e.r.instancesToRecover <- &instanceId{q, i} //@sshithil
-				time.Sleep(10 * 1e9)
+				time.Sleep(10 * 5e9)
 
 			}
 			w := e.r.InstanceSpace[q][i]
