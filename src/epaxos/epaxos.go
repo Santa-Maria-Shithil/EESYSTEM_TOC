@@ -586,39 +586,37 @@ func (r *Replica) executeCommands() {
 		}
 
 		for q := 0; q < r.N; q++ {
-			log.Println("inside loop2")
+
 			inst := int32(0)
 			for inst = r.ExecedUpTo[q] + 1; inst < r.crtInstance[q]; inst++ {
-				log.Printf("inside loop3")
+
 				if r.InstanceSpace[q][inst] != nil && r.InstanceSpace[q][inst].Status == epaxosproto.EXECUTED {
-					log.Printf("inside first if")
+
 					if inst == r.ExecedUpTo[q]+1 {
 						r.ExecedUpTo[q] = inst
 					}
 					continue
 				}
 				if r.InstanceSpace[q][inst] == nil || r.InstanceSpace[q][inst].Status != epaxosproto.COMMITTED {
-					log.Printf("inside second if")
+
 					if inst == problemInstance[q] {
 						timeout[q] += SLEEP_TIME_NS
 						if timeout[q] >= COMMIT_GRACE_PERIOD {
-							log.Printf("channeling data for recovery")
+
 							r.instancesToRecover <- &instanceId{int32(q), inst}
 							timeout[q] = 0
 						}
 					} else {
-						log.Printf("inside else")
+
 						problemInstance[q] = inst
 						timeout[q] = 0
 					}
 					if r.InstanceSpace[q][inst] == nil {
-						log.Printf("inside third if")
 						continue
 					}
 					break
 				}
 				if ok := r.exec.executeCommand(int32(q), inst); ok {
-					log.Printf("inside execution if")
 					executed = true
 					if inst == r.ExecedUpTo[q]+1 {
 						r.ExecedUpTo[q] = inst
