@@ -92,11 +92,13 @@ func (e *Exec) strongconnect(v *Instance, index *int) bool {
 			for e.r.InstanceSpace[q][i].Status != epaxosproto.COMMITTED {
 				log.Printf("inside loop4 and status: %d, replica: %d, instance:%d committed info status: %d", e.r.InstanceSpace[q][i].Status, q, i, v.Status)
 
-				e.r.instancesToRecover <- &instanceId{q, i} //@sshithil
+				//e.r.instancesToRecover <- &instanceId{q, i} //@sshithil
 				//e.r.startRecoveryForInstance(q, i) //@sshithil
-				id := <-e.r.instancesToRecover
-				log.Printf("Vlaue of channel, replica:%d, instace:%d", id.replica, id.instance)
+				//id := <-e.r.instancesToRecover
+				//log.Printf("Vlaue of channel, replica:%d, instace:%d", id.replica, id.instance)
+
 				time.Sleep(10 * 5e9)
+				return false //@sshithl
 
 			}
 			w := e.r.InstanceSpace[q][i]
@@ -132,6 +134,7 @@ func (e *Exec) strongconnect(v *Instance, index *int) bool {
 			for w.Cmds == nil {
 				log.Printf("inside loop6")
 				time.Sleep(1000 * 1000)
+				return false //@sshithil
 			}
 			for idx := 0; idx < len(w.Cmds); idx++ {
 				log.Printf("inside loop7")
