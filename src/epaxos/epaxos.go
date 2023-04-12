@@ -13,6 +13,7 @@ import (
 	"log"
 	"math"
 	"state"
+	"strconv"
 	"sync"
 	"time"
 )
@@ -619,6 +620,7 @@ func (r *Replica) executeCommands() {
 		}
 		//log.Println(r.ExecedUpTo, " ", r.crtInstance)
 	}
+	log.Printf("outside the main loop. vlaue of r.Shutdown:%s", strconv.FormatBool(r.Shutdown))
 }
 
 /* Ballot helper functions */
