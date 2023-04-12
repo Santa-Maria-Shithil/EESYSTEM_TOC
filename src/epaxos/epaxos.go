@@ -13,7 +13,6 @@ import (
 	"log"
 	"math"
 	"state"
-	"strconv"
 	"sync"
 	"time"
 )
@@ -282,9 +281,9 @@ func (r *Replica) run() {
 
 	go r.WaitForClientConnections()
 
-	//if r.Exec {
-	//	go r.executeCommands()
-	//}
+	if r.Exec {
+		go r.executeCommands()
+	}
 
 	if r.Id == 0 {
 		//init quorum read lease
@@ -1473,14 +1472,14 @@ func (r *Replica) handleCommit(commit *epaxosproto.Commit) {
 	r.recordCommands(commit.Command)
 
 	//-----@sshithil
-	log.Printf("Fast:Executed upto %d of replica %d", r.ExecedUpTo[commit.Replica], commit.Replica)
+	/*log.Printf("Fast:Executed upto %d of replica %d", r.ExecedUpTo[commit.Replica], commit.Replica)
 	ok := r.exec.executeCommand(commit.Replica, commit.Instance)
 	if ok == true {
 		latest := r.ExecedUpTo[commit.Replica] + 1
 		r.ExecedUpTo[commit.Replica] = latest
 		log.Printf("Fast:Executed upto %d of replica %d", r.ExecedUpTo[commit.Replica], commit.Replica)
 		log.Printf(strconv.FormatBool(ok))
-	}
+	}*/
 
 	//-----@sshithil
 }
@@ -1527,14 +1526,14 @@ func (r *Replica) handleCommitShort(commit *epaxosproto.CommitShort) {
 	r.recordInstanceMetadata(r.InstanceSpace[commit.Replica][commit.Instance])
 
 	//-----@sshithil
-	log.Printf("Slow: Executed upto %d of replica %d", r.ExecedUpTo[commit.Replica], commit.Replica)
+	/*log.Printf("Slow: Executed upto %d of replica %d", r.ExecedUpTo[commit.Replica], commit.Replica)
 	ok := r.exec.executeCommand(commit.Replica, commit.Instance)
 	if ok == true {
 		latest := r.ExecedUpTo[commit.Replica] + 1
 		r.ExecedUpTo[commit.Replica] = latest
 		log.Printf("Slow: Executed upto %d of replica %d", r.ExecedUpTo[commit.Replica], commit.Replica)
 		log.Printf(strconv.FormatBool(ok))
-	}
+	}*/
 
 	//-----@sshithil
 }
