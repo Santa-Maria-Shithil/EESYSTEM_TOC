@@ -94,7 +94,7 @@ func (e *Exec) strongconnect(v *Instance, index *int) bool {
 
 				//e.r.instancesToRecover <- &instanceId{q, i} //@sshithil
 				e.r.startRecoveryForInstance(q, i) //@sshithil
-				time.Sleep(10 * 5e9)
+				//time.Sleep(10 * 5e9)
 
 			}
 			w := e.r.InstanceSpace[q][i]
