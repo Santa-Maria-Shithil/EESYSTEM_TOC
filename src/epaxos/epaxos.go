@@ -532,98 +532,98 @@ func (r *Replica) executeCommands() {
 	}
 	allFired := false
 
-	//for !r.Shutdown { //@sshithil
+	for !r.Shutdown { //@sshithil
 
-	executed := false
+		executed := false
 
-	if r.Id == 0 && INJECT_SLOWDOWN && !allFired {
-		log.Printf("Logging inside the if statement!!!!!!!!!!!")
-		select {
-		case <-timer05ms.C:
-			fmt.Printf("Replica %v: ExecTimer 0.5ms fired at %v\n", r.Id, time.Now())
-			time.Sleep(500 * time.Microsecond)
-			break
+		if r.Id == 0 && INJECT_SLOWDOWN && !allFired {
+			log.Printf("Logging inside the if statement!!!!!!!!!!!")
+			select {
+			case <-timer05ms.C:
+				fmt.Printf("Replica %v: ExecTimer 0.5ms fired at %v\n", r.Id, time.Now())
+				time.Sleep(500 * time.Microsecond)
+				break
 
-		case <-timer1ms.C:
-			fmt.Printf("Replica %v: ExecTimer 1ms fired at %v\n", r.Id, time.Now())
-			time.Sleep(1 * time.Millisecond)
-			break
+			case <-timer1ms.C:
+				fmt.Printf("Replica %v: ExecTimer 1ms fired at %v\n", r.Id, time.Now())
+				time.Sleep(1 * time.Millisecond)
+				break
 
-		case <-timer2ms.C:
-			fmt.Printf("Replica %v: ExecTimer 2ms fired at %v\n", r.Id, time.Now())
-			time.Sleep(2 * time.Millisecond)
-			break
+			case <-timer2ms.C:
+				fmt.Printf("Replica %v: ExecTimer 2ms fired at %v\n", r.Id, time.Now())
+				time.Sleep(2 * time.Millisecond)
+				break
 
-		case <-timer5ms.C:
-			fmt.Printf("Replica %v: ExecTimer 5ms fired at %v\n", r.Id, time.Now())
-			time.Sleep(5 * time.Millisecond)
-			break
+			case <-timer5ms.C:
+				fmt.Printf("Replica %v: ExecTimer 5ms fired at %v\n", r.Id, time.Now())
+				time.Sleep(5 * time.Millisecond)
+				break
 
-		case <-timer10ms.C:
-			fmt.Printf("Replica %v: ExecTimer 10ms fired at %v\n", r.Id, time.Now())
-			time.Sleep(10 * time.Millisecond)
-			break
+			case <-timer10ms.C:
+				fmt.Printf("Replica %v: ExecTimer 10ms fired at %v\n", r.Id, time.Now())
+				time.Sleep(10 * time.Millisecond)
+				break
 
-		case <-timer20ms.C:
-			fmt.Printf("Replica %v: ExecTimer 20ms fired at %v\n", r.Id, time.Now())
-			time.Sleep(20 * time.Millisecond)
-			break
+			case <-timer20ms.C:
+				fmt.Printf("Replica %v: ExecTimer 20ms fired at %v\n", r.Id, time.Now())
+				time.Sleep(20 * time.Millisecond)
+				break
 
-		case <-timer40ms.C:
-			fmt.Printf("Replica %v: ExecTimer 40ms fired at %v\n", r.Id, time.Now())
-			time.Sleep(40 * time.Millisecond)
-			break
+			case <-timer40ms.C:
+				fmt.Printf("Replica %v: ExecTimer 40ms fired at %v\n", r.Id, time.Now())
+				time.Sleep(40 * time.Millisecond)
+				break
 
-		case <-timer80ms.C:
-			fmt.Printf("Replica %v: ExecTimer 80ms fired at %v\n", r.Id, time.Now())
-			allFired = true
-			time.Sleep(80 * time.Millisecond)
-			break
-		default:
-			break
+			case <-timer80ms.C:
+				fmt.Printf("Replica %v: ExecTimer 80ms fired at %v\n", r.Id, time.Now())
+				allFired = true
+				time.Sleep(80 * time.Millisecond)
+				break
+			default:
+				break
 
-		}
-	}
-
-	for q := 0; q < r.N; q++ {
-		inst := int32(0)
-		for inst = r.ExecedUpTo[q] + 1; inst < r.crtInstance[q]; inst++ {
-			if r.InstanceSpace[q][inst] != nil && r.InstanceSpace[q][inst].Status == epaxosproto.EXECUTED {
-				if inst == r.ExecedUpTo[q]+1 {
-					r.ExecedUpTo[q] = inst
-				}
-				continue
 			}
-			if r.InstanceSpace[q][inst] == nil || r.InstanceSpace[q][inst].Status != epaxosproto.COMMITTED {
-				if inst == problemInstance[q] {
-					timeout[q] += SLEEP_TIME_NS
-					if timeout[q] >= COMMIT_GRACE_PERIOD {
-						log.Printf("channeling data for recovery")
-						r.instancesToRecover <- &instanceId{int32(q), inst}
-						timeout[q] = 0
+		}
+
+		for q := 0; q < r.N; q++ {
+			inst := int32(0)
+			for inst = r.ExecedUpTo[q] + 1; inst < r.crtInstance[q]; inst++ {
+				if r.InstanceSpace[q][inst] != nil && r.InstanceSpace[q][inst].Status == epaxosproto.EXECUTED {
+					if inst == r.ExecedUpTo[q]+1 {
+						r.ExecedUpTo[q] = inst
 					}
-				} else {
-					problemInstance[q] = inst
-					timeout[q] = 0
-				}
-				if r.InstanceSpace[q][inst] == nil {
 					continue
 				}
-				break
-			}
-			if ok := r.exec.executeCommand(int32(q), inst); ok {
-				executed = true
-				if inst == r.ExecedUpTo[q]+1 {
-					r.ExecedUpTo[q] = inst
+				if r.InstanceSpace[q][inst] == nil || r.InstanceSpace[q][inst].Status != epaxosproto.COMMITTED {
+					if inst == problemInstance[q] {
+						timeout[q] += SLEEP_TIME_NS
+						if timeout[q] >= COMMIT_GRACE_PERIOD {
+							log.Printf("channeling data for recovery")
+							r.instancesToRecover <- &instanceId{int32(q), inst}
+							timeout[q] = 0
+						}
+					} else {
+						problemInstance[q] = inst
+						timeout[q] = 0
+					}
+					if r.InstanceSpace[q][inst] == nil {
+						continue
+					}
+					break
+				}
+				if ok := r.exec.executeCommand(int32(q), inst); ok {
+					executed = true
+					if inst == r.ExecedUpTo[q]+1 {
+						r.ExecedUpTo[q] = inst
+					}
 				}
 			}
 		}
-	}
-	if !executed {
-		time.Sleep(SLEEP_TIME_NS)
-	}
-	//log.Println(r.ExecedUpTo, " ", r.crtInstance)
-	//} //@sshithil
+		if !executed {
+			time.Sleep(SLEEP_TIME_NS)
+		}
+		//log.Println(r.ExecedUpTo, " ", r.crtInstance)
+	} //@sshithil
 	log.Printf("Breaking out from the main r.shutdown loop!!!!!!!!!!!")
 
 }
