@@ -13,7 +13,6 @@ import (
 	"log"
 	"math"
 	"state"
-	"strconv"
 	"sync"
 	"time"
 )
@@ -25,7 +24,7 @@ const TRUE = uint8(1)
 const FALSE = uint8(0)
 const ADAPT_TIME_SEC = 10
 
-const MAX_BATCH = 1000
+const MAX_BATCH = 5000
 const BATCH_INTERVAL = 100 * time.Microsecond
 
 const COMMIT_GRACE_PERIOD = 10 * 1e9 //10 seconds
@@ -282,6 +281,7 @@ func (r *Replica) run() {
 
 	go r.WaitForClientConnections()
 
+	//-----------@sshithil
 	if r.Exec {
 		go r.executeCommands()
 	}
@@ -493,6 +493,7 @@ func (r *Replica) run() {
 			weird, conflicted, slow, happy = 0, 0, 0, 0
 
 		case iid := <-r.instancesToRecover:
+			log.Printf("Recovering replica: %d, instance: %d", iid.replica, iid.instance)
 			r.startRecoveryForInstance(iid.replica, iid.instance)
 		}
 	}
@@ -503,7 +504,7 @@ func (r *Replica) run() {
 ************************************/
 
 func (r *Replica) executeCommands() {
-	const SLEEP_TIME_NS = 1000 // 1 microsecond
+	const SLEEP_TIME_NS = 1000 // 1 microsecond=1000
 	problemInstance := make([]int32, r.N)
 	timeout := make([]uint64, r.N)
 	for q := 0; q < r.N; q++ {
@@ -531,99 +532,99 @@ func (r *Replica) executeCommands() {
 	}
 	allFired := false
 
-	for !r.Shutdown {
-		log.Printf("Inside the main loop in epaxos.go")
-		executed := false
+	//for !r.Shutdown { //@sshithil
 
-		if r.Id == 0 && INJECT_SLOWDOWN && !allFired {
-			select {
-			case <-timer05ms.C:
-				fmt.Printf("Replica %v: ExecTimer 0.5ms fired at %v\n", r.Id, time.Now())
-				time.Sleep(500 * time.Microsecond)
-				break
+	executed := false
 
-			case <-timer1ms.C:
-				fmt.Printf("Replica %v: ExecTimer 1ms fired at %v\n", r.Id, time.Now())
-				time.Sleep(1 * time.Millisecond)
-				break
+	if r.Id == 0 && INJECT_SLOWDOWN && !allFired {
+		log.Printf("Logging inside the if statement!!!!!!!!!!!")
+		select {
+		case <-timer05ms.C:
+			fmt.Printf("Replica %v: ExecTimer 0.5ms fired at %v\n", r.Id, time.Now())
+			time.Sleep(500 * time.Microsecond)
+			break
 
-			case <-timer2ms.C:
-				fmt.Printf("Replica %v: ExecTimer 2ms fired at %v\n", r.Id, time.Now())
-				time.Sleep(2 * time.Millisecond)
-				break
+		case <-timer1ms.C:
+			fmt.Printf("Replica %v: ExecTimer 1ms fired at %v\n", r.Id, time.Now())
+			time.Sleep(1 * time.Millisecond)
+			break
 
-			case <-timer5ms.C:
-				fmt.Printf("Replica %v: ExecTimer 5ms fired at %v\n", r.Id, time.Now())
-				time.Sleep(5 * time.Millisecond)
-				break
+		case <-timer2ms.C:
+			fmt.Printf("Replica %v: ExecTimer 2ms fired at %v\n", r.Id, time.Now())
+			time.Sleep(2 * time.Millisecond)
+			break
 
-			case <-timer10ms.C:
-				fmt.Printf("Replica %v: ExecTimer 10ms fired at %v\n", r.Id, time.Now())
-				time.Sleep(10 * time.Millisecond)
-				break
+		case <-timer5ms.C:
+			fmt.Printf("Replica %v: ExecTimer 5ms fired at %v\n", r.Id, time.Now())
+			time.Sleep(5 * time.Millisecond)
+			break
 
-			case <-timer20ms.C:
-				fmt.Printf("Replica %v: ExecTimer 20ms fired at %v\n", r.Id, time.Now())
-				time.Sleep(20 * time.Millisecond)
-				break
+		case <-timer10ms.C:
+			fmt.Printf("Replica %v: ExecTimer 10ms fired at %v\n", r.Id, time.Now())
+			time.Sleep(10 * time.Millisecond)
+			break
 
-			case <-timer40ms.C:
-				fmt.Printf("Replica %v: ExecTimer 40ms fired at %v\n", r.Id, time.Now())
-				time.Sleep(40 * time.Millisecond)
-				break
+		case <-timer20ms.C:
+			fmt.Printf("Replica %v: ExecTimer 20ms fired at %v\n", r.Id, time.Now())
+			time.Sleep(20 * time.Millisecond)
+			break
 
-			case <-timer80ms.C:
-				fmt.Printf("Replica %v: ExecTimer 80ms fired at %v\n", r.Id, time.Now())
-				allFired = true
-				time.Sleep(80 * time.Millisecond)
-				break
-			default:
-				break
+		case <-timer40ms.C:
+			fmt.Printf("Replica %v: ExecTimer 40ms fired at %v\n", r.Id, time.Now())
+			time.Sleep(40 * time.Millisecond)
+			break
 
-			}
+		case <-timer80ms.C:
+			fmt.Printf("Replica %v: ExecTimer 80ms fired at %v\n", r.Id, time.Now())
+			allFired = true
+			time.Sleep(80 * time.Millisecond)
+			break
+		default:
+			break
+
 		}
+	}
 
-		for q := 0; q < r.N; q++ {
-			log.Printf("inside the first inner loop in epaxos.go")
-			inst := int32(0)
-			for inst = r.ExecedUpTo[q] + 1; inst < r.crtInstance[q]; inst++ {
-				log.Printf("inside the second inner loop in epaxos.go")
-				if r.InstanceSpace[q][inst] != nil && r.InstanceSpace[q][inst].Status == epaxosproto.EXECUTED {
-					if inst == r.ExecedUpTo[q]+1 {
-						r.ExecedUpTo[q] = inst
-					}
-					continue
+	for q := 0; q < r.N; q++ {
+		inst := int32(0)
+		for inst = r.ExecedUpTo[q] + 1; inst < r.crtInstance[q]; inst++ {
+			if r.InstanceSpace[q][inst] != nil && r.InstanceSpace[q][inst].Status == epaxosproto.EXECUTED {
+				if inst == r.ExecedUpTo[q]+1 {
+					r.ExecedUpTo[q] = inst
 				}
-				if r.InstanceSpace[q][inst] == nil || r.InstanceSpace[q][inst].Status != epaxosproto.COMMITTED {
-					if inst == problemInstance[q] {
-						timeout[q] += SLEEP_TIME_NS
-						if timeout[q] >= COMMIT_GRACE_PERIOD {
-							r.instancesToRecover <- &instanceId{int32(q), inst}
-							timeout[q] = 0
-						}
-					} else {
-						problemInstance[q] = inst
+				continue
+			}
+			if r.InstanceSpace[q][inst] == nil || r.InstanceSpace[q][inst].Status != epaxosproto.COMMITTED {
+				if inst == problemInstance[q] {
+					timeout[q] += SLEEP_TIME_NS
+					if timeout[q] >= COMMIT_GRACE_PERIOD {
+						r.instancesToRecover <- &instanceId{int32(q), inst}
 						timeout[q] = 0
 					}
-					if r.InstanceSpace[q][inst] == nil {
-						continue
-					}
-					break
+				} else {
+					problemInstance[q] = inst
+					timeout[q] = 0
 				}
-				if ok := r.exec.executeCommand(int32(q), inst); ok {
-					executed = true
-					if inst == r.ExecedUpTo[q]+1 {
-						r.ExecedUpTo[q] = inst
-					}
+				if r.InstanceSpace[q][inst] == nil {
+					continue
+				}
+				break
+			}
+			if ok := r.exec.executeCommand(int32(q), inst); ok {
+				executed = true
+				if inst == r.ExecedUpTo[q]+1 {
+					r.ExecedUpTo[q] = inst
 				}
 			}
 		}
-		if !executed {
-			time.Sleep(SLEEP_TIME_NS)
-		}
-		//log.Println(r.ExecedUpTo, " ", r.crtInstance)
 	}
-	log.Printf("outside the main loop. vlaue of r.Shutdown:%s", strconv.FormatBool(r.Shutdown))
+	if !executed {
+		time.Sleep(SLEEP_TIME_NS)
+	}
+	//log.Println(r.ExecedUpTo, " ", r.crtInstance)
+	//} //@sshithil
+	log.Printf("Breaking out from the main r.shutdown loop!!!!!!!!!!!")
+
 }
 
 /* Ballot helper functions */
@@ -826,6 +827,7 @@ func (r *Replica) bcastCommit(replica int32, instance int32, cmds []state.Comman
 			sent++
 		}
 	}
+
 }
 
 /******************************************************************
@@ -943,9 +945,7 @@ func bfFromCommands(cmds []state.Command) *bloomfilter.Bloomfilter {
 
 /**********************************************************************
 
-
                             PHASE 1
-
 
 ***********************************************************************/
 
@@ -995,7 +995,7 @@ func (r *Replica) startPhase1(replica int32, instance int32, ballot int32, propo
 	r.InstanceSpace[r.Id][instance] = &Instance{
 		cmds,
 		ballot,
-		epaxosproto.COMMITTED, //@sshithil
+		epaxosproto.PREACCEPTED,
 		seq,
 		deps,
 		&LeaderBookkeeping{proposals, 0, 0, true, 0, 0, 0, deps, comDeps, nil, false, false, nil, 0}, 0, 0,
@@ -1007,24 +1007,11 @@ func (r *Replica) startPhase1(replica int32, instance int32, ballot int32, propo
 		r.maxSeq = seq + 1
 	}
 
-	inst := r.InstanceSpace[r.Id][instance]
-
-	for i := 0; i < len(inst.lb.clientProposals); i++ {
-		r.ReplyProposeTS(
-			&genericsmrproto.ProposeReplyTS{
-				TRUE,
-				inst.lb.clientProposals[i].CommandId,
-				state.NIL,
-				inst.lb.clientProposals[i].Timestamp},
-			inst.lb.clientProposals[i].Reply)
-	}
-
 	r.recordInstanceMetadata(r.InstanceSpace[r.Id][instance])
 	r.recordCommands(cmds)
 	r.sync()
 
-	//r.bcastPreAccept(r.Id, instance, ballot, cmds, seq, deps)
-	r.bcastCommit(r.Id, instance, cmds, seq, deps) //changed @sshithil
+	r.bcastPreAccept(r.Id, instance, ballot, cmds, seq, deps)
 
 	cpcounter += batchSize
 
@@ -1044,7 +1031,7 @@ func (r *Replica) startPhase1(replica int32, instance int32, ballot int32, propo
 		r.InstanceSpace[r.Id][instance] = &Instance{
 			cpMarker,
 			0,
-			epaxosproto.COMMITTED, //changed @sshithil
+			epaxosproto.PREACCEPTED,
 			r.maxSeq,
 			deps,
 			&LeaderBookkeeping{nil, 0, 0, true, 0, 0, 0, deps, nil, nil, false, false, nil, 0},
@@ -1061,10 +1048,7 @@ func (r *Replica) startPhase1(replica int32, instance int32, ballot int32, propo
 		r.recordInstanceMetadata(r.InstanceSpace[r.Id][instance])
 		r.sync()
 
-		//r.bcastPreAccept(r.Id, instance, 0, cpMarker, r.maxSeq, deps)
-
-		r.bcastCommit(r.Id, instance, cmds, r.maxSeq, deps) //changed @sshithil
-
+		r.bcastPreAccept(r.Id, instance, 0, cpMarker, r.maxSeq, deps)
 	}
 }
 
@@ -1315,9 +1299,7 @@ func (r *Replica) handlePreAcceptOK(pareply *epaxosproto.PreAcceptOK) {
 
 /**********************************************************************
 
-
                         PHASE 2
-
 
 ***********************************************************************/
 
@@ -1426,9 +1408,7 @@ func (r *Replica) handleAcceptReply(areply *epaxosproto.AcceptReply) {
 
 /**********************************************************************
 
-
                             COMMIT
-
 
 ***********************************************************************/
 
@@ -1482,6 +1462,16 @@ func (r *Replica) handleCommit(commit *epaxosproto.Commit) {
 
 	r.recordInstanceMetadata(r.InstanceSpace[commit.Replica][commit.Instance])
 	r.recordCommands(commit.Command)
+
+	//-----@sshithil
+	/*log.Printf("Executed upto %d of replica %d", r.ExecedUpTo[commit.Replica], commit.Replica)
+	ok := r.exec.executeCommand(commit.Replica, commit.Instance)
+	latest := r.ExecedUpTo[commit.Replica] + 1
+	r.ExecedUpTo[commit.Replica] = latest
+	log.Printf("Executed upto %d of replica %d", r.ExecedUpTo[commit.Replica], commit.Replica)
+	log.Printf(strconv.FormatBool(ok))*/
+
+	//-----@sshithil
 }
 
 func (r *Replica) handleCommitShort(commit *epaxosproto.CommitShort) {
@@ -1524,13 +1514,21 @@ func (r *Replica) handleCommitShort(commit *epaxosproto.CommitShort) {
 	r.updateCommitted(commit.Replica)
 
 	r.recordInstanceMetadata(r.InstanceSpace[commit.Replica][commit.Instance])
+
+	//-----@sshithil
+	/*log.Printf("Executed upto %d of replica %d", r.ExecedUpTo[commit.Replica], commit.Replica)
+	ok := r.exec.executeCommand(commit.Replica, commit.Instance)
+	latest := r.ExecedUpTo[commit.Replica] + 1
+	r.ExecedUpTo[commit.Replica] = latest
+	log.Printf("Executed upto %d of replica %d", r.ExecedUpTo[commit.Replica], commit.Replica)
+	log.Printf(strconv.FormatBool(ok))*/
+
+	//-----@sshithil
 }
 
 /**********************************************************************
 
-
                       RECOVERY ACTIONS
-
 
 ***********************************************************************/
 
