@@ -31,7 +31,7 @@ const PRINT_STATS = false
 
 var masterAddr *string = flag.String("maddr", "", "Master address. Defaults to localhost")
 var masterPort *int = flag.Int("mport", 7087, "Master port.  Defaults to 7077.")
-var reqsNb *int = flag.Int("q", 1000000, "Total number of requests. Defaults to 5000.")
+var reqsNb *int = flag.Int("q", 100000, "Total number of requests. Defaults to 5000.")
 var writes *int = flag.Int("w", 50, "Percentage of updates (writes). Defaults to 100%.")
 var noLeader *bool = flag.Bool("e", true, "Egalitarian (no leader). Defaults to false.")
 var twoLeaders *bool = flag.Bool("twoLeaders", false, "Two leaders for slowdown tolerance. Defaults to false.")

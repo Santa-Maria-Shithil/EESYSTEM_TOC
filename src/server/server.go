@@ -12,9 +12,9 @@ import (
 	"mencius"
 	"net"
 	"net/http"
+	_ "net/http/pprof"
 	"net/rpc"
 	"os"
-	"os/signal"
 	"paxos"
 	"runtime"
 	"runtime/pprof"
@@ -28,6 +28,8 @@ var myAddr *string = flag.String("addr", "", "Server address (this machine). Def
 var doMencius *bool = flag.Bool("m", false, "Use Mencius as the replication protocol. Defaults to false.")
 var doGpaxos *bool = flag.Bool("g", false, "Use Generalized Paxos as the replication protocol. Defaults to false.")
 var doEpaxos *bool = flag.Bool("e", true, "Use EPaxos as the replication protocol. Defaults to false.")
+
+// var doWeakEpaxos *bool = flag.Bool("we", false, "Use EPaxos as the replication protocol. Defaults to false.") //@sshithil
 var doCopilot *bool = flag.Bool("copilot", false, "Use Copilot as the replication protocol. Defaults to false.")
 var doLatentCopilot *bool = flag.Bool("latentcopilot", false, "Use Latent Copilot as the replication protocol. Defaults to false.")
 var procs *int = flag.Int("p", 2, "GOMAXPROCS. Defaults to 2")
@@ -44,7 +46,8 @@ func main() {
 
 	runtime.GOMAXPROCS(*procs)
 
-	if *cpuprofile != "" {
+	//current_time := time.Now()
+	/*if *cpuprofile != "" {
 		f, err := os.Create(*cpuprofile)
 		if err != nil {
 			log.Fatal(err)
@@ -53,7 +56,18 @@ func main() {
 
 		interrupt := make(chan os.Signal, 1)
 		signal.Notify(interrupt)
+
 		go catchKill(interrupt)
+
+	}*/
+	log.Println(*cpuprofile)
+
+	if *cpuprofile != "noprofiling" {
+		go func() {
+			log.Println("Starting profiling...")
+			log.Println(http.ListenAndServe("localhost:6060", nil))
+
+		}()
 	}
 
 	log.Printf("Server starting on port %d\n", *portnum)
@@ -94,6 +108,7 @@ func main() {
 	}
 
 	http.Serve(l, nil)
+	//http.ListenAndServe()
 }
 
 func registerWithMaster(masterAddr string) (int, []string) {
@@ -118,6 +133,8 @@ func registerWithMaster(masterAddr string) (int, []string) {
 func catchKill(interrupt chan os.Signal) {
 	<-interrupt
 	if *cpuprofile != "" {
+		//theTime := <-time.After(time.Second * 5)
+		//log.Println(theTime)
 		pprof.StopCPUProfile()
 	}
 	fmt.Println("Caught signal")

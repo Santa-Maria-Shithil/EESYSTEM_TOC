@@ -103,3 +103,9 @@ docker network inspect overnet
 # sudo tc qdisc add dev eno1 root netem delay 100ms
 #sudo tc qdisc delete dev eno1 root netem delay 100ms
 #docker exec server1 tc qdisc add dev eth0 root netem delay 1ms
+
+#lsof -nti:7087 | xargs kill -9
+#go tool pprof server cpu.prof
+#export CPUPROFILE_FREQUENCY=100
+#go tool pprof -seconds 100 http://localhost:6060/debug/pprof/profile
+#sudo docker cp server5:/root/pprof/pprof.server.samples.cpu.003.pb.gz /home/users/sshithil/copilot/cpu_profile.pb.gz

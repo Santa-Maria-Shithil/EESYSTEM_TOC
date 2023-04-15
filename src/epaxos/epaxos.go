@@ -24,7 +24,7 @@ const TRUE = uint8(1)
 const FALSE = uint8(0)
 const ADAPT_TIME_SEC = 10
 
-const MAX_BATCH = 5000 //default value 5000
+const MAX_BATCH = 5000
 const BATCH_INTERVAL = 100 * time.Microsecond
 
 const COMMIT_GRACE_PERIOD = 10 * 1e9 //10 seconds
@@ -490,9 +490,13 @@ func (r *Replica) run() {
 		case <-r.OnClientConnect:
 			log.Printf("weird %d; conflicted %d; slow %d; happy %d\n", weird, conflicted, slow, happy)
 			weird, conflicted, slow, happy = 0, 0, 0, 0
+			break
 
 		case iid := <-r.instancesToRecover:
+			log.Printf("Recovering replica: %d, instance: %d", iid.replica, iid.instance)
 			r.startRecoveryForInstance(iid.replica, iid.instance)
+			break
+
 		}
 	}
 }
@@ -502,7 +506,7 @@ func (r *Replica) run() {
 ************************************/
 
 func (r *Replica) executeCommands() {
-	const SLEEP_TIME_NS = 1000 // 1 microsecond
+	const SLEEP_TIME_NS = 1000 * 1000 * 50 // 1 microsecond=1000, now 100ms
 	problemInstance := make([]int32, r.N)
 	timeout := make([]uint64, r.N)
 	for q := 0; q < r.N; q++ {
@@ -530,10 +534,12 @@ func (r *Replica) executeCommands() {
 	}
 	allFired := false
 
-	for !r.Shutdown {
+	for !r.Shutdown { //@sshithil
+
 		executed := false
 
 		if r.Id == 0 && INJECT_SLOWDOWN && !allFired {
+			log.Printf("Logging inside the if statement!!!!!!!!!!!")
 			select {
 			case <-timer05ms.C:
 				fmt.Printf("Replica %v: ExecTimer 0.5ms fired at %v\n", r.Id, time.Now())
@@ -582,22 +588,28 @@ func (r *Replica) executeCommands() {
 		}
 
 		for q := 0; q < r.N; q++ {
+
 			inst := int32(0)
 			for inst = r.ExecedUpTo[q] + 1; inst < r.crtInstance[q]; inst++ {
+
 				if r.InstanceSpace[q][inst] != nil && r.InstanceSpace[q][inst].Status == epaxosproto.EXECUTED {
+
 					if inst == r.ExecedUpTo[q]+1 {
 						r.ExecedUpTo[q] = inst
 					}
 					continue
 				}
 				if r.InstanceSpace[q][inst] == nil || r.InstanceSpace[q][inst].Status != epaxosproto.COMMITTED {
+
 					if inst == problemInstance[q] {
 						timeout[q] += SLEEP_TIME_NS
 						if timeout[q] >= COMMIT_GRACE_PERIOD {
-							r.instancesToRecover <- &instanceId{int32(q), inst}
+
+							//r.instancesToRecover <- &instanceId{int32(q), inst}
 							timeout[q] = 0
 						}
 					} else {
+
 						problemInstance[q] = inst
 						timeout[q] = 0
 					}
@@ -618,7 +630,9 @@ func (r *Replica) executeCommands() {
 			time.Sleep(SLEEP_TIME_NS)
 		}
 		//log.Println(r.ExecedUpTo, " ", r.crtInstance)
-	}
+	} //@sshithil
+	log.Printf("Breaking out from the main r.shutdown loop!!!!!!!!!!!")
+
 }
 
 /* Ballot helper functions */
@@ -821,6 +835,7 @@ func (r *Replica) bcastCommit(replica int32, instance int32, cmds []state.Comman
 			sent++
 		}
 	}
+
 }
 
 /******************************************************************
@@ -937,7 +952,9 @@ func bfFromCommands(cmds []state.Command) *bloomfilter.Bloomfilter {
 }
 
 /**********************************************************************
+
                             PHASE 1
+
 ***********************************************************************/
 
 func (r *Replica) handlePropose(propose *genericsmr.Propose) {
@@ -1206,7 +1223,7 @@ func (r *Replica) handlePreAcceptReply(pareply *epaxosproto.PreAcceptReply) {
 					&genericsmrproto.ProposeReplyTS{
 						TRUE,
 						inst.lb.clientProposals[i].CommandId,
-						0,
+						state.NIL,
 						inst.lb.clientProposals[i].Timestamp},
 					inst.lb.clientProposals[i].Reply)
 			}
@@ -1267,7 +1284,7 @@ func (r *Replica) handlePreAcceptOK(pareply *epaxosproto.PreAcceptOK) {
 					&genericsmrproto.ProposeReplyTS{
 						TRUE,
 						inst.lb.clientProposals[i].CommandId,
-						0,
+						state.NIL,
 						inst.lb.clientProposals[i].Timestamp},
 					inst.lb.clientProposals[i].Reply)
 			}
@@ -1289,7 +1306,9 @@ func (r *Replica) handlePreAcceptOK(pareply *epaxosproto.PreAcceptOK) {
 }
 
 /**********************************************************************
+
                         PHASE 2
+
 ***********************************************************************/
 
 func (r *Replica) handleAccept(accept *epaxosproto.Accept) {
@@ -1382,7 +1401,7 @@ func (r *Replica) handleAcceptReply(areply *epaxosproto.AcceptReply) {
 					&genericsmrproto.ProposeReplyTS{
 						TRUE,
 						inst.lb.clientProposals[i].CommandId,
-						1,
+						state.NIL,
 						inst.lb.clientProposals[i].Timestamp},
 					inst.lb.clientProposals[i].Reply)
 			}
@@ -1396,7 +1415,9 @@ func (r *Replica) handleAcceptReply(areply *epaxosproto.AcceptReply) {
 }
 
 /**********************************************************************
+
                             COMMIT
+
 ***********************************************************************/
 
 func (r *Replica) handleCommit(commit *epaxosproto.Commit) {
@@ -1449,6 +1470,18 @@ func (r *Replica) handleCommit(commit *epaxosproto.Commit) {
 
 	r.recordInstanceMetadata(r.InstanceSpace[commit.Replica][commit.Instance])
 	r.recordCommands(commit.Command)
+
+	//-----@sshithil
+	/*log.Printf("Fast:Executed upto %d of replica %d", r.ExecedUpTo[commit.Replica], commit.Replica)
+	ok := r.exec.executeCommand(commit.Replica, commit.Instance)
+	if ok == true {
+		latest := r.ExecedUpTo[commit.Replica] + 1
+		r.ExecedUpTo[commit.Replica] = latest
+		log.Printf("Fast:Executed upto %d of replica %d", r.ExecedUpTo[commit.Replica], commit.Replica)
+		log.Printf(strconv.FormatBool(ok))
+	}*/
+
+	//-----@sshithil
 }
 
 func (r *Replica) handleCommitShort(commit *epaxosproto.CommitShort) {
@@ -1491,10 +1524,24 @@ func (r *Replica) handleCommitShort(commit *epaxosproto.CommitShort) {
 	r.updateCommitted(commit.Replica)
 
 	r.recordInstanceMetadata(r.InstanceSpace[commit.Replica][commit.Instance])
+
+	//-----@sshithil
+	/*log.Printf("Slow: Executed upto %d of replica %d", r.ExecedUpTo[commit.Replica], commit.Replica)
+	ok := r.exec.executeCommand(commit.Replica, commit.Instance)
+	if ok == true {
+		latest := r.ExecedUpTo[commit.Replica] + 1
+		r.ExecedUpTo[commit.Replica] = latest
+		log.Printf("Slow: Executed upto %d of replica %d", r.ExecedUpTo[commit.Replica], commit.Replica)
+		log.Printf(strconv.FormatBool(ok))
+	}*/
+
+	//-----@sshithil
 }
 
 /**********************************************************************
+
                       RECOVERY ACTIONS
+
 ***********************************************************************/
 
 func (r *Replica) startRecoveryForInstance(replica int32, instance int32) {

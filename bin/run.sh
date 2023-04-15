@@ -60,7 +60,7 @@ fi
 mkdir -p logs/
 
 if [ "${TYPE}" == "server" ]; then
-    args="-port ${SPORT} -addr ${SADDR} -mport ${MPORT} -maddr ${MADDR}"
+    args="-port ${SPORT} -addr ${SADDR} -mport ${MPORT} -maddr ${MADDR} -cpuprofile ${CPUPROFILE}"
     #arguments must be according to the order of the server.go file
 
 

@@ -38,8 +38,13 @@ RUN apk add iproute2
 
 ENV NAME=/copilot
 ENV PATH="/copilot/bin:${PATH}"
-#export GOPATH=$HOME/copilot  for server wihout docker
+#export GOPATH=$HOME/copilot  for server and mac wihout docker
+#export GO111MODULE=auto for mac without docker
 #go install ./src/eclientol   installing eclientol using go without docker (inside copilot folder)
+#go build -o master ./src/master
+#./master
+
+
 #ENV NAME=/go/epaxos
 RUN mkdir $NAME
 

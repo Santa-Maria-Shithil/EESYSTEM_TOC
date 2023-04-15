@@ -169,15 +169,15 @@ func (master *Master) GetLeader(args *masterproto.GetLeaderArgs, reply *masterpr
 func (master *Master) GetTwoLeaders(args *masterproto.GetTwoLeadersArgs, reply *masterproto.GetTwoLeadersReply) error {
 
 	time.Sleep(4 * 1000 * 1000)
-	reply.Leader1Id = -1;
-	reply.Leader2Id = -1;
+	reply.Leader1Id = -1
+	reply.Leader2Id = -1
 	for i, l := range master.leader {
 		if l {
 			if reply.Leader1Id == -1 {
 				reply.Leader1Id = i
 			} else {
-				reply.Leader2Id = i;
-				break;
+				reply.Leader2Id = i
+				break
 			}
 		}
 	}
