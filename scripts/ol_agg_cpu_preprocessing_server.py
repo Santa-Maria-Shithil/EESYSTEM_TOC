@@ -47,10 +47,10 @@ for x in range(0,1000):
     sum4.append(0.0)
     sum5.append(0.0)
 
-path="E:\\open_loop\\updated_rps\\effects_of_conflict\\100_conflict"
+path="E:\\open_loop\\effects_of_different_interval\\100_ms"
 #path="E:\effect of durable log\without durable"
 nclient=20
-filename=".\\scripts\\updated_rps\ol_agg_cpu_usage_median_serverside_100_conflict.txt"
+filename=".\\scripts\\different_interval\\ol_agg_cpu_usage_median_serverside_100_ms.txt"
 
 
 j=0

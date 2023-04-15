@@ -43,10 +43,10 @@ e=[]
 #e.append(0.0)
 #e.append(200.0)
 
-path="E:\\open_loop\\updated_rps\\effects_of_conflict\\100_conflict"
+path="E:\\open_loop\\effects_of_different_interval\\1_us"
 #path="E:\effect of durable log\without durable"
 nclient=20
-filename=".\\scripts\\updated_rps\"
+filename=".\\scripts\\different_interval\\ol_tput_median_1_us.txt"
 
 
 
