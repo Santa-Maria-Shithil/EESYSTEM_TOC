@@ -2,10 +2,11 @@ package weakepaxos
 
 import (
 	//    "state"
-	"epaxosproto"
+
 	"genericsmrproto"
 	"sort"
 	"time"
+	"weakepaxosproto"
 )
 
 const (
@@ -28,10 +29,10 @@ func (e *Exec) executeCommand(replica int32, instance int32) bool {
 		return false
 	}
 	inst := e.r.InstanceSpace[replica][instance]
-	if inst.Status == epaxosproto.EXECUTED {
+	if inst.Status == weakepaxosproto.EXECUTED {
 		return true
 	}
-	if inst.Status != epaxosproto.COMMITTED {
+	if inst.Status != weakepaxosproto.COMMITTED {
 		return false
 	}
 
@@ -78,10 +79,10 @@ func (e *Exec) strongconnect(v *Instance, index *int) bool {
 			          continue
 			          }
 			*/
-			if e.r.InstanceSpace[q][i].Status == epaxosproto.EXECUTED {
+			if e.r.InstanceSpace[q][i].Status == weakepaxosproto.EXECUTED {
 				continue
 			}
-			for e.r.InstanceSpace[q][i].Status != epaxosproto.COMMITTED {
+			for e.r.InstanceSpace[q][i].Status != weakepaxosproto.COMMITTED {
 				//log.Printf("inside loop4 and status: %d, replica: %d, instance:%d committed info status: %d", e.r.InstanceSpace[q][i].Status, q, i, v.Status)
 
 				//e.r.instancesToRecover <- &instanceId{q, i} //@sshithil
@@ -140,7 +141,7 @@ func (e *Exec) strongconnect(v *Instance, index *int) bool {
 						w.lb.clientProposals[idx].Reply)
 				}
 			}
-			w.Status = epaxosproto.EXECUTED
+			w.Status = weakepaxosproto.EXECUTED
 		}
 		stack = stack[0:l]
 	}
