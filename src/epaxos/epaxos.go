@@ -605,7 +605,7 @@ func (r *Replica) executeCommands() {
 						timeout[q] += SLEEP_TIME_NS
 						if timeout[q] >= COMMIT_GRACE_PERIOD {
 
-							//r.instancesToRecover <- &instanceId{int32(q), inst}
+							r.instancesToRecover <- &instanceId{int32(q), inst}
 							timeout[q] = 0
 						}
 					} else {
