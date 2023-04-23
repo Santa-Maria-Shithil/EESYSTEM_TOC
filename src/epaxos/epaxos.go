@@ -506,7 +506,7 @@ func (r *Replica) run() {
 ************************************/
 
 func (r *Replica) executeCommands() {
-	const SLEEP_TIME_NS = 1000 * 1000 * 50 // 1 microsecond=1000, now 100ms
+	const SLEEP_TIME_NS = 1000 * 1000 // 1 microsecond=1000
 	problemInstance := make([]int32, r.N)
 	timeout := make([]uint64, r.N)
 	for q := 0; q < r.N; q++ {
