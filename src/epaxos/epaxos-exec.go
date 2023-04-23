@@ -129,7 +129,7 @@ func (e *Exec) strongconnect(v *Instance, index *int) bool {
 				//return false //@sshithil
 			}
 			for idx := 0; idx < len(w.Cmds); idx++ {
-				log.Printf("value of accept ok: %d", w.lb.clientProposals[idx].acceptOKs)
+				log.Printf("value of accept ok is: %d", w.lb.clientProposals[idx].acceptOKs)
 				val := w.Cmds[idx].Execute(e.r.State)
 				if e.r.Dreply && w.lb != nil && w.lb.clientProposals != nil {
 					e.r.ReplyProposeTS(
