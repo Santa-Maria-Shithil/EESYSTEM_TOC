@@ -1,7 +1,7 @@
 
 
 
-scp sshithil@130.245.173.103:/home/users/sshithil/copilot/cpuUsage.txt ./Downloads/server 
+scp sshithil@130.245.173.103:/home/users/sshithil/EESYSTEM//cpuUsage.txt ./Downloads/server 
 scp sshithil@130.245.173.103:/home/users/sshithil/copilot/mem_usage.txt ./Downloads/server 
 scp sshithil@130.245.173.103:/home/users/sshithil/copilot/netIO.txt ./Downloads/server 
 scp sshithil@130.245.173.103:/home/users/sshithil/copilot/nic_info.txt ./Downloads/server

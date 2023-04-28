@@ -36,8 +36,8 @@ RUN apk add iproute2
 #RUN apt -y install golang-go
 
 
-ENV NAME=/copilot
-ENV PATH="/copilot/bin:${PATH}"
+ENV NAME=/EESYSTEM
+ENV PATH="/EESYSTEM/bin:${PATH}"
 #export GOPATH=$HOME/copilot  for server and mac wihout docker
 #export GO111MODULE=auto for mac without docker
 #go install ./src/eclientol   installing eclientol using go without docker (inside copilot folder)

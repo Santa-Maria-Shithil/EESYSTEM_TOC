@@ -8,12 +8,12 @@ sudo mkdir logs1
 
 for i in {1..40}
 do
-   sudo docker cp client1:/copilot/client-${i}.throughput.txt /home/users/sshithil/copilot/logs1/client-${i}.throughput.txt
-   sudo docker cp client1:/copilot/client-${i}.latency.all.txt /home/users/sshithil/copilot/logs1/client-${i}.latency.all.txt
-   sudo docker cp client1:/copilot/client-${i}.latency.orig.txt /home/users/sshithil/copilot/logs1/client-${i}.latency.orig.txt
-sudo docker cp client1:/copilot/client-${i}.latency.percentiles.txt /home/users/sshithil/copilot/logs1/client-${i}.latency.percentiles.txt
-sudo docker cp client1:/copilot/client-${i}.timestamps.orig.txt /home/users/sshithil/copilot/logs1/client-${i}.timestamps.orig.txt
-sudo docker cp client1:/copilot/client-${i}.tputlat.txt /home/users/sshithil/copilot/logs1/client-${i}.tputlat.txt
+   sudo docker cp client1:/EESYSTEM/client-${i}.throughput.txt /home/users/sshithil/EESYSTEM//logs1/client-${i}.throughput.txt
+   sudo docker cp client1:/EESYSTEM//client-${i}.latency.all.txt /home/users/sshithil/EESYSTEM//logs1/client-${i}.latency.all.txt
+   sudo docker cp client1:/EESYSTEM//client-${i}.latency.orig.txt /home/users/sshithil/EESYSTEM//logs1/client-${i}.latency.orig.txt
+sudo docker cp client1:/EESYSTEM//client-${i}.latency.percentiles.txt /home/users/sshithil/EESYSTEM//logs1/client-${i}.latency.percentiles.txt
+sudo docker cp client1:/EESYSTEM//client-${i}.timestamps.orig.txt /home/users/sshithil/EESYSTEM//logs1/client-${i}.timestamps.orig.txt
+sudo docker cp client1:/EESYSTEM//client-${i}.tputlat.txt /home/users/sshithil/EESYSTEM/logs1/client-${i}.tputlat.txt
 done
 
 sudo mv cpu_intr_info_client.txt ./logs1

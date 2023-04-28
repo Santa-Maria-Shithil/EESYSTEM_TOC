@@ -1,7 +1,7 @@
 #!/bin/sh
 
 #DIR="$(cd "$(dirname "${SH_SOURCE[0]}")" && pwd)"
-DIR="/copilot/bin"
+DIR="/EESYSTEM/bin"
 
 echo ${NRUNTIME}
 

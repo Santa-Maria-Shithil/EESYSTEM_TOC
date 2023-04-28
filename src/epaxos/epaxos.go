@@ -271,7 +271,7 @@ var conflicted, weird, slow, happy int
 /* ============= */
 
 /***********************************
-   Main event processing loop      *
+  Main event processing loop      *
 ************************************/
 
 func (r *Replica) run() {
@@ -428,7 +428,7 @@ func (r *Replica) run() {
 		case commitS := <-r.commitShortChan:
 			commit := commitS.(*epaxosproto.CommitShort)
 			//got a Commit message
-			dlog.Printf("Received Commit for instance %d.%d\n", commit.LeaderId, commit.Instance)
+			//log.Printf("Received Commit for instance %d.%d\n", commit.LeaderId, commit.Instance)
 			r.handleCommitShort(commit)
 			break
 
@@ -490,23 +490,19 @@ func (r *Replica) run() {
 		case <-r.OnClientConnect:
 			log.Printf("weird %d; conflicted %d; slow %d; happy %d\n", weird, conflicted, slow, happy)
 			weird, conflicted, slow, happy = 0, 0, 0, 0
-			break
 
 		case iid := <-r.instancesToRecover:
-			log.Printf("Recovering replica: %d, instance: %d", iid.replica, iid.instance)
 			r.startRecoveryForInstance(iid.replica, iid.instance)
-			break
-
 		}
 	}
 }
 
 /***********************************
-   Command execution thread        *
+  Command execution thread        *
 ************************************/
 
 func (r *Replica) executeCommands() {
-	const SLEEP_TIME_NS = 1000 * 1000 // 1 microsecond=1000
+	const SLEEP_TIME_NS = 1000 * 1000 // 1 microsecond
 	problemInstance := make([]int32, r.N)
 	timeout := make([]uint64, r.N)
 	for q := 0; q < r.N; q++ {
@@ -534,12 +530,10 @@ func (r *Replica) executeCommands() {
 	}
 	allFired := false
 
-	for !r.Shutdown { //@sshithil
-
+	for !r.Shutdown {
 		executed := false
 
 		if r.Id == 0 && INJECT_SLOWDOWN && !allFired {
-			log.Printf("Logging inside the if statement!!!!!!!!!!!")
 			select {
 			case <-timer05ms.C:
 				fmt.Printf("Replica %v: ExecTimer 0.5ms fired at %v\n", r.Id, time.Now())
@@ -588,28 +582,22 @@ func (r *Replica) executeCommands() {
 		}
 
 		for q := 0; q < r.N; q++ {
-
 			inst := int32(0)
 			for inst = r.ExecedUpTo[q] + 1; inst < r.crtInstance[q]; inst++ {
-
 				if r.InstanceSpace[q][inst] != nil && r.InstanceSpace[q][inst].Status == epaxosproto.EXECUTED {
-
 					if inst == r.ExecedUpTo[q]+1 {
 						r.ExecedUpTo[q] = inst
 					}
 					continue
 				}
 				if r.InstanceSpace[q][inst] == nil || r.InstanceSpace[q][inst].Status != epaxosproto.COMMITTED {
-
 					if inst == problemInstance[q] {
 						timeout[q] += SLEEP_TIME_NS
 						if timeout[q] >= COMMIT_GRACE_PERIOD {
-
 							r.instancesToRecover <- &instanceId{int32(q), inst}
 							timeout[q] = 0
 						}
 					} else {
-
 						problemInstance[q] = inst
 						timeout[q] = 0
 					}
@@ -630,9 +618,7 @@ func (r *Replica) executeCommands() {
 			time.Sleep(SLEEP_TIME_NS)
 		}
 		//log.Println(r.ExecedUpTo, " ", r.crtInstance)
-	} //@sshithil
-	log.Printf("Breaking out from the main r.shutdown loop!!!!!!!!!!!")
-
+	}
 }
 
 /* Ballot helper functions */
@@ -654,7 +640,7 @@ func replicaIdFromBallot(ballot int32) int32 {
 }
 
 /**********************************************************************
-                    inter-replica communication
+                   inter-replica communication
 ***********************************************************************/
 
 func (r *Replica) replyPrepare(replicaId int32, reply *epaxosproto.PrepareReply) {
@@ -800,7 +786,8 @@ func (r *Replica) bcastAccept(replica int32, instance int32, ballot int32, count
 }
 
 var ec epaxosproto.Commit
-var ecs epaxosproto.CommitShort
+
+//var ecs epaxosproto.CommitShort
 
 func (r *Replica) bcastCommit(replica int32, instance int32, cmds []state.Command, seq int32, deps []int32) {
 	defer func() {
@@ -815,31 +802,32 @@ func (r *Replica) bcastCommit(replica int32, instance int32, cmds []state.Comman
 	ec.Seq = seq
 	ec.Deps = deps
 	args := &ec
-	ecs.LeaderId = r.Id
-	ecs.Replica = replica
-	ecs.Instance = instance
-	ecs.Count = int32(len(cmds))
-	ecs.Seq = seq
-	ecs.Deps = deps
-	argsShort := &ecs
+	//ecs.LeaderId = r.Id
+	//ecs.Replica = replica
+	//ecs.Instance = instance
+	//ecs.Count = int32(len(cmds))
+	//ecs.Seq = seq
+	//ecs.Deps = deps
+	//argsShort := &ecs
+
+	//log.Printf("value of instance inside bcastCommit %d", ecs.Instance)
 
 	sent := 0
 	for q := 0; q < r.N-1; q++ {
 		if !r.Alive[r.PreferredPeerOrder[q]] {
 			continue
 		}
-		if r.Thrifty && sent >= r.N/2 {
-			r.SendMsg(r.PreferredPeerOrder[q], r.commitRPC, args)
-		} else {
-			r.SendMsg(r.PreferredPeerOrder[q], r.commitShortRPC, argsShort)
-			sent++
-		}
+		//if r.Thrifty && sent >= r.N/2 {
+		r.SendMsg(r.PreferredPeerOrder[q], r.commitRPC, args)
+		//} else {
+		//  r.SendMsg(r.PreferredPeerOrder[q], r.commitShortRPC, argsShort)
+		sent++
+		//}
 	}
-
 }
 
 /******************************************************************
-               Helper functions
+              Helper functions
 *******************************************************************/
 
 func (r *Replica) clearHashtables() {
@@ -953,7 +941,9 @@ func bfFromCommands(cmds []state.Command) *bloomfilter.Bloomfilter {
 
 /**********************************************************************
 
-                            PHASE 1
+
+                           PHASE 1
+
 
 ***********************************************************************/
 
@@ -987,6 +977,8 @@ func (r *Replica) handlePropose(propose *genericsmr.Propose) {
 func (r *Replica) startPhase1(replica int32, instance int32, ballot int32, proposals []*genericsmr.Propose, cmds []state.Command, batchSize int) {
 	//init command attributes
 
+	log.Printf("inside startPhase1: value of r.id=%d and value of replica=%d value of instance:%d", r.Id, replica, instance)
+
 	seq := int32(0)
 	deps := make([]int32, r.N)
 	for q := 0; q < r.N; q++ {
@@ -1003,7 +995,7 @@ func (r *Replica) startPhase1(replica int32, instance int32, ballot int32, propo
 	r.InstanceSpace[r.Id][instance] = &Instance{
 		cmds,
 		ballot,
-		epaxosproto.PREACCEPTED,
+		epaxosproto.COMMITTED,
 		seq,
 		deps,
 		&LeaderBookkeeping{proposals, 0, 0, true, 0, 0, 0, deps, comDeps, nil, false, false, nil, 0}, 0, 0,
@@ -1019,7 +1011,9 @@ func (r *Replica) startPhase1(replica int32, instance int32, ballot int32, propo
 	r.recordCommands(cmds)
 	r.sync()
 
-	r.bcastPreAccept(r.Id, instance, ballot, cmds, seq, deps)
+	//r.bcastPreAccept(r.Id, instance, ballot, cmds, seq, deps)
+	//log.Printf("value of instance inside start phase 1 %d", instance)
+	r.bcastCommit(replica, instance, cmds, seq, deps)
 
 	cpcounter += batchSize
 
@@ -1307,7 +1301,9 @@ func (r *Replica) handlePreAcceptOK(pareply *epaxosproto.PreAcceptOK) {
 
 /**********************************************************************
 
-                        PHASE 2
+
+                       PHASE 2
+
 
 ***********************************************************************/
 
@@ -1416,11 +1412,15 @@ func (r *Replica) handleAcceptReply(areply *epaxosproto.AcceptReply) {
 
 /**********************************************************************
 
-                            COMMIT
+
+                           COMMIT
+
 
 ***********************************************************************/
 
 func (r *Replica) handleCommit(commit *epaxosproto.Commit) {
+	//log.Printf("long commit")
+	log.Printf("inside handleCommit: value of command.replica=%d and value of command.instance=%d", commit.Replica, commit.Instance)
 	inst := r.InstanceSpace[commit.Replica][commit.Instance]
 
 	if commit.Seq >= r.maxSeq {
@@ -1432,6 +1432,7 @@ func (r *Replica) handleCommit(commit *epaxosproto.Commit) {
 	}
 
 	if inst != nil {
+		//log.Printf("inst is not nil")
 		if inst.lb != nil && inst.lb.clientProposals != nil && len(commit.Command) == 0 {
 			//someone committed a NO-OP, but we have proposals for this instance
 			//try in a different instance
@@ -1444,6 +1445,7 @@ func (r *Replica) handleCommit(commit *epaxosproto.Commit) {
 		inst.Deps = commit.Deps
 		inst.Status = epaxosproto.COMMITTED
 	} else {
+		//log.Printf("inst is nil")
 		r.InstanceSpace[commit.Replica][int(commit.Instance)] = &Instance{
 			commit.Command,
 			0,
@@ -1466,25 +1468,21 @@ func (r *Replica) handleCommit(commit *epaxosproto.Commit) {
 			r.clearHashtables()
 		}
 	}
+
+	/*inst = r.InstanceSpace[commit.Replica][commit.Instance]
+	  if inst != nil {
+	      log.Printf("inside handleCommit: is not nil")
+	  }*/
+
 	r.updateCommitted(commit.Replica)
 
 	r.recordInstanceMetadata(r.InstanceSpace[commit.Replica][commit.Instance])
 	r.recordCommands(commit.Command)
-
-	//-----@sshithil
-	/*log.Printf("Fast:Executed upto %d of replica %d", r.ExecedUpTo[commit.Replica], commit.Replica)
-	ok := r.exec.executeCommand(commit.Replica, commit.Instance)
-	if ok == true {
-		latest := r.ExecedUpTo[commit.Replica] + 1
-		r.ExecedUpTo[commit.Replica] = latest
-		log.Printf("Fast:Executed upto %d of replica %d", r.ExecedUpTo[commit.Replica], commit.Replica)
-		log.Printf(strconv.FormatBool(ok))
-	}*/
-
-	//-----@sshithil
 }
 
 func (r *Replica) handleCommitShort(commit *epaxosproto.CommitShort) {
+	//log.Printf("value of instance inside handleCommitShotrt %d", commit.Instance)
+	log.Printf("inside handleCommitShort: value of command.replica=%d and value of command.instance=%d", commit.Replica, commit.Instance)
 	inst := r.InstanceSpace[commit.Replica][commit.Instance]
 
 	if commit.Instance >= r.crtInstance[commit.Replica] {
@@ -1492,6 +1490,7 @@ func (r *Replica) handleCommitShort(commit *epaxosproto.CommitShort) {
 	}
 
 	if inst != nil {
+		log.Printf("inst is not nil")
 		if inst.lb != nil && inst.lb.clientProposals != nil {
 			//try command in a different instance
 			for _, p := range inst.lb.clientProposals {
@@ -1503,6 +1502,7 @@ func (r *Replica) handleCommitShort(commit *epaxosproto.CommitShort) {
 		inst.Deps = commit.Deps
 		inst.Status = epaxosproto.COMMITTED
 	} else {
+		log.Printf("inst is nil")
 		r.InstanceSpace[commit.Replica][commit.Instance] = &Instance{
 			nil,
 			0,
@@ -1524,23 +1524,13 @@ func (r *Replica) handleCommitShort(commit *epaxosproto.CommitShort) {
 	r.updateCommitted(commit.Replica)
 
 	r.recordInstanceMetadata(r.InstanceSpace[commit.Replica][commit.Instance])
-
-	//-----@sshithil
-	/*log.Printf("Slow: Executed upto %d of replica %d", r.ExecedUpTo[commit.Replica], commit.Replica)
-	ok := r.exec.executeCommand(commit.Replica, commit.Instance)
-	if ok == true {
-		latest := r.ExecedUpTo[commit.Replica] + 1
-		r.ExecedUpTo[commit.Replica] = latest
-		log.Printf("Slow: Executed upto %d of replica %d", r.ExecedUpTo[commit.Replica], commit.Replica)
-		log.Printf(strconv.FormatBool(ok))
-	}*/
-
-	//-----@sshithil
 }
 
 /**********************************************************************
 
-                      RECOVERY ACTIONS
+
+                     RECOVERY ACTIONS
+
 
 ***********************************************************************/
 
