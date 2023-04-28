@@ -135,7 +135,7 @@ func (e *Exec) strongconnect(v *Instance, index *int) bool {
 						&genericsmrproto.ProposeReplyTS{
 							TRUE,
 							w.lb.clientProposals[idx].CommandId,
-							val,
+							0,
 							w.lb.clientProposals[idx].Timestamp},
 						w.lb.clientProposals[idx].Reply)
 				}
