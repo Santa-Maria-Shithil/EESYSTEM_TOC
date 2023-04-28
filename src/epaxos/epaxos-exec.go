@@ -130,12 +130,13 @@ func (e *Exec) strongconnect(v *Instance, index *int) bool {
 			for idx := 0; idx < len(w.Cmds); idx++ {
 				//log.Printf("value of accept ok is: %d", w.lb.clientProposals[idx].acceptOKs)
 				val := w.Cmds[idx].Execute(e.r.State)
+				val = 0
 				if e.r.Dreply && w.lb != nil && w.lb.clientProposals != nil {
 					e.r.ReplyProposeTS(
 						&genericsmrproto.ProposeReplyTS{
 							TRUE,
 							w.lb.clientProposals[idx].CommandId,
-							0,
+							val,
 							w.lb.clientProposals[idx].Timestamp},
 						w.lb.clientProposals[idx].Reply)
 				}
