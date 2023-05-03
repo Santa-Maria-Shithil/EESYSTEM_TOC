@@ -41,7 +41,7 @@ var rounds *int = flag.Int("r", 1, "Split the total number of requests into this
 var procs *int = flag.Int("p", 2, "GOMAXPROCS. Defaults to 2")
 var check = flag.Bool("check", false, "Check that every expected reply was received exactly once.")
 var eps *int = flag.Int("eps", 0, "Send eps more messages per round than the client will wait for (to discount stragglers). Defaults to 0.")
-var conflicts *int = flag.Int("c", 100, "Percentage of conflicts. Defaults to 0%")
+var conflicts *int = flag.Int("c", 0, "Percentage of conflicts. Defaults to 0%")
 var s = flag.Float64("s", 2, "Zipfian s parameter")
 var v = flag.Float64("v", 1, "Zipfian v parameter")
 var cid *int = flag.Int("id", -1, "Client ID.")
@@ -57,7 +57,7 @@ var numKeys *uint64 = flag.Uint64("numKeys", 1000000, "Number of keys in simulat
 var proxyReplica *int = flag.Int("proxy", -1, "Replica Id to proxy requests to. If id < 0, use request Id mod N as default.")
 var sendOnce *bool = flag.Bool("once", false, "Send request to only one leader.")
 var tput_interval *float64 = flag.Float64("tput_interval_in_sec", 1, "Time interval to record and print throughput")
-var target_rps *int = flag.Int("target_rps", 4000, "Target request per sec for open-loop client") //600 is the best for our system configuration
+var target_rps *int = flag.Int("target_rps", 600, "Target request per sec for open-loop client") //600 is the best for our system configuration
 
 // GC debug
 var garPercent = flag.Int("garC", 50, "Collect info about GC")
