@@ -123,7 +123,7 @@ func (e *Exec) strongconnect(v *Instance, index *int, replica int32, instant int
 				if !e.strongconnect(w, index, q, i) { //added parameter q and i to track causal order @sshithil
 					for j := l; j < len(stack); j++ {
 						//log.Printf("inside loop5")
-						stack[j].Index = 0
+						stack[j].nodes.Index = 0
 					}
 					stack = stack[0:l]
 					return false
@@ -182,14 +182,14 @@ func (e *Exec) inStack(w *Instance) bool {
 	return false
 }
 
-type nodeArray []*Instance
+type nodeArray []*StackComponent
 
 func (na nodeArray) Len() int {
 	return len(na)
 }
 
 func (na nodeArray) Less(i, j int) bool {
-	return na[i].Seq < na[j].Seq
+	return na[i].nodes.Seq < na[j].nodes.Seq
 }
 
 func (na nodeArray) Swap(i, j int) {
