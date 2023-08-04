@@ -26,8 +26,8 @@ type SCComponent struct {
 // ---added this structure to specifically store replica id and instance no in the stack@sshithil
 type StackComponent struct {
 	nodes   []*Instance
-	replica int32
-	instant int32
+	replica int64
+	instant int64
 }
 
 //-----------------@sshithil_>
@@ -146,26 +146,27 @@ func (e *Exec) strongconnect(v *Instance, index *int, replica int32, instant int
 		//execute commands in the increasing order of the Seq field
 		sort.Sort(nodeArray(list))
 		for _, w := range list {
-			for w.Cmds == nil {
-				//log.Printf("inside loop6")
+			//for w.Cmds == nil {
+			for w.nodes.Cmds == nil { //changed @sshithil
+
 				time.Sleep(1000 * 1000)
-				//return false //@sshithil
+
 			}
-			for idx := 0; idx < len(w.Cmds); idx++ {
+			for idx := 0; idx < len(w.nodes.Cmds); idx++ {
 				//log.Printf("value of accept ok is: %d", w.lb.clientProposals[idx].acceptOKs)
-				val := w.Cmds[idx].Execute(e.r.State)
+				val := w.nodes.Cmds[idx].Execute(e.r.State)
 				val = 0
-				if e.r.Dreply && w.lb != nil && w.lb.clientProposals != nil {
+				if e.r.Dreply && w.nodes.lb != nil && w.nodes.lb.clientProposals != nil {
 					e.r.ReplyProposeTS(
 						&genericsmrproto.ProposeReplyTS{
 							TRUE,
-							w.lb.clientProposals[idx].CommandId,
-							val, //originally send val here. I am sending instant id for now. Then need to change again to val. @sshithil
-							w.lb.clientProposals[idx].Timestamp},
-						w.lb.clientProposals[idx].Reply)
+							w.nodes.lb.clientProposals[idx].CommandId,
+							w.replica, //originally send val here. I am sending instant id for now. Then need to change again to val. @sshithil
+							w.instant},
+						w.nodes.lb.clientProposals[idx].Reply)
 				}
 			}
-			w.Status = epaxosproto.EXECUTED
+			w.nodes.Status = epaxosproto.EXECUTED
 		}
 		stack = stack[0:l]
 	}
