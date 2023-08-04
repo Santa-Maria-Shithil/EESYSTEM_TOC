@@ -23,6 +23,15 @@ type SCComponent struct {
 	color int8
 }
 
+// ---added this structure to specifically store replica id and instance no in the stack@sshithil
+type StackComponent struct {
+	nodes   []*Instance
+	replica int32
+	instant int32
+}
+
+//-----------------@sshithil_>
+
 func (e *Exec) executeCommand(replica int32, instance int32) bool {
 	if e.r.InstanceSpace[replica][instance] == nil {
 		return false
@@ -35,23 +44,33 @@ func (e *Exec) executeCommand(replica int32, instance int32) bool {
 		return false
 	}
 
-	if !e.findSCC(inst) {
+	/*if !e.findSCC(inst) {
+		return false
+	}*/
+
+	//<-------@sshithil----added replica and instance to the parameter of findSCC to record the instance id to track the causal order
+	if !e.findSCC(inst, replica, instance) {
 		return false
 	}
+	//---------@sshithil>
 
 	return true
 }
 
-var stack []*Instance = make([]*Instance, 0, 100)
+// var stack []*Instance = make([]*Instance, 0, 100)
+var stack []*StackComponent = make([]*StackComponent, 0, 100)
 
-func (e *Exec) findSCC(root *Instance) bool {
+// func (e *Exec) findSCC(root *Instance) bool {
+func (e *Exec) findSCC(root *Instance, replica int32, instance int32) bool { //@added replica int32 and instance int32 to record the instance if to track causal order @sshithil
 	index := 1
 	//find SCCs using Tarjan's algorithm
 	stack = stack[0:0]
-	return e.strongconnect(root, &index)
+	//return e.strongconnect(root, &index)
+	return e.strongconnect(root, &index, replica, instance) //added replica and instance to record the instance id to track the causal order @sshithil
 }
 
-func (e *Exec) strongconnect(v *Instance, index *int) bool {
+// func (e *Exec) strongconnect(v *Instance, index *int) bool {
+func (e *Exec) strongconnect(v *Instance, index *int, replica int32, instant int32) bool { //@added replica int32 and instance int32 to record the instance if to track causal order @sshithil
 	v.Index = *index
 	v.Lowlink = *index
 	*index = *index + 1
@@ -63,7 +82,11 @@ func (e *Exec) strongconnect(v *Instance, index *int) bool {
 		stack = newSlice
 	}
 	stack = stack[0 : l+1]
-	stack[l] = v
+	stack[l].nodes = v
+	//stack[l] = v
+	stack[l].nodes = v         //modified @sshithil
+	stack[l].replica = replica //added this line @sshithil
+	stack[l].instant = instant //added this line @sshithil
 
 	for q := int32(0); q < int32(e.r.N); q++ {
 		inst := v.Deps[q]
@@ -96,7 +119,8 @@ func (e *Exec) strongconnect(v *Instance, index *int) bool {
 
 			if w.Index == 0 {
 				//e.strongconnect(w, index)
-				if !e.strongconnect(w, index) {
+				//if !e.strongconnect(w, index) {
+				if !e.strongconnect(w, index, q, i) { //added parameter q and i to track causal order @sshithil
 					for j := l; j < len(stack); j++ {
 						//log.Printf("inside loop5")
 						stack[j].Index = 0
@@ -136,7 +160,7 @@ func (e *Exec) strongconnect(v *Instance, index *int) bool {
 						&genericsmrproto.ProposeReplyTS{
 							TRUE,
 							w.lb.clientProposals[idx].CommandId,
-							val,
+							val, //originally send val here. I am sending instant id for now. Then need to change again to val. @sshithil
 							w.lb.clientProposals[idx].Timestamp},
 						w.lb.clientProposals[idx].Reply)
 				}
