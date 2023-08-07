@@ -25,7 +25,7 @@ type SCComponent struct {
 
 // ---added this structure to specifically store replica id and instance no in the stack@sshithil
 type StackComponent struct {
-	nodes   []*Instance
+	nodes   Instance
 	replica int64
 	instant int64
 }
