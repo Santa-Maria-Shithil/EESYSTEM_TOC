@@ -25,7 +25,7 @@ type SCComponent struct {
 
 // ---added this structure to specifically store replica id and instance no in the stack@sshithil
 type StackComponent struct {
-	nodes   Instance
+	nodes   *Instance
 	replica int64
 	instant int64
 }
@@ -83,9 +83,9 @@ func (e *Exec) strongconnect(v *Instance, index *int, replica int32, instant int
 	}
 	stack = stack[0 : l+1]
 	//stack[l] = v
-	stack[l].nodes = v         //modified @sshithil
-	stack[l].replica = replica //added this line @sshithil
-	stack[l].instant = instant //added this line @sshithil
+	stack[l].nodes = v                //modified @sshithil
+	stack[l].replica = int64(replica) //added this line @sshithil
+	stack[l].instant = int64(instant) //added this line @sshithil
 
 	for q := int32(0); q < int32(e.r.N); q++ {
 		inst := v.Deps[q]
