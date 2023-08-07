@@ -77,12 +77,11 @@ func (e *Exec) strongconnect(v *Instance, index *int, replica int32, instant int
 
 	l := len(stack)
 	if l == cap(stack) {
-		newSlice := make([]*Instance, l, 2*l)
+		newSlice := make([]*StackComponent, l, 2*l)
 		copy(newSlice, stack)
 		stack = newSlice
 	}
 	stack = stack[0 : l+1]
-	stack[l].nodes = v
 	//stack[l] = v
 	stack[l].nodes = v         //modified @sshithil
 	stack[l].replica = replica //added this line @sshithil
