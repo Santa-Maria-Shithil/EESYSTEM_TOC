@@ -1,11 +1,11 @@
 package epaxos
 
 import (
-	//    "state"
 	"epaxosproto"
 	"genericsmrproto"
 	"log"
 	"sort"
+	"state"
 	"time"
 )
 
@@ -27,7 +27,7 @@ type SCComponent struct {
 // ---added this structure to specifically store replica id and instance no in the stack@sshithil
 type StackComponent struct {
 	nodes   *Instance
-	replica int64
+	replica state.Value
 	instant int64
 }
 
@@ -162,7 +162,7 @@ func (e *Exec) strongconnect(v *Instance, index *int, replica int32, instant int
 						&genericsmrproto.ProposeReplyTS{
 							TRUE,
 							w.nodes.lb.clientProposals[idx].CommandId,
-							int64(w.replica), //originally send val here. I am sending instant id for now. Then need to change again to val. @sshithil
+							w.replica, //originally send val here. I am sending instant id for now. Then need to change again to val. @sshithil
 							w.instant},
 						w.nodes.lb.clientProposals[idx].Reply)
 				}
