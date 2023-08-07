@@ -87,17 +87,13 @@ type DataPoint struct {
 	reqsCount     int64
 	conflictCount int64
 	t             time.Time
-	replicaId     int
-	instId        int64
 }
 
 type Response struct {
 	OpId       int32
 	rcvingTime time.Time
 	value      int64
-	instId     int64 //@sshithil
 	timestamp  int64
-	replicaId  int //@sshithil
 }
 
 type View struct {
@@ -317,8 +313,6 @@ func main() {
 
 	var reqsCount int64 = 0
 	var conflictCount int64 = 0
-	var replicaId int = 0
-	var instId int64 = 0
 
 	// incoming request channel
 	reqsChan := make(chan int, 100000) /*keep max outstanding requests at 100000*/
@@ -382,7 +376,7 @@ func main() {
 		case <-printChan:
 			t := time.Now()
 			//p := DataPoint{elapse: time.Since(before_total), reqsCount: reqsCount}
-			p := DataPoint{elapse: t.Sub(before_total), reqsCount: reqsCount, conflictCount: conflictCount, t: t, replicaId: replicaId, instId: instId}
+			p := DataPoint{elapse: t.Sub(before_total), reqsCount: reqsCount, conflictCount: conflictCount, t: t}
 			throughputs = append(throughputs, p)
 			if *verbose && readings != nil {
 				readings <- &p
@@ -470,8 +464,7 @@ func main() {
 
 		case e := <-leaderReplyChan:
 			//conft := <-conflictReplyChan
-			//lat := int64(e.rcvingTime.Sub(timestamps[e.OpId]) / time.Microsecond)
-			lat := int64(0)                    //@sshithil
+			lat := int64(e.rcvingTime.Sub(timestamps[e.OpId]) / time.Microsecond)
 			if latencies[e.OpId] == int64(0) { /*1st response*/
 				//conflict = conft
 				//log.Printf("Conflict:%v, amount: %v", e.value, conflictCount)
@@ -489,9 +482,6 @@ func main() {
 			}
 
 			rsp[e.OpId] = true
-			replicaId = e.replicaId
-			instId = e.instId
-			log.Printf("InstantId: %d, Replica: %d", instId, replicaId)
 
 			break
 
@@ -582,9 +572,8 @@ func waitReplies2(readers []*bufio.Reader, leader int, done chan *Response, expe
 			}
 			if reply.OK != 0 {
 				successful[leader]++
-				done <- &Response{OpId: reply.CommandId, instId: reply.Timestamp, replicaId: leader}
+				done <- &Response{OpId: reply.CommandId, value: reflect.ValueOf(reply.Value).Int(), rcvingTime: time.Now()}
 				//conflict_chan <- reflect.ValueOf(reply.Value).Int()
-
 				if expected == successful[leader] {
 					return
 				}
@@ -644,7 +633,7 @@ func waitRepliesPilot(readers []*bufio.Reader, leader int, done chan *Response, 
 			}
 			if reply.OK != 0 {
 				successful[leader]++
-				done <- &Response{OpId: reply.CommandId, rcvingTime: time.Now(), value: reflect.ValueOf(reply.Value).Int(), timestamp: reply.Timestamp}
+				done <- &Response{reply.CommandId, time.Now(), reflect.ValueOf(reply.Value).Int(), reply.Timestamp}
 				if expected == successful[leader] {
 					return
 				}
