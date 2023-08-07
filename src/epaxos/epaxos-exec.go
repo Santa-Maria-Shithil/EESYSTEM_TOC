@@ -1,11 +1,11 @@
 package epaxos
 
 import (
+	//    "state"
 	"epaxosproto"
 	"genericsmrproto"
 	"log"
 	"sort"
-	"state"
 	"time"
 )
 
@@ -27,7 +27,7 @@ type SCComponent struct {
 // ---added this structure to specifically store replica id and instance no in the stack@sshithil
 type StackComponent struct {
 	nodes   *Instance
-	replica state.Value
+	replica int64
 	instant int64
 }
 
@@ -85,7 +85,7 @@ func (e *Exec) strongconnect(v *Instance, index *int, replica int32, instant int
 	stack = stack[0 : l+1]
 	//stack[l] = v
 	stack[l].nodes = v                //modified @sshithil
-	stack[l].replica = replica        //added this line @sshithil
+	stack[l].replica = int64(replica) //added this line @sshithil
 	stack[l].instant = int64(instant) //added this line @sshithil
 
 	for q := int32(0); q < int32(e.r.N); q++ {
@@ -156,13 +156,13 @@ func (e *Exec) strongconnect(v *Instance, index *int, replica int32, instant int
 				//log.Printf("value of accept ok is: %d", w.lb.clientProposals[idx].acceptOKs)
 				val := w.nodes.Cmds[idx].Execute(e.r.State)
 				val = 0
-				log.Printf("%d", val)
+				log.Printf("%d", replica)
 				if e.r.Dreply && w.nodes.lb != nil && w.nodes.lb.clientProposals != nil {
 					e.r.ReplyProposeTS(
 						&genericsmrproto.ProposeReplyTS{
 							TRUE,
 							w.nodes.lb.clientProposals[idx].CommandId,
-							w.replica, //originally send val here. I am sending instant id for now. Then need to change again to val. @sshithil
+							val, //originally send val here. I am sending instant id for now. Then need to change again to val. @sshithil
 							w.instant},
 						w.nodes.lb.clientProposals[idx].Reply)
 				}
