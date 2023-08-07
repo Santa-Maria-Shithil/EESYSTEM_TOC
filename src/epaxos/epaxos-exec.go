@@ -85,7 +85,7 @@ func (e *Exec) strongconnect(v *Instance, index *int, replica int32, instant int
 	stack = stack[0 : l+1]
 	//stack[l] = v
 	stack[l].nodes = v                //modified @sshithil
-	stack[l].replica = int64(replica) //added this line @sshithil
+	stack[l].replica = replica        //added this line @sshithil
 	stack[l].instant = int64(instant) //added this line @sshithil
 
 	for q := int32(0); q < int32(e.r.N); q++ {
