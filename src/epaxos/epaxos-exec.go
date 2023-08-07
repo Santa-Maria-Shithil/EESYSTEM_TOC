@@ -162,7 +162,7 @@ func (e *Exec) strongconnect(v *Instance, index *int, replica int32, instant int
 						&genericsmrproto.ProposeReplyTS{
 							TRUE,
 							w.nodes.lb.clientProposals[idx].CommandId,
-							w.replica, //originally send val here. I am sending instant id for now. Then need to change again to val. @sshithil
+							int64(w.replica), //originally send val here. I am sending instant id for now. Then need to change again to val. @sshithil
 							w.instant},
 						w.nodes.lb.clientProposals[idx].Reply)
 				}
@@ -174,7 +174,7 @@ func (e *Exec) strongconnect(v *Instance, index *int, replica int32, instant int
 	return true
 }
 
-func (e *Exec) inStack(w *Instance) bool {
+func (e *Exec) inStack(w *StackComponent) bool {
 	for _, u := range stack {
 		if w == u {
 			return true
