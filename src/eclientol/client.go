@@ -33,7 +33,7 @@ const PRINT_STATS = true
 var masterAddr *string = flag.String("maddr", "", "Master address. Defaults to localhost")
 var masterPort *int = flag.Int("mport", 7087, "Master port.  Defaults to 7077.")
 var reqsNb *int = flag.Int("q", 50000, "Total number of requests. Defaults to 5000.")
-var writes *int = flag.Int("w", 100, "Percentage of updates (writes). Defaults to 100%.")
+var writes *int = flag.Int("w", 50, "Percentage of updates (writes). Defaults to 100%.")
 var noLeader *bool = flag.Bool("e", false, "Egalitarian (no leader). Defaults to false.")
 var twoLeaders *bool = flag.Bool("twoLeaders", false, "Two leaders for slowdown tolerance. Defaults to false.")
 var fast *bool = flag.Bool("f", false, "Fast Paxos: send message directly to all replicas. Defaults to false.")
@@ -386,7 +386,7 @@ func main() {
 			}
 			/* Prepare proposal */
 			id := int32(i)
-			log.Printf("Sending proposal %d\n", id)
+			dlog.Printf("Sending proposal %d\n", id)
 
 			args := genericsmrproto.Propose{id, state.Command{ClientId: clientId, OpId: id, Op: state.PUT, K: 0, V: 0}, time.Now().UnixNano()}
 
