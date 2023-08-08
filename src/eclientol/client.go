@@ -456,6 +456,7 @@ func main() {
 		case e := <-leaderReplyChan:
 			lat := int64(e.rcvingTime.Sub(timestamps[e.OpId]) / time.Microsecond)
 			if latencies[e.OpId] == int64(0) { /*1st response*/
+				log.Printf("command id: %d", e.OpId)
 				reqsCount++
 			}
 			if latencies[e.OpId] == int64(0) || latencies[e.OpId] > lat {
