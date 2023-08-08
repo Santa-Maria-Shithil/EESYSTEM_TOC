@@ -581,7 +581,7 @@ func (r *Replica) executeCommands() {
 
 			}
 		}
-		time.Sleep(SLEEP_TIME_NS)
+		//time.Sleep(SLEEP_TIME_NS)
 		for q := 0; q < r.N; q++ {
 			inst := int32(0)
 			for inst = r.ExecedUpTo[q] + 1; inst < r.crtInstance[q]; inst++ {
