@@ -1004,8 +1004,10 @@ func (r *Replica) startPhase1(replica int32, instance int32, ballot int32, propo
 	r.recordCommands(cmds)
 	r.sync()
 
+	log.Printf("inside delay, max=%d, instance=%d", r.maxSeq, instance)
+
 	if r.maxSeq < 100 { //@sshithil
-		log.Printf("inside delay, max=%d", r.maxSeq)
+
 		time.Sleep(10 * time.Second)
 	} //@sshithil, delayed for 10 seconds
 
