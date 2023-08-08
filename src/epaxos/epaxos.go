@@ -1007,9 +1007,9 @@ func (r *Replica) startPhase1(replica int32, instance int32, ballot int32, propo
 
 	log.Printf("inside delay, max=%d, instance=%d", r.maxSeq, instance)
 
-	if instance%100 == 0 { //@sshithil
+	if instance%10 == 0 { //@sshithil
 
-		time.Sleep(5 * time.Second)
+		time.Sleep(2 * time.Second)
 	} //@sshithil, delayed for 10 seconds
 
 	r.bcastPreAccept(r.Id, instance, ballot, cmds, seq, deps)
