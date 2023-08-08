@@ -24,11 +24,10 @@ const TRUE = uint8(1)
 const FALSE = uint8(0)
 const ADAPT_TIME_SEC = 10
 
-// const MAX_BATCH = 5000
-const MAX_BATCH = 10 //@sshithil
+const MAX_BATCH = 5000
 const BATCH_INTERVAL = 100 * time.Microsecond
 
-const COMMIT_GRACE_PERIOD = 20 * 1e9 //10 seconds
+const COMMIT_GRACE_PERIOD = 10 * 1e9 //10 seconds
 //const COMMIT_GRACE_PERIOD = 10 * 1e6 //10 seconds
 
 const BF_K = 4
@@ -503,7 +502,7 @@ func (r *Replica) run() {
 ************************************/
 
 func (r *Replica) executeCommands() {
-	const SLEEP_TIME_NS = 5 * 1000 * 1000 // 1 microsecond default, 5 sec now
+	const SLEEP_TIME_NS = 1000 // 1 microsecond
 	problemInstance := make([]int32, r.N)
 	timeout := make([]uint64, r.N)
 	for q := 0; q < r.N; q++ {
@@ -581,7 +580,7 @@ func (r *Replica) executeCommands() {
 
 			}
 		}
-		//time.Sleep(SLEEP_TIME_NS)
+
 		for q := 0; q < r.N; q++ {
 			inst := int32(0)
 			for inst = r.ExecedUpTo[q] + 1; inst < r.crtInstance[q]; inst++ {
@@ -954,8 +953,8 @@ func (r *Replica) handlePropose(propose *genericsmr.Propose) {
 	instNo := r.crtInstance[r.Id]
 	r.crtInstance[r.Id]++
 
-	log.Printf("Starting instance %d\n", instNo)
-	log.Printf("Batching %d\n", batchSize)
+	dlog.Printf("Starting instance %d\n", instNo)
+	dlog.Printf("Batching %d\n", batchSize)
 
 	cmds := make([]state.Command, batchSize)
 	proposals := make([]*genericsmr.Propose, batchSize)
@@ -1004,14 +1003,6 @@ func (r *Replica) startPhase1(replica int32, instance int32, ballot int32, propo
 	r.recordInstanceMetadata(r.InstanceSpace[r.Id][instance])
 	r.recordCommands(cmds)
 	r.sync()
-
-	log.Printf("inside delay, max=%d, instance=%d\n", r.maxSeq, instance)
-
-	/*if instance == 0 { //@sshithil
-
-		time.Sleep(10 * time.Second)
-	} //@sshithil, delayed for 10 seconds
-	?*/
 
 	r.bcastPreAccept(r.Id, instance, ballot, cmds, seq, deps)
 
@@ -1265,10 +1256,6 @@ func (r *Replica) handlePreAcceptOK(pareply *epaxosproto.PreAcceptOK) {
 			allCommitted = false
 		}
 	}
-
-	/*for q := 0; q < r.N; q++ {
-		log.Printf("%d ", inst.Deps[q])
-	}*/
 
 	//can we commit on the fast path?
 	if inst.lb.preAcceptOKs >= r.N/2+(r.N/2+1)/2-1 && inst.lb.allEqual && allCommitted && isInitialBallot(inst.ballot) {
