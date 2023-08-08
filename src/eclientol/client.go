@@ -89,6 +89,7 @@ type Response struct {
 	OpId       int32
 	rcvingTime time.Time
 	timestamp  int64
+	replicaId  int
 }
 
 type View struct {
@@ -456,7 +457,7 @@ func main() {
 		case e := <-leaderReplyChan:
 			lat := int64(e.rcvingTime.Sub(timestamps[e.OpId]) / time.Microsecond)
 			if latencies[e.OpId] == int64(0) { /*1st response*/
-				log.Printf("command id: %d", e.OpId)
+				log.Printf("command id: %d, replica id: %d", e.OpId, e.replicaId)
 				reqsCount++
 			}
 			if latencies[e.OpId] == int64(0) || latencies[e.OpId] > lat {
@@ -554,7 +555,7 @@ func waitReplies(readers []*bufio.Reader, leader int, done chan *Response, expec
 			}
 			if reply.OK != 0 {
 				successful[leader]++
-				done <- &Response{OpId: reply.CommandId, rcvingTime: time.Now()}
+				done <- &Response{OpId: reply.CommandId, rcvingTime: time.Now(), replicaId: leader}
 				if expected == successful[leader] {
 					return
 				}
@@ -664,7 +665,7 @@ func printer(dataChan chan *DataPoint, done chan bool) {
 		if reading.elapse == time.Duration(0) {
 			continue
 		}
-		fmt.Printf("%.1f\t%d\t%.0f\n", float64(reading.elapse)/float64(time.Second), reading.reqsCount, float64(reading.reqsCount)*float64(time.Second)/float64(reading.elapse))
+		//fmt.Printf("%.1f\t%d\t%.0f\n", float64(reading.elapse)/float64(time.Second), reading.reqsCount, float64(reading.reqsCount)*float64(time.Second)/float64(reading.elapse))
 	}
 
 }
