@@ -1009,7 +1009,7 @@ func (r *Replica) startPhase1(replica int32, instance int32, ballot int32, propo
 
 	if instance >= 1000 && instance <= 1010 { //@sshithil
 
-		time.Sleep(3 * time.Second)
+		time.Sleep(5 * time.Second)
 	} //@sshithil, delayed for 10 seconds
 
 	r.bcastPreAccept(r.Id, instance, ballot, cmds, seq, deps)
