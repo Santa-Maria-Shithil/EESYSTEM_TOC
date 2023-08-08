@@ -23,8 +23,9 @@ import (
 	"time"
 )
 
-// const REQUEST_TIMEOUT = 1 * time.Second
-const REQUEST_TIMEOUT = 100 * time.Millisecond
+const REQUEST_TIMEOUT = 10 * time.Second
+
+// const REQUEST_TIMEOUT = 100 * time.Millisecond
 const GET_VIEW_TIMEOUT = 100 * time.Millisecond
 const GC_DEBUG_ENABLED = false
 const PRINT_STATS = true
