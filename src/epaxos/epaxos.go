@@ -1266,9 +1266,9 @@ func (r *Replica) handlePreAcceptOK(pareply *epaxosproto.PreAcceptOK) {
 		}
 	}
 
-	for q := 0; q < r.N; q++ {
+	/*for q := 0; q < r.N; q++ {
 		log.Printf("%d ", inst.Deps[q])
-	}
+	}*/
 
 	//can we commit on the fast path?
 	if inst.lb.preAcceptOKs >= r.N/2+(r.N/2+1)/2-1 && inst.lb.allEqual && allCommitted && isInitialBallot(inst.ballot) {
