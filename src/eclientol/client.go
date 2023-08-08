@@ -55,7 +55,7 @@ var hook *bool = flag.Bool("hook", true, "Add shutdown hook.")
 var verbose *bool = flag.Bool("verbose", true, "Print throughput to stdout.")
 var numKeys *uint64 = flag.Uint64("numKeys", 1000000, "Number of keys in simulated store.")
 var proxyReplica *int = flag.Int("proxy", -1, "Replica Id to proxy requests to. If id < 0, use request Id mod N as default.")
-var sendOnce *bool = flag.Bool("once", false, "Send request to only one leader.")
+var sendOnce *bool = flag.Bool("once", true, "Send request to only one leader.")
 var tput_interval *float64 = flag.Float64("tput_interval_in_sec", 1, "Time interval to record and print throughput")
 var target_rps *int = flag.Int("target_rps", 600, "Target request per sec for open-loop client") //600 is the best for our system configuration
 
