@@ -586,7 +586,7 @@ func waitRepliesPilot(readers []*bufio.Reader, leader int, done chan *Response, 
 			}
 			if reply.OK != 0 {
 				successful[leader]++
-				done <- &Response{reply.CommandId, time.Now(), reply.Timestamp}
+				done <- &Response{reply.CommandId, time.Now(), reply.Timestamp, leader}
 				if expected == successful[leader] {
 					return
 				}
