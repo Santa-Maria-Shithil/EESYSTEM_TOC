@@ -1005,11 +1005,14 @@ func (r *Replica) startPhase1(replica int32, instance int32, ballot int32, propo
 	r.recordCommands(cmds)
 	r.sync()
 
-	log.Printf("inside delay, max=%d, instance=%d", r.maxSeq, instance)
+	log.Printf("inside delay, max=%d, instance=%d\n", r.maxSeq, instance)
+	for q := 0; q < r.N; q++ {
+		log.Printf("%d ", deps)
+	}
 
-	if instance%10 == 0 { //@sshithil
+	if instance == 0 { //@sshithil
 
-		time.Sleep(2 * time.Second)
+		time.Sleep(10 * time.Second)
 	} //@sshithil, delayed for 10 seconds
 
 	r.bcastPreAccept(r.Id, instance, ballot, cmds, seq, deps)
