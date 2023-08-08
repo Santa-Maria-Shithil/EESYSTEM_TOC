@@ -1006,9 +1006,6 @@ func (r *Replica) startPhase1(replica int32, instance int32, ballot int32, propo
 	r.sync()
 
 	log.Printf("inside delay, max=%d, instance=%d\n", r.maxSeq, instance)
-	for q := 0; q < r.N; q++ {
-		log.Printf("%d ", deps)
-	}
 
 	/*if instance == 0 { //@sshithil
 
@@ -1205,6 +1202,10 @@ func (r *Replica) handlePreAcceptReply(pareply *epaxosproto.PreAcceptReply) {
 		if inst.lb.committedDeps[q] < inst.Deps[q] {
 			allCommitted = false
 		}
+	}
+
+	for q := 0; q < r.N; q++ {
+		log.Printf("%d ", inst.Deps[q])
 	}
 
 	//can we commit on the fast path?
