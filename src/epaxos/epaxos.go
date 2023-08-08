@@ -25,7 +25,7 @@ const FALSE = uint8(0)
 const ADAPT_TIME_SEC = 10
 
 // const MAX_BATCH = 5000
-const MAX_BATCH = 1 //@sshithil
+const MAX_BATCH = 10 //@sshithil
 const BATCH_INTERVAL = 100 * time.Microsecond
 
 const COMMIT_GRACE_PERIOD = 10 * 1e9 //10 seconds
