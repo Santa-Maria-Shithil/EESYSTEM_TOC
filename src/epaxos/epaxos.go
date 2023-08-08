@@ -980,8 +980,12 @@ func (r *Replica) startPhase1(replica int32, instance int32, ballot int32, propo
 
 	seq, deps, _ = r.updateAttributes(cmds, seq, deps, replica, instance)
 
+	log.Printf("instance=%d", instance)
 	for q := 0; q < r.N; q++ {
-		log.Printf("%d ", deps[q])
+		if deps[q] != -1 {
+			log.Printf("%d ", deps[q])
+		}
+
 	}
 
 	comDeps := make([]int32, r.N)
