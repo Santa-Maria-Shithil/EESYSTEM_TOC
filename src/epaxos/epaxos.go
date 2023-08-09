@@ -1486,6 +1486,7 @@ func (r *Replica) handleCommit(commit *epaxosproto.Commit) {
 }
 
 func (r *Replica) handleCommitShort(commit *epaxosproto.CommitShort) {
+	log.Printf("Inside handleCommit short")
 	inst := r.InstanceSpace[commit.Replica][commit.Instance]
 
 	if commit.Instance >= r.crtInstance[commit.Replica] {
