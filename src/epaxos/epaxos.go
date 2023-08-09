@@ -435,18 +435,19 @@ func (r *Replica) run() {
 		case prepareReplyS := <-r.prepareReplyChan:
 			prepareReply := prepareReplyS.(*epaxosproto.PrepareReply)
 			//got a Prepare reply
-			log.Printf("Received PrepareReply for instance %d.%d\n", prepareReply.Replica, prepareReply.Instance)
-			if prepareReply.Instance%2 == 0 {
-				log.Printf("inside preparereply case")
-				time.Sleep(2 * time.Second)
-			}
+			dlog.Printf("Received PrepareReply for instance %d.%d\n", prepareReply.Replica, prepareReply.Instance)
+
 			r.handlePrepareReply(prepareReply)
 			break
 
 		case preAcceptReplyS := <-r.preAcceptReplyChan:
 			preAcceptReply := preAcceptReplyS.(*epaxosproto.PreAcceptReply)
 			//got a PreAccept reply
-			dlog.Printf("Received PreAcceptReply for instance %d.%d\n", preAcceptReply.Replica, preAcceptReply.Instance)
+			log.Printf("Received PreAcceptReply for instance %d.%d\n", preAcceptReply.Replica, preAcceptReply.Instance)
+			if preAcceptReply.Instance%2 == 0 {
+				log.Printf("inside preparereply case")
+				time.Sleep(2 * time.Second)
+			}
 			r.handlePreAcceptReply(preAcceptReply)
 			break
 
