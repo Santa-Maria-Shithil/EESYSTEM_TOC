@@ -1493,7 +1493,7 @@ func (r *Replica) handleCommitShort(commit *epaxosproto.CommitShort) {
 		r.crtInstance[commit.Replica] = commit.Instance + 1
 	}
 
-	log.Printf("instance=%d, seq=%d", int(commit.Instance), int(commit.Seq))
+	//log.Printf("instance=%d, seq=%d", int(commit.Instance), int(commit.Seq))
 
 	if inst != nil {
 		if inst.lb != nil && inst.lb.clientProposals != nil {
