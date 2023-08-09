@@ -1275,7 +1275,7 @@ func (r *Replica) handlePreAcceptOK(pareply *epaxosproto.PreAcceptOK) {
 	for q := 0; q < r.N; q++ {
 		if inst.Deps[q] != -1 {
 			log.Printf("final value")
-			log.Printf("instance=%d", pareply.instance)
+			log.Printf("instance=%d", pareply.Instance)
 			log.Printf("dependency[%d]=%d ", q, inst.Deps[q])
 		}
 
