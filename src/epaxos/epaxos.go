@@ -1245,7 +1245,7 @@ func (r *Replica) handlePreAcceptReply(pareply *epaxosproto.PreAcceptReply) {
 }
 
 func (r *Replica) handlePreAcceptOK(pareply *epaxosproto.PreAcceptOK) {
-	dlog.Printf("Handling PreAccept reply\n")
+	log.Printf("Handling PreAccept reply\n")
 	inst := r.InstanceSpace[r.Id][pareply.Instance]
 
 	if inst.Status != epaxosproto.PREACCEPTED {
@@ -1272,14 +1272,14 @@ func (r *Replica) handlePreAcceptOK(pareply *epaxosproto.PreAcceptOK) {
 		}
 	}
 
-	for q := 0; q < r.N; q++ {
+	/*for q := 0; q < r.N; q++ {
 		if inst.Deps[q] != -1 {
 			log.Printf("final value")
 			log.Printf("instance=%d", pareply.Instance)
 			log.Printf("dependency[%d]=%d ", q, inst.Deps[q])
 		}
 
-	}
+	}*/
 
 	//can we commit on the fast path?
 	if inst.lb.preAcceptOKs >= r.N/2+(r.N/2+1)/2-1 && inst.lb.allEqual && allCommitted && isInitialBallot(inst.ballot) {
@@ -1301,9 +1301,10 @@ func (r *Replica) handlePreAcceptOK(pareply *epaxosproto.PreAcceptOK) {
 
 		r.recordInstanceMetadata(inst)
 		r.sync() //is this necessary here?
-
+		log.Printf("committing fast path")
 		r.bcastCommit(r.Id, pareply.Instance, inst.Cmds, inst.Seq, inst.Deps)
 	} else if inst.lb.preAcceptOKs >= r.N/2 {
+		log.Printf("committing slow path")
 		if !allCommitted {
 			weird++
 		}
