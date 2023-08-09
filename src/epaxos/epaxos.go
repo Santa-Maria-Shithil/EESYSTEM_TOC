@@ -435,7 +435,7 @@ func (r *Replica) run() {
 		case prepareReplyS := <-r.prepareReplyChan:
 			prepareReply := prepareReplyS.(*epaxosproto.PrepareReply)
 			//got a Prepare reply
-			dlog.Printf("Received PrepareReply for instance %d.%d\n", prepareReply.Replica, prepareReply.Instance)
+			log.Printf("Received PrepareReply for instance %d.%d\n", prepareReply.Replica, prepareReply.Instance)
 			if prepareReply.Instance%2 == 0 {
 				log.Printf("inside preparereply case")
 				time.Sleep(2 * time.Second)
