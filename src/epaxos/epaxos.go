@@ -957,7 +957,7 @@ func (r *Replica) handlePropose(propose *genericsmr.Propose) {
 	instNo := r.crtInstance[r.Id]
 	r.crtInstance[r.Id]++
 
-	log.Printf("Starting instance %d.%d with command id %d\n", r.Id, instNo, propose.CommandId)
+	//log.Printf("Starting instance %d.%d with command id %d\n", r.Id, instNo, propose.CommandId)
 	dlog.Printf("Batching %d\n", batchSize)
 
 	cmds := make([]state.Command, batchSize)
