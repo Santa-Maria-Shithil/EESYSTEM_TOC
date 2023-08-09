@@ -1442,7 +1442,7 @@ func (r *Replica) handleCommit(commit *epaxosproto.Commit) {
 	}
 
 	log.Printf("Inside handleCommit")
-	log.Printf("instance=%d, seq=%d", int(commit.Instance), commit.Seq)
+	//log.Printf("instance=%d, seq=%d", int(commit.Instance), commit.Seq)
 
 	if inst != nil {
 		if inst.lb != nil && inst.lb.clientProposals != nil && len(commit.Command) == 0 {
