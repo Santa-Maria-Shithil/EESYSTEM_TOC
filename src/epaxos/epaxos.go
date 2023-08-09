@@ -384,6 +384,7 @@ func (r *Replica) run() {
 		case propose := <-onOffProposeChan:
 			//got a Propose from a client
 			log.Printf("Proposal with op %d\n", propose.Command.Op)
+
 			r.handlePropose(propose)
 			//deactivate new proposals channel to prioritize the handling of other protocol messages,
 			//and to allow commands to accumulate for batching
@@ -1013,6 +1014,10 @@ func (r *Replica) startPhase1(replica int32, instance int32, ballot int32, propo
 	r.recordInstanceMetadata(r.InstanceSpace[r.Id][instance])
 	r.recordCommands(cmds)
 	r.sync()
+
+	if instance == 0 {
+		time.Sleep(5 * time.Second)
+	}
 
 	r.bcastPreAccept(r.Id, instance, ballot, cmds, seq, deps)
 
