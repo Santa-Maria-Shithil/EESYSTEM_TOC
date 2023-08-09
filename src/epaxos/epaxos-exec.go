@@ -4,6 +4,7 @@ import (
 	//    "state"
 	"epaxosproto"
 	"genericsmrproto"
+	"log"
 	"sort"
 	"time"
 )
@@ -115,6 +116,7 @@ func (e *Exec) strongconnect(v *Instance, index *int) bool {
 			}
 			for idx := 0; idx < len(w.Cmds); idx++ {
 				val := w.Cmds[idx].Execute(e.r.State)
+				log.Printf("execuiton seq=%d", w.Seq)
 				if e.r.Dreply && w.lb != nil && w.lb.clientProposals != nil {
 					e.r.ReplyProposeTS(
 						&genericsmrproto.ProposeReplyTS{

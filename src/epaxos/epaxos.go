@@ -505,7 +505,7 @@ func (r *Replica) run() {
 ************************************/
 
 func (r *Replica) executeCommands() {
-	const SLEEP_TIME_NS = 1000 // 1 microsecond
+	const SLEEP_TIME_NS = 10 * time.Second // 1 microsecond default 1000
 	problemInstance := make([]int32, r.N)
 	timeout := make([]uint64, r.N)
 	for q := 0; q < r.N; q++ {
@@ -534,6 +534,7 @@ func (r *Replica) executeCommands() {
 	allFired := false
 
 	for !r.Shutdown {
+		time.Sleep(SLEEP_TIME_NS)
 		executed := false
 
 		if r.Id == 0 && INJECT_SLOWDOWN && !allFired {
@@ -1015,9 +1016,9 @@ func (r *Replica) startPhase1(replica int32, instance int32, ballot int32, propo
 	r.recordCommands(cmds)
 	r.sync()
 
-	if instance == 0 {
+	/*if instance == 0 {
 		time.Sleep(20 * time.Second)
-	}
+	}*/
 
 	r.bcastPreAccept(r.Id, instance, ballot, cmds, seq, deps)
 
