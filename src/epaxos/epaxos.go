@@ -1441,6 +1441,9 @@ func (r *Replica) handleCommit(commit *epaxosproto.Commit) {
 		r.crtInstance[commit.Replica] = commit.Instance + 1
 	}
 
+	log.Printf("Inside handleCommit")
+	log.Printf("instance=%d, seq=%d", int(commit.Instance), commit.Seq)
+
 	if inst != nil {
 		if inst.lb != nil && inst.lb.clientProposals != nil && len(commit.Command) == 0 {
 			//someone committed a NO-OP, but we have proposals for this instance
