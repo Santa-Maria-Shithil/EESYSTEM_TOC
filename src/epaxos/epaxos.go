@@ -436,6 +436,10 @@ func (r *Replica) run() {
 			prepareReply := prepareReplyS.(*epaxosproto.PrepareReply)
 			//got a Prepare reply
 			dlog.Printf("Received PrepareReply for instance %d.%d\n", prepareReply.Replica, prepareReply.Instance)
+			if prepareReply.Instance%2 == 0 {
+				log.Printf("inside preparereply case")
+				time.Sleep(2 * time.Second)
+			}
 			r.handlePrepareReply(prepareReply)
 			break
 
@@ -1011,10 +1015,6 @@ func (r *Replica) startPhase1(replica int32, instance int32, ballot int32, propo
 	r.recordInstanceMetadata(r.InstanceSpace[r.Id][instance])
 	r.recordCommands(cmds)
 	r.sync()
-
-	if instance > 12000 && instance < 13000 {
-		time.Sleep(2 * time.Second)
-	}
 
 	r.bcastPreAccept(r.Id, instance, ballot, cmds, seq, deps)
 
