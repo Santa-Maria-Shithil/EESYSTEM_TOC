@@ -1016,7 +1016,7 @@ func (r *Replica) startPhase1(replica int32, instance int32, ballot int32, propo
 	r.sync()
 
 	if instance == 0 {
-		time.Sleep(50 * time.Second)
+		time.Sleep(20 * time.Second)
 	}
 
 	r.bcastPreAccept(r.Id, instance, ballot, cmds, seq, deps)
