@@ -116,7 +116,8 @@ func (e *Exec) strongconnect(v *Instance, index *int) bool {
 			}
 			for idx := 0; idx < len(w.Cmds); idx++ {
 				val := w.Cmds[idx].Execute(e.r.State)
-				log.Printf("execuiting the operation with seq=%d", w.Seq)
+				log.Printf("execuiting the operatiionId=%d with seq=%d", w.Seq, int(w.lb.clientProposals[idx].CommandId))
+				//log.Printf("execuiting the operation with seq=%d", w.Seq)
 				if e.r.Dreply && w.lb != nil && w.lb.clientProposals != nil {
 					e.r.ReplyProposeTS(
 						&genericsmrproto.ProposeReplyTS{
