@@ -1018,10 +1018,13 @@ func (r *Replica) startPhase1(replica int32, instance int32, ballot int32, propo
 
 	if instance%2 == 0 {
 		//time.Sleep(20 * time.Second)
-		defer r.bcastPreAccept(r.Id, instance, ballot, cmds, seq, deps)
-	} else {
-		r.bcastPreAccept(r.Id, instance, ballot, cmds, seq, deps)
+		for q := 0; q < 100000; q++ {
+			log.Printf("spinning")
+
+		}
 	}
+
+	r.bcastPreAccept(r.Id, instance, ballot, cmds, seq, deps)
 
 	cpcounter += batchSize
 
