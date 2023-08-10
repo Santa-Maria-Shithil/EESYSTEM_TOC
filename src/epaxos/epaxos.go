@@ -984,13 +984,13 @@ func (r *Replica) startPhase1(replica int32, instance int32, ballot int32, propo
 
 	seq, deps, _ = r.updateAttributes(cmds, seq, deps, replica, instance)
 
-	for q := 0; q < r.N; q++ {
+	/*for q := 0; q < r.N; q++ {
 		if deps[q] != -1 {
 			log.Printf("instance=%d", instance)
 			log.Printf("dependency[%d]=%d ", q, deps[q])
 		}
 
-	}
+	}*/
 
 	comDeps := make([]int32, r.N)
 	for i := 0; i < r.N; i++ {
@@ -1246,7 +1246,7 @@ func (r *Replica) handlePreAcceptReply(pareply *epaxosproto.PreAcceptReply) {
 }
 
 func (r *Replica) handlePreAcceptOK(pareply *epaxosproto.PreAcceptOK) {
-	log.Printf("Handling PreAccept reply\n")
+	dlog.Printf("Handling PreAccept reply\n")
 	inst := r.InstanceSpace[r.Id][pareply.Instance]
 
 	if inst.Status != epaxosproto.PREACCEPTED {
