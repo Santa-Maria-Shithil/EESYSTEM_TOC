@@ -1302,7 +1302,7 @@ func (r *Replica) handlePreAcceptOK(pareply *epaxosproto.PreAcceptOK) {
 
 		r.recordInstanceMetadata(inst)
 		r.sync() //is this necessary here?
-		log.Printf("committing fast path")
+		//log.Printf("committing fast path")
 		r.bcastCommit(r.Id, pareply.Instance, inst.Cmds, inst.Seq, inst.Deps)
 	} else if inst.lb.preAcceptOKs >= r.N/2 {
 		log.Printf("committing slow path")
