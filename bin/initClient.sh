@@ -3,7 +3,7 @@
 MIP="10.0.1.100"
 MASTERNAME="master5"
 MASTERPORT=9087
-CLIENTNAME="client1"  #modify client name
+CLIENTNAME="client10"  #modify client name
 CLIENTIP="10.0.1.20" #ip start with IP address 172.75.0.200
 CLIENTPORT=5099 #port start with 5090
 NCLIENTS=1 # minimum 1
