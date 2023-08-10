@@ -1016,11 +1016,12 @@ func (r *Replica) startPhase1(replica int32, instance int32, ballot int32, propo
 	r.recordCommands(cmds)
 	r.sync()
 
-	/*if instance == 0 {
-		time.Sleep(20 * time.Second)
-	}*/
-
-	r.bcastPreAccept(r.Id, instance, ballot, cmds, seq, deps)
+	if instance == 0 {
+		//time.Sleep(20 * time.Second)
+		defer r.bcastPreAccept(r.Id, instance, ballot, cmds, seq, deps)
+	} else {
+		r.bcastPreAccept(r.Id, instance, ballot, cmds, seq, deps)
+	}
 
 	cpcounter += batchSize
 
