@@ -881,7 +881,7 @@ func (r *Replica) updateAttributes(cmds []state.Command, seq int32, deps []int32
 		}
 		for i := 0; i < len(cmds); i++ {
 			if d, present := (r.conflicts[q])[cmds[i].K]; present {
-				log.Printf("instance=%d.%d, d=%d, deps[%d]=%d", replica, instance, d, deps[q])
+				log.Printf("instance=%d.%d, d=%d, deps[%d]=%d", replica, instance, d, q, deps[q])
 				if d > deps[q] {
 					deps[q] = d
 					if seq <= r.InstanceSpace[q][d].Seq {
