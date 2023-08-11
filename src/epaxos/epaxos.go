@@ -511,7 +511,7 @@ func (r *Replica) run() {
 ************************************/
 
 func (r *Replica) executeCommands() {
-	const SLEEP_TIME_NS = 10 * 1000 * 1000 // 1 microsecond default 1000
+	const SLEEP_TIME_NS = 30 * 1000 * 1000 // 1 microsecond default 1000
 	problemInstance := make([]int32, r.N)
 	timeout := make([]uint64, r.N)
 	for q := 0; q < r.N; q++ {
@@ -541,6 +541,7 @@ func (r *Replica) executeCommands() {
 
 	for !r.Shutdown {
 		time.Sleep(SLEEP_TIME_NS)
+		log.Printf("Starting execution")
 		executed := false
 
 		if r.Id == 0 && INJECT_SLOWDOWN && !allFired {
@@ -604,6 +605,7 @@ func (r *Replica) executeCommands() {
 					if inst == problemInstance[q] {
 						timeout[q] += SLEEP_TIME_NS
 						if timeout[q] >= COMMIT_GRACE_PERIOD {
+							log.Printf("starting recovery")
 							r.instancesToRecover <- &instanceId{int32(q), inst}
 							timeout[q] = 0
 						}
@@ -854,7 +856,8 @@ func (r *Replica) updateCommitted(replica int32) {
 func (r *Replica) updateConflicts(cmds []state.Command, replica int32, instance int32, seq int32) {
 	for i := 0; i < len(cmds); i++ {
 		if d, present := r.conflicts[replica][cmds[i].K]; present {
-			if d < instance {
+			if d < instance { /*reason why not voilating causal dependency. This line will not allow an higher value
+				  instance to be on the dependency list of the lower value instance*/
 				r.conflicts[replica][cmds[i].K] = instance
 			}
 		} else {
@@ -878,6 +881,7 @@ func (r *Replica) updateAttributes(cmds []state.Command, seq int32, deps []int32
 		}
 		for i := 0; i < len(cmds); i++ {
 			if d, present := (r.conflicts[q])[cmds[i].K]; present {
+				log.Printf("instance=%d.%d, d=%d, deps[%d]=%d", replica, instance, d, deps[q])
 				if d > deps[q] {
 					deps[q] = d
 					if seq <= r.InstanceSpace[q][d].Seq {
