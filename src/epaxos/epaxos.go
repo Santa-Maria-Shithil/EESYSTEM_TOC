@@ -1086,7 +1086,7 @@ func (r *Replica) startPhase1(replica int32, instance int32, ballot int32, propo
 }
 
 func (r *Replica) handlePreAccept(preAccept *epaxosproto.PreAccept) {
-	log.Printf("Logged in hadlePreAccept")
+	//log.Printf("Logged in hadlePreAccept")
 	inst := r.InstanceSpace[preAccept.LeaderId][preAccept.Instance]
 
 	if preAccept.Seq >= r.maxSeq {
@@ -1094,7 +1094,7 @@ func (r *Replica) handlePreAccept(preAccept *epaxosproto.PreAccept) {
 	}
 
 	if inst != nil && (inst.Status == epaxosproto.COMMITTED || inst.Status == epaxosproto.ACCEPTED) {
-		log.Printf("logged in conditional return in hadlePreAccept")
+		//log.Printf("logged in conditional return in hadlePreAccept")
 		//reordered handling of commit/accept and pre-accept
 		if inst.Cmds == nil {
 			r.InstanceSpace[preAccept.LeaderId][preAccept.Instance].Cmds = preAccept.Command
