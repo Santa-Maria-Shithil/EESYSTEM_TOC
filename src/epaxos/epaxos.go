@@ -27,13 +27,19 @@ const ADAPT_TIME_SEC = 10
 const MAX_BATCH = 1
 const BATCH_INTERVAL = 100 * time.Microsecond
 
-const COMMIT_GRACE_PERIOD = 10 * 1e9 //10 seconds
+const COMMIT_GRACE_PERIOD = 100 * 1e9 //10 seconds
 //const COMMIT_GRACE_PERIOD = 10 * 1e6 //10 seconds
 
 const BF_K = 4
 const BF_M_N = 32.0
 
 var bf_PT uint32
+var id1 int32
+var instance1 int32
+var ballot1 int32
+var cmds1 []state.Command
+var seq1 int32
+var deps1 []int32
 
 const DO_CHECKPOINTING = false
 const HT_INIT_SIZE = 200000
@@ -1016,15 +1022,22 @@ func (r *Replica) startPhase1(replica int32, instance int32, ballot int32, propo
 	r.recordCommands(cmds)
 	r.sync()
 
-	if instance%2 == 0 {
-		//time.Sleep(20 * time.Second)
-		for q := 0; q < 100000; q++ {
-			log.Printf("spinning")
+	if instance == 0 {
+		id1 = r.Id
+		instance1 = instance
+		ballot1 = ballot
+		cmds1 = cmds
+		seq1 = seq
+		deps1 = deps
+	} else {
+		log.Printf("previos value seq=%d, instance=%d", seq1, instance1)
+		log.Printf("current value seq=%d, instance=%d", seq, instance)
+		r.bcastPreAccept(r.Id, instance, ballot, cmds, seq, deps)
+		r.bcastPreAccept(id1, instance1, ballot1, cmds1, seq1, deps1)
 
-		}
 	}
 
-	r.bcastPreAccept(r.Id, instance, ballot, cmds, seq, deps)
+	//r.bcastPreAccept(r.Id, instance, ballot, cmds, seq, deps)
 
 	cpcounter += batchSize
 
