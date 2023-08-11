@@ -119,7 +119,7 @@ func (e *Exec) strongconnect(v *Instance, index *int) bool {
 				//log.Printf("execuiting the operatiionId=%d with seq=%d", w.Seq, int(w.lb.clientProposals[idx].CommandId))
 				//log.Printf("execuiting the operation with seq=%d", w.Seq)
 				if e.r.Dreply && w.lb != nil && w.lb.clientProposals != nil {
-					log.Printf("execuiting the operatiionId=%d with seq=%d", w.Seq, int(w.lb.clientProposals[idx].CommandId))
+					log.Printf("execuiting the operatiionId=%d with seq=%d", int(w.lb.clientProposals[idx].CommandId), w.Seq)
 					e.r.ReplyProposeTS(
 						&genericsmrproto.ProposeReplyTS{
 							TRUE,
