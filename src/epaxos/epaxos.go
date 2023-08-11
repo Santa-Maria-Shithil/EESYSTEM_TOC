@@ -1022,7 +1022,7 @@ func (r *Replica) startPhase1(replica int32, instance int32, ballot int32, propo
 	r.recordCommands(cmds)
 	r.sync()
 
-	if instance == 0 {
+	/*if instance == 0 {
 		id1 = r.Id
 		instance1 = instance
 		ballot1 = ballot
@@ -1035,9 +1035,9 @@ func (r *Replica) startPhase1(replica int32, instance int32, ballot int32, propo
 		r.bcastPreAccept(r.Id, instance, ballot, cmds, seq, deps)
 		r.bcastPreAccept(id1, instance1, ballot1, cmds1, seq1, deps1)
 
-	}
+	}*/
 
-	//r.bcastPreAccept(r.Id, instance, ballot, cmds, seq, deps)
+	r.bcastPreAccept(r.Id, instance, ballot, cmds, seq, deps)
 
 	cpcounter += batchSize
 
