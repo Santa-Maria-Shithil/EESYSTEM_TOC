@@ -1034,7 +1034,7 @@ func (r *Replica) startPhase1(replica int32, instance int32, ballot int32, propo
 		log.Printf("current value seq=%d, instance=%d", seq, instance)
 		r.bcastPreAccept(r.Id, instance, ballot, cmds, seq, deps)
 		time.Sleep((10 * time.Second))
-		r.bcastPreAccept(id1, instance1, ballot1, cmds1, seq1, deps1)
+		//r.bcastPreAccept(id1, instance1, ballot1, cmds1, seq1, deps1)
 
 	}
 
