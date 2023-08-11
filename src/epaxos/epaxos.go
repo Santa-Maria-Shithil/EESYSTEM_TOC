@@ -886,6 +886,7 @@ func (r *Replica) updateAttributes(cmds []state.Command, seq int32, deps []int32
 				log.Printf("instance=%d.%d, d=%d, deps[%d]=%d", replica, instance, d, q, deps[q])
 				if d > deps[q] {
 					deps[q] = d
+					log.Printf("instance=%d.%d, d=%d, deps[%d]=%d", replica, instance, d, q, deps[q])
 					if seq <= r.InstanceSpace[q][d].Seq {
 						seq = r.InstanceSpace[q][d].Seq + 1
 					}
