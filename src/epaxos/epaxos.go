@@ -540,7 +540,7 @@ func (r *Replica) executeCommands() {
 	allFired := false
 
 	for !r.Shutdown {
-		time.Sleep(20 * Time.Second)
+		time.Sleep(20 * time.Second)
 		log.Printf("Starting execution")
 		executed := false
 
