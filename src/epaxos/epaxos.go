@@ -877,9 +877,9 @@ func (r *Replica) updateAttributes(cmds []state.Command, seq int32, deps []int32
 	changed := false
 	log.Printf("Loged in updateAttributes")
 	for q := 0; q < r.N; q++ {
-		if r.Id != replica && int32(q) == replica {
-			continue
-		}
+		//if r.Id != replica && int32(q) == replica {
+		//	continue
+		//}
 		for i := 0; i < len(cmds); i++ {
 			log.Printf(" inside update attributes instance=%d.%d, deps[%d]=%d", replica, instance, q, deps[q])
 			if d, present := (r.conflicts[q])[cmds[i].K]; present {
