@@ -541,7 +541,7 @@ func (r *Replica) executeCommands() {
 
 	for !r.Shutdown {
 		//time.Sleep(20 * time.Second)
-		log.Printf("Starting execution")
+		//log.Printf("Starting execution")
 		executed := false
 
 		if r.Id == 0 && INJECT_SLOWDOWN && !allFired {
