@@ -1086,7 +1086,7 @@ func (r *Replica) startPhase1(replica int32, instance int32, ballot int32, propo
 }
 
 func (r *Replica) handlePreAccept(preAccept *epaxosproto.PreAccept) {
-	//log.Printf("Logged in hadlePreAccept")
+	log.Printf("Logged in hadlePreAccept")
 	inst := r.InstanceSpace[preAccept.LeaderId][preAccept.Instance]
 
 	if preAccept.Seq >= r.maxSeq {
@@ -1189,7 +1189,7 @@ func (r *Replica) handlePreAccept(preAccept *epaxosproto.PreAccept) {
 }
 
 func (r *Replica) handlePreAcceptReply(pareply *epaxosproto.PreAcceptReply) {
-	dlog.Printf("Handling PreAccept reply\n")
+	log.Printf("Logged in handlePreAcceptReply\n")
 	inst := r.InstanceSpace[pareply.Replica][pareply.Instance]
 
 	if inst.Status != epaxosproto.PREACCEPTED {
@@ -1272,7 +1272,7 @@ func (r *Replica) handlePreAcceptReply(pareply *epaxosproto.PreAcceptReply) {
 }
 
 func (r *Replica) handlePreAcceptOK(pareply *epaxosproto.PreAcceptOK) {
-	dlog.Printf("Handling PreAccept reply\n")
+	log.Printf("Logged in handlePreAcceptReply\n")
 	inst := r.InstanceSpace[r.Id][pareply.Instance]
 
 	if inst.Status != epaxosproto.PREACCEPTED {
