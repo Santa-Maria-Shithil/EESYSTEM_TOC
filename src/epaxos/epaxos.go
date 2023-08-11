@@ -875,6 +875,7 @@ func (r *Replica) updateConflicts(cmds []state.Command, replica int32, instance 
 
 func (r *Replica) updateAttributes(cmds []state.Command, seq int32, deps []int32, replica int32, instance int32) (int32, []int32, bool) {
 	changed := false
+	log.Printf("Loged in updateAttributes")
 	for q := 0; q < r.N; q++ {
 		if r.Id != replica && int32(q) == replica {
 			continue
