@@ -856,8 +856,7 @@ func (r *Replica) updateCommitted(replica int32) {
 func (r *Replica) updateConflicts(cmds []state.Command, replica int32, instance int32, seq int32) {
 	for i := 0; i < len(cmds); i++ {
 		if d, present := r.conflicts[replica][cmds[i].K]; present {
-			if d < instance { /*reason why not voilating causal dependency. This line will not allow an higher value
-				  instance to be on the dependency list of the lower value instance*/
+			if d < instance {
 				r.conflicts[replica][cmds[i].K] = instance
 			}
 		} else {
@@ -877,8 +876,9 @@ func (r *Replica) updateAttributes(cmds []state.Command, seq int32, deps []int32
 	changed := false
 	log.Printf("Loged in updateAttributes")
 	for q := 0; q < r.N; q++ {
-		//if r.Id != replica && int32(q) == replica {
-		//	continue
+		//if r.Id != replica && int32(q) == replica {///reason why not voilating causal dependency. This line will not allow an higher value
+		//instance to be on the dependency list of the lower value instance*/
+		//continue
 		//}
 		for i := 0; i < len(cmds); i++ {
 			log.Printf(" inside update attributes instance=%d.%d, deps[%d]=%d", replica, instance, q, deps[q])
@@ -909,6 +909,9 @@ func (r *Replica) updateAttributes(cmds []state.Command, seq int32, deps []int32
 }
 
 func (r *Replica) mergeAttributes(seq1 int32, deps1 []int32, seq2 int32, deps2 []int32) (int32, []int32, bool) {
+
+	log.Printf("inside mergeAttribute: seq1=%d deps1[0]=%d seq2=%d deps2[0]=%d", seq1, deps1[0], seq2, deps2[0])
+
 	equal := true
 	if seq1 != seq2 {
 		equal = false
