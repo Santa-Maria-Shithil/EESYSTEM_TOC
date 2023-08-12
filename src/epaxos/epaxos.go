@@ -876,10 +876,10 @@ func (r *Replica) updateAttributes(cmds []state.Command, seq int32, deps []int32
 	changed := false
 	log.Printf("Loged in updateAttributes")
 	for q := 0; q < r.N; q++ {
-		//if r.Id != replica && int32(q) == replica {///reason why not voilating causal dependency. This line will not allow an higher value
-		//instance to be on the dependency list of the lower value instance*/
-		//continue
-		//}
+		if r.Id != replica && int32(q) == replica { ///reason why not voilating causal dependency. This line will not allow an higher value
+			//instance to be on the dependency list of the lower value instance*/
+			continue
+		}
 		for i := 0; i < len(cmds); i++ {
 			log.Printf(" inside update attributes instance=%d.%d, deps[%d]=%d", replica, instance, q, deps[q])
 			if d, present := (r.conflicts[q])[cmds[i].K]; present {
@@ -920,10 +920,10 @@ func (r *Replica) mergeAttributes(seq1 int32, deps1 []int32, seq2 int32, deps2 [
 		}
 	}
 	for q := 0; q < r.N; q++ {
-		//if int32(q) == r.Id {///reason why not voilating causal dependency. This line will not allow an higher value
-		//instance to be on the dependency list of the lower value instance*/
-		//	continue
-		//}
+		if int32(q) == r.Id { ///reason why not voilating causal dependency. This line will not allow an higher value
+			//instance to be on the dependency list of the lower value instance*/
+			continue
+		}
 		if deps1[q] != deps2[q] {
 			equal = false
 			if deps2[q] > deps1[q] {
