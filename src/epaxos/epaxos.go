@@ -920,9 +920,10 @@ func (r *Replica) mergeAttributes(seq1 int32, deps1 []int32, seq2 int32, deps2 [
 		}
 	}
 	for q := 0; q < r.N; q++ {
-		if int32(q) == r.Id {
-			continue
-		}
+		//if int32(q) == r.Id {///reason why not voilating causal dependency. This line will not allow an higher value
+		//instance to be on the dependency list of the lower value instance*/
+		//	continue
+		//}
 		if deps1[q] != deps2[q] {
 			equal = false
 			if deps2[q] > deps1[q] {
