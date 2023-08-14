@@ -1051,17 +1051,17 @@ func (r *Replica) startPhase1(replica int32, instance int32, ballot int32, propo
 			seq1 = seq
 			deps1 = deps
 		} else if instance == 1 {
-			/*log.Printf("previos value seq=%d, instance=%d", seq1, instance1)
+			log.Printf("previos value seq=%d, instance=%d", seq1, instance1)
 			log.Printf("current value seq=%d, instance=%d", seq, instance)
 			r.bcastPreAccept(r.Id, instance, ballot, cmds, seq, deps)
 			//time.Sleep((10 * time.Second))
-			r.bcastPreAccept(id1, instance1, ballot1, cmds1, seq1, deps1)*/
-			id2 = r.Id
+			r.bcastPreAccept(id1, instance1, ballot1, cmds1, seq1, deps1)
+			/*id2 = r.Id
 			instance2 = instance
 			ballot2 = ballot
 			cmds2 = cmds
 			seq2 = seq
-			deps2 = deps
+			deps2 = deps*/
 
 		}
 	} else {
