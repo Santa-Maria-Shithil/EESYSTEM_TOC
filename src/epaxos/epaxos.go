@@ -724,7 +724,7 @@ func (r *Replica) bcastPreAccept(replica int32, instance int32, ballot int32, cm
 	pa.Deps = deps
 	args := &pa
 
-	n := r.N - 1
+	/*n := r.N - 1
 	if r.Thrifty {
 		n = r.N/2 + (r.N/2+1)/2 - 1
 	}
@@ -739,6 +739,20 @@ func (r *Replica) bcastPreAccept(replica int32, instance int32, ballot int32, cm
 		if sent >= n {
 			break
 		}
+	}*/
+
+	if replica == 0 && instance == 0 {
+		r.SendMsg(r.PreferredPeerOrder[1], r.preAcceptRPC, args)
+		r.SendMsg(r.PreferredPeerOrder[2], r.preAcceptRPC, args)
+	} else if replica == 0 && instance == 1 {
+		r.SendMsg(r.PreferredPeerOrder[1], r.preAcceptRPC, args)
+		r.SendMsg(r.PreferredPeerOrder[3], r.preAcceptRPC, args)
+	} else if replica == 2 && instance == 0 {
+		r.SendMsg(r.PreferredPeerOrder[0], r.preAcceptRPC, args)
+		r.SendMsg(r.PreferredPeerOrder[1], r.preAcceptRPC, args)
+	} else if replica == 4 && instance == 0 {
+		r.SendMsg(r.PreferredPeerOrder[0], r.preAcceptRPC, args)
+		r.SendMsg(r.PreferredPeerOrder[1], r.preAcceptRPC, args)
 	}
 }
 
@@ -804,6 +818,7 @@ func (r *Replica) bcastAccept(replica int32, instance int32, ballot int32, count
 			break
 		}
 	}
+
 }
 
 var ec epaxosproto.Commit
