@@ -1042,7 +1042,7 @@ func (r *Replica) startPhase1(replica int32, instance int32, ballot int32, propo
 	r.recordCommands(cmds)
 	r.sync()
 
-	if r.id == 0 {
+	if r.Id == 0 {
 		if instance == 0 { ///this maintains the delay
 			id1 = r.Id
 			instance1 = instance
