@@ -34,12 +34,20 @@ const BF_K = 4
 const BF_M_N = 32.0
 
 var bf_PT uint32
+
 var id1 int32
 var instance1 int32
 var ballot1 int32
 var cmds1 []state.Command
 var seq1 int32
 var deps1 []int32
+
+var id2 int32
+var instance2 int32
+var ballot2 int32
+var cmds2 []state.Command
+var seq2 int32
+var deps2 []int32
 
 const DO_CHECKPOINTING = false
 const HT_INIT_SIZE = 200000
@@ -696,6 +704,7 @@ func (r *Replica) bcastPrepare(replica int32, instance int32, ballot int32) {
 		r.SendMsg(q, r.prepareRPC, args)
 		sent++
 	}
+
 }
 
 var pa epaxosproto.PreAccept
@@ -1033,23 +1042,31 @@ func (r *Replica) startPhase1(replica int32, instance int32, ballot int32, propo
 	r.recordCommands(cmds)
 	r.sync()
 
-	if instance == 0 { ///this if maintains the delay
-		id1 = r.Id
-		instance1 = instance
-		ballot1 = ballot
-		cmds1 = cmds
-		seq1 = seq
-		deps1 = deps
+	if r.id == 0 {
+		if instance == 0 { ///this maintains the delay
+			id1 = r.Id
+			instance1 = instance
+			ballot1 = ballot
+			cmds1 = cmds
+			seq1 = seq
+			deps1 = deps
+		} else if instance == 1 {
+			/*log.Printf("previos value seq=%d, instance=%d", seq1, instance1)
+			log.Printf("current value seq=%d, instance=%d", seq, instance)
+			r.bcastPreAccept(r.Id, instance, ballot, cmds, seq, deps)
+			//time.Sleep((10 * time.Second))
+			r.bcastPreAccept(id1, instance1, ballot1, cmds1, seq1, deps1)*/
+			id2 = r.Id
+			instance2 = instance
+			ballot2 = ballot
+			cmds2 = cmds
+			seq2 = seq
+			deps2 = deps
+
+		}
 	} else {
-		log.Printf("previos value seq=%d, instance=%d", seq1, instance1)
-		log.Printf("current value seq=%d, instance=%d", seq, instance)
 		r.bcastPreAccept(r.Id, instance, ballot, cmds, seq, deps)
-		//time.Sleep((10 * time.Second))
-		r.bcastPreAccept(id1, instance1, ballot1, cmds1, seq1, deps1)
-
 	}
-
-	//r.bcastPreAccept(r.Id, instance, ballot, cmds, seq, deps)
 
 	cpcounter += batchSize
 

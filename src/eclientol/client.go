@@ -412,7 +412,16 @@ func main() {
 
 			// picking server for epaxos client
 			if isRandomLeader {
-				leader = i % N
+				//leader = i % N
+				if i == 0 {
+					leader = 2
+				} else if i == 1 {
+					leader = 4
+				} else if i == 2 {
+					leader = 0
+				} else if i == 3 {
+					leader = 0
+				}
 			}
 			if leader < 0 {
 				select {
