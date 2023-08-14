@@ -1042,7 +1042,9 @@ func (r *Replica) startPhase1(replica int32, instance int32, ballot int32, propo
 	r.recordCommands(cmds)
 	r.sync()
 
+	log.Printf("r.id=%d", r.Id)
 	if r.Id == 0 {
+		log.Printf("inside replica 0")
 		if instance == 0 { ///this maintains the delay
 			id1 = r.Id
 			instance1 = instance
@@ -1065,6 +1067,7 @@ func (r *Replica) startPhase1(replica int32, instance int32, ballot int32, propo
 
 		}
 	} else {
+		log.Printf("inside other than replica 0")
 		r.bcastPreAccept(r.Id, instance, ballot, cmds, seq, deps)
 	}
 
