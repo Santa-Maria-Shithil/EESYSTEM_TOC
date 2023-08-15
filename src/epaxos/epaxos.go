@@ -473,7 +473,7 @@ func (r *Replica) run() {
 		case acceptReplyS := <-r.acceptReplyChan:
 			acceptReply := acceptReplyS.(*epaxosproto.AcceptReply)
 			//got an Accept reply
-			log.Printf("Received AcceptReply for instance %d.%d\n", acceptReply.Replica, acceptReply.Instance)
+			dlog.Printf("Received AcceptReply for instance %d.%d\n", acceptReply.Replica, acceptReply.Instance)
 			r.handleAcceptReply(acceptReply)
 			break
 
@@ -898,19 +898,19 @@ func (r *Replica) updateConflicts(cmds []state.Command, replica int32, instance 
 
 func (r *Replica) updateAttributes(cmds []state.Command, seq int32, deps []int32, replica int32, instance int32) (int32, []int32, bool) {
 	changed := false
-	log.Printf("Loged in updateAttributes")
+	//log.Printf("Loged in updateAttributes")
 	for q := 0; q < r.N; q++ {
 		if r.Id != replica && int32(q) == replica { ///reason why not voilating causal dependency. This line will not allow an higher value
 			//instance to be on the dependency list of the lower value instance*/
 			continue
 		}
 		for i := 0; i < len(cmds); i++ {
-			log.Printf(" inside update attributes instance=%d.%d, deps[%d]=%d", replica, instance, q, deps[q])
+			//log.Printf(" inside update attributes instance=%d.%d, deps[%d]=%d", replica, instance, q, deps[q])
 			if d, present := (r.conflicts[q])[cmds[i].K]; present {
-				log.Printf("instance=%d.%d, d=%d, deps[%d]=%d", replica, instance, d, q, deps[q])
+				//log.Printf("instance=%d.%d, d=%d, deps[%d]=%d", replica, instance, d, q, deps[q])
 				if d > deps[q] {
 					deps[q] = d
-					log.Printf("instance=%d.%d, d=%d, deps[%d]=%d", replica, instance, d, q, deps[q])
+					//log.Printf("instance=%d.%d, d=%d, deps[%d]=%d", replica, instance, d, q, deps[q])
 					if seq <= r.InstanceSpace[q][d].Seq {
 						seq = r.InstanceSpace[q][d].Seq + 1
 					}
@@ -1059,7 +1059,7 @@ func (r *Replica) startPhase1(replica int32, instance int32, ballot int32, propo
 
 	log.Printf("r.id=%d", r.Id)
 	if r.Id == 0 {
-		log.Printf("inside replica 0")
+		//log.Printf("inside replica 0")
 		if instance == 0 { ///this maintains the delay
 			id1 = r.Id
 			instance1 = instance
@@ -1068,8 +1068,8 @@ func (r *Replica) startPhase1(replica int32, instance int32, ballot int32, propo
 			seq1 = seq
 			deps1 = deps
 		} else if instance == 1 {
-			log.Printf("previos value seq=%d, instance=%d", seq1, instance1)
-			log.Printf("current value seq=%d, instance=%d", seq, instance)
+			//log.Printf("previos value seq=%d, instance=%d", seq1, instance1)
+			//log.Printf("current value seq=%d, instance=%d", seq, instance)
 			r.bcastPreAccept(r.Id, instance, ballot, cmds, seq, deps)
 			//time.Sleep((10 * time.Second))
 			r.bcastPreAccept(id1, instance1, ballot1, cmds1, seq1, deps1)
@@ -1082,7 +1082,7 @@ func (r *Replica) startPhase1(replica int32, instance int32, ballot int32, propo
 
 		}
 	} else {
-		log.Printf("inside other than replica 0")
+		//log.Printf("inside other than replica 0")
 		r.bcastPreAccept(r.Id, instance, ballot, cmds, seq, deps)
 	}
 
@@ -1211,6 +1211,7 @@ func (r *Replica) handlePreAccept(preAccept *epaxosproto.PreAccept) {
 	}
 
 	if changed || uncommittedDeps || preAccept.Replica != preAccept.LeaderId || !isInitialBallot(preAccept.Ballot) {
+		log.Printf("inside handlepreaccept conditional")
 		r.replyPreAccept(preAccept.LeaderId,
 			&epaxosproto.PreAcceptReply{
 				preAccept.Replica,
@@ -1221,6 +1222,7 @@ func (r *Replica) handlePreAccept(preAccept *epaxosproto.PreAccept) {
 				deps,
 				r.CommittedUpTo})
 	} else {
+		log.Printf("inside handle preaccept unconditional")
 		pok := &epaxosproto.PreAcceptOK{preAccept.Instance}
 		r.SendMsg(preAccept.LeaderId, r.preAcceptOKRPC, pok)
 	}
