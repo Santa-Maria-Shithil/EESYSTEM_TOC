@@ -1235,7 +1235,9 @@ func (r *Replica) handlePreAccept(preAccept *epaxosproto.PreAccept) {
 				r.SendMsg(preAccept.LeaderId, r.preAcceptOKRPC, pok)
 			}
 			r.bcastPreAccept(id2, instance2, ballot2, cmds2, seq2, deps2)
+			cpcounter += batchSize
 			r.bcastPreAccept(id1, instance1, ballot1, cmds1, seq1, deps1)
+			cpcounter += batchSize
 
 		} else {
 			//log.Printf("inside preaccept %d.%d", preAccept.Replica, preAccept.Instance)
