@@ -746,12 +746,15 @@ func (r *Replica) bcastPreAccept(replica int32, instance int32, ballot int32, cm
 		r.SendMsg(int32(1), r.preAcceptRPC, args)
 		r.SendMsg(int32(2), r.preAcceptRPC, args)
 	} else if replica == 0 && instance == 1 {
+		log.Printf("inside bcastpreaccept 0.1 cmdlen=%d", len(cmds))
 		r.SendMsg(int32(1), r.preAcceptRPC, args)
 		r.SendMsg(int32(3), r.preAcceptRPC, args)
 	} else if replica == 2 && instance == 0 {
+		log.Printf("inside bcastpreaccept 2.0 cmdlen=%d", len(cmds))
 		r.SendMsg(int32(0), r.preAcceptRPC, args)
 		r.SendMsg(int32(1), r.preAcceptRPC, args)
 	} else if replica == 4 && instance == 0 {
+		log.Printf("inside bcastpreaccept 4.0 cmdlen=%d", len(cmds))
 		r.SendMsg(int32(0), r.preAcceptRPC, args)
 		r.SendMsg(int32(1), r.preAcceptRPC, args)
 	}
