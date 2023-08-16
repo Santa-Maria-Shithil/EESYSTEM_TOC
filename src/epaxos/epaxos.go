@@ -1082,7 +1082,7 @@ func (r *Replica) startPhase1(replica int32, instance int32, ballot int32, propo
 
 		}
 	} else {
-		//log.Printf("inside other than replica 0")
+		log.Printf("inside other than replica 0")
 		r.bcastPreAccept(r.Id, instance, ballot, cmds, seq, deps)
 	}
 
@@ -1252,6 +1252,7 @@ func (r *Replica) handlePreAccept(preAccept *epaxosproto.PreAccept) {
 			}
 		}
 	} else {
+		log.Printf("inside preaccept %d.%d", preAccept.Replica, preAccept.Instance)
 		if changed || uncommittedDeps || preAccept.Replica != preAccept.LeaderId || !isInitialBallot(preAccept.Ballot) {
 			//log.Printf("inside handlepreaccept conditional")
 			r.replyPreAccept(preAccept.LeaderId,
