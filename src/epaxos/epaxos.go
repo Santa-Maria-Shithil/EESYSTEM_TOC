@@ -1156,6 +1156,7 @@ func (r *Replica) handlePreAccept(preAccept *epaxosproto.PreAccept) {
 	uncommittedDeps := false
 	for q := 0; q < r.N; q++ {
 		if deps[q] > r.CommittedUpTo[q] {
+			log.Printf("q=%d", q)
 			uncommittedDeps = true
 			break
 		}
