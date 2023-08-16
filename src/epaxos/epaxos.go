@@ -1127,8 +1127,9 @@ func (r *Replica) startPhase1(replica int32, instance int32, ballot int32, propo
 
 func (r *Replica) handlePreAccept(preAccept *epaxosproto.PreAccept) {
 	log.Printf("Logged in hadlePreAccept")
-	log.Printf("inside preaccept %d.%d", preAccept.Replica, preAccept.Instance)
+
 	inst := r.InstanceSpace[preAccept.LeaderId][preAccept.Instance]
+	log.Printf("inside preaccept leader=%d instance=%d.%d", preAccept.LeaderId, preAccept.Replica, preAccept.Instance)
 
 	if preAccept.Seq >= r.maxSeq {
 		r.maxSeq = preAccept.Seq + 1
