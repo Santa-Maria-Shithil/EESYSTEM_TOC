@@ -898,7 +898,7 @@ func (r *Replica) updateConflicts(cmds []state.Command, replica int32, instance 
 
 func (r *Replica) updateAttributes(cmds []state.Command, seq int32, deps []int32, replica int32, instance int32) (int32, []int32, bool) {
 	changed := false
-	log.Printf(" outside looop update attributes instance=%d.%d, deps[%d]=%d", replica, instance, q, deps[q])
+	log.Printf(" outside looop update attributes instance=%d.%d", replica, instance)
 	for q := 0; q < r.N; q++ {
 		if r.Id != replica && int32(q) == replica { ///reason why not voilating causal dependency. This line will not allow an higher value
 			//instance to be on the dependency list of the lower value instance*/
