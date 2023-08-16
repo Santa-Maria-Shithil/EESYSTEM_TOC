@@ -128,8 +128,9 @@ func (e *Exec) strongconnect(v *Instance, index *int) bool {
 							w.lb.clientProposals[idx].Timestamp},
 						w.lb.clientProposals[idx].Reply)
 				}
+				w.Status = epaxosproto.EXECUTED
 			}
-			w.Status = epaxosproto.EXECUTED
+
 		}
 		stack = stack[0:l]
 	}
