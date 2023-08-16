@@ -875,7 +875,7 @@ func (r *Replica) bcastCommit(replica int32, instance int32, cmds []state.Comman
 	ecs.Deps = deps
 	argsShort := &ecs
 
-	sent := 0
+	/*sent := 0
 	for q := 0; q < r.N-1; q++ {
 		if !r.Alive[r.PreferredPeerOrder[q]] {
 			continue
@@ -886,6 +886,36 @@ func (r *Replica) bcastCommit(replica int32, instance int32, cmds []state.Comman
 			r.SendMsg(r.PreferredPeerOrder[q], r.commitShortRPC, argsShort)
 			sent++
 		}
+	}*/
+
+	if replica == 0 && instance == 0 {
+		//log.Printf("inside bcastpreaccept 0.0 cmdlen=%d", len(cmds))
+		//r.SendMsg(int32(0), r.preAcceptRPC, args)
+		r.SendMsg(int32(1), r.commitShortRPC, argsShort)
+		r.SendMsg(int32(2), r.commitShortRPC, argsShort)
+		r.SendMsg(int32(3), r.commitRPC, args)
+		r.SendMsg(int32(4), r.commitRPC, args)
+	} else if replica == 0 && instance == 1 {
+		//log.Printf("inside bcastpreaccept 0.1 cmdlen=%d", len(cmds))
+		//r.SendMsg(int32(0), r.preAcceptRPC, args)
+		r.SendMsg(int32(1), r.commitShortRPC, argsShort)
+		r.SendMsg(int32(3), r.commitShortRPC, argsShort)
+		r.SendMsg(int32(2), r.commitRPC, args)
+		r.SendMsg(int32(4), r.commitRPC, args)
+	} else if replica == 2 && instance == 0 {
+		//log.Printf("inside bcastpreaccept 2.0 cmdlen=%d", len(cmds))
+		//r.SendMsg(int32(2), r.preAcceptRPC, args)
+		r.SendMsg(int32(0), r.commitShortRPC, argsShort)
+		r.SendMsg(int32(1), r.commitShortRPC, argsShort)
+		r.SendMsg(int32(3), r.commitRPC, args)
+		r.SendMsg(int32(4), r.commitRPC, args)
+	} else if replica == 4 && instance == 0 {
+		//log.Printf("inside bcastpreaccept 4.0 cmdlen=%d", len(cmds))
+		//r.SendMsg(int32(4), r.preAcceptRPC, args)
+		r.SendMsg(int32(0), r.commitShortRPC, argsShort)
+		r.SendMsg(int32(1), r.commitShortRPC, argsShort)
+		r.SendMsg(int32(2), r.commitRPC, args)
+		r.SendMsg(int32(3), r.commitRPC, args)
 	}
 }
 
