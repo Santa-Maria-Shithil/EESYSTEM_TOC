@@ -1070,15 +1070,15 @@ func (r *Replica) startPhase1(replica int32, instance int32, ballot int32, propo
 		} else if instance == 1 {
 			//log.Printf("previos value seq=%d, instance=%d", seq1, instance1)
 			//log.Printf("current value seq=%d, instance=%d", seq, instance)
-			r.bcastPreAccept(r.Id, instance, ballot, cmds, seq, deps)
+			//r.bcastPreAccept(r.Id, instance, ballot, cmds, seq, deps)
 			//time.Sleep((10 * time.Second))
-			r.bcastPreAccept(id1, instance1, ballot1, cmds1, seq1, deps1)
-			/*id2 = r.Id
+			//r.bcastPreAccept(id1, instance1, ballot1, cmds1, seq1, deps1)
+			id2 = r.Id
 			instance2 = instance
 			ballot2 = ballot
 			cmds2 = cmds
 			seq2 = seq
-			deps2 = deps*/
+			deps2 = deps
 
 		}
 	} else {
@@ -1210,21 +1210,65 @@ func (r *Replica) handlePreAccept(preAccept *epaxosproto.PreAccept) {
 		r.clearHashtables()
 	}
 
-	if changed || uncommittedDeps || preAccept.Replica != preAccept.LeaderId || !isInitialBallot(preAccept.Ballot) {
-		log.Printf("inside handlepreaccept conditional")
-		r.replyPreAccept(preAccept.LeaderId,
-			&epaxosproto.PreAcceptReply{
-				preAccept.Replica,
-				preAccept.Instance,
-				TRUE,
-				preAccept.Ballot,
-				seq,
-				deps,
-				r.CommittedUpTo})
+	if r.Id == 0 {
+		if preAccept.Replica == 2 && preAccept.Instance == 0 {
+			log.Printf("inside preaccept %d.%d", preAccept.Replica, preAccept.Instance)
+			if changed || uncommittedDeps || preAccept.Replica != preAccept.LeaderId || !isInitialBallot(preAccept.Ballot) {
+				//log.Printf("inside handlepreaccept conditional")
+				r.replyPreAccept(preAccept.LeaderId,
+					&epaxosproto.PreAcceptReply{
+						preAccept.Replica,
+						preAccept.Instance,
+						TRUE,
+						preAccept.Ballot,
+						seq,
+						deps,
+						r.CommittedUpTo})
+			} else {
+				//log.Printf("inside handle preaccept unconditional")
+				pok := &epaxosproto.PreAcceptOK{preAccept.Instance}
+				r.SendMsg(preAccept.LeaderId, r.preAcceptOKRPC, pok)
+			}
+			r.bcastPreAccept(id1, instance1, ballot1, cmds1, seq1, deps1)
+			r.bcastPreAccept(id2, instance2, ballot2, cmds2, seq2, deps2)
+
+		} else {
+			log.Printf("inside preaccept %d.%d", preAccept.Replica, preAccept.Instance)
+			if changed || uncommittedDeps || preAccept.Replica != preAccept.LeaderId || !isInitialBallot(preAccept.Ballot) {
+				//log.Printf("inside handlepreaccept conditional")
+				r.replyPreAccept(preAccept.LeaderId,
+					&epaxosproto.PreAcceptReply{
+						preAccept.Replica,
+						preAccept.Instance,
+						TRUE,
+						preAccept.Ballot,
+						seq,
+						deps,
+						r.CommittedUpTo})
+			} else {
+				//log.Printf("inside handle preaccept unconditional")
+				pok := &epaxosproto.PreAcceptOK{preAccept.Instance}
+				r.SendMsg(preAccept.LeaderId, r.preAcceptOKRPC, pok)
+			}
+		}
 	} else {
-		log.Printf("inside handle preaccept unconditional")
-		pok := &epaxosproto.PreAcceptOK{preAccept.Instance}
-		r.SendMsg(preAccept.LeaderId, r.preAcceptOKRPC, pok)
+		if changed || uncommittedDeps || preAccept.Replica != preAccept.LeaderId || !isInitialBallot(preAccept.Ballot) {
+			//log.Printf("inside handlepreaccept conditional")
+			r.replyPreAccept(preAccept.LeaderId,
+				&epaxosproto.PreAcceptReply{
+					preAccept.Replica,
+					preAccept.Instance,
+					TRUE,
+					preAccept.Ballot,
+					seq,
+					deps,
+					r.CommittedUpTo})
+		} else {
+			//log.Printf("inside handle preaccept unconditional")
+			pok := &epaxosproto.PreAcceptOK{preAccept.Instance}
+			r.SendMsg(preAccept.LeaderId, r.preAcceptOKRPC, pok)
+		}
+
 	}
 
 	dlog.Printf("I've replied to the PreAccept\n")
