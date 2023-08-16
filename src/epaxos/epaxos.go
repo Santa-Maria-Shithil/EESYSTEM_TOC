@@ -1071,6 +1071,7 @@ func (r *Replica) startPhase1(replica int32, instance int32, ballot int32, propo
 			cmds1 = cmds
 			seq1 = seq
 			deps1 = deps
+			log.Printf("current value seq=%d, instance=%d", seq, instance)
 		} else if instance == 1 {
 			//log.Printf("previos value seq=%d, instance=%d", seq1, instance1)
 			//log.Printf("current value seq=%d, instance=%d", seq, instance)
@@ -1083,6 +1084,7 @@ func (r *Replica) startPhase1(replica int32, instance int32, ballot int32, propo
 			cmds2 = cmds
 			seq2 = seq
 			deps2 = deps
+			log.Printf("current value seq=%d, instance=%d", seq, instance)
 
 		}
 	} else {
