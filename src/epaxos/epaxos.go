@@ -1127,6 +1127,7 @@ func (r *Replica) startPhase1(replica int32, instance int32, ballot int32, propo
 
 func (r *Replica) handlePreAccept(preAccept *epaxosproto.PreAccept) {
 	log.Printf("Logged in hadlePreAccept")
+	log.Printf("inside preaccept %d.%d", preAccept.Replica, preAccept.Instance)
 	inst := r.InstanceSpace[preAccept.LeaderId][preAccept.Instance]
 
 	if preAccept.Seq >= r.maxSeq {
@@ -1212,7 +1213,7 @@ func (r *Replica) handlePreAccept(preAccept *epaxosproto.PreAccept) {
 
 	if r.Id == 0 {
 		if preAccept.Replica == 2 && preAccept.Instance == 0 {
-			log.Printf("inside preaccept %d.%d", preAccept.Replica, preAccept.Instance)
+			//log.Printf("inside preaccept %d.%d", preAccept.Replica, preAccept.Instance)
 			if changed || uncommittedDeps || preAccept.Replica != preAccept.LeaderId || !isInitialBallot(preAccept.Ballot) {
 				//log.Printf("inside handlepreaccept conditional")
 				r.replyPreAccept(preAccept.LeaderId,
@@ -1233,7 +1234,7 @@ func (r *Replica) handlePreAccept(preAccept *epaxosproto.PreAccept) {
 			r.bcastPreAccept(id1, instance1, ballot1, cmds1, seq1, deps1)
 
 		} else {
-			log.Printf("inside preaccept %d.%d", preAccept.Replica, preAccept.Instance)
+			//log.Printf("inside preaccept %d.%d", preAccept.Replica, preAccept.Instance)
 			if changed || uncommittedDeps || preAccept.Replica != preAccept.LeaderId || !isInitialBallot(preAccept.Ballot) {
 				//log.Printf("inside handlepreaccept conditional")
 				r.replyPreAccept(preAccept.LeaderId,
@@ -1252,7 +1253,7 @@ func (r *Replica) handlePreAccept(preAccept *epaxosproto.PreAccept) {
 			}
 		}
 	} else {
-		log.Printf("inside preaccept %d.%d", preAccept.Replica, preAccept.Instance)
+		//log.Printf("inside preaccept %d.%d", preAccept.Replica, preAccept.Instance)
 		if changed || uncommittedDeps || preAccept.Replica != preAccept.LeaderId || !isInitialBallot(preAccept.Ballot) {
 			//log.Printf("inside handlepreaccept conditional")
 			r.replyPreAccept(preAccept.LeaderId,
