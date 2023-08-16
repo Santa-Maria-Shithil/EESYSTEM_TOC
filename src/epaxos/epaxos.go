@@ -1606,13 +1606,14 @@ func (r *Replica) handleCommit(commit *epaxosproto.Commit) {
 				r.ProposeChan <- p
 			}
 			inst.lb = nil
-			log.Printf("Inside handleCommit")
-			log.Printf("leader=%d, instance=%d, seq=%d, dep[0]=%d,dep[1]=%d,dep[2]=%d,dep[3]=%d,dep[4]=%d", int(commit.LeaderId), int(commit.Instance), commit.Seq, int(commit.Deps[0]), int(commit.Deps[1]), int(commit.Deps[2]), int(commit.Deps[3]), int(commit.Deps[4]))
 
 		}
 		inst.Seq = commit.Seq
 		inst.Deps = commit.Deps
 		inst.Status = epaxosproto.COMMITTED
+		log.Printf("Inside handleCommit")
+		log.Printf("leader=%d, instance=%d, seq=%d, dep[0]=%d,dep[1]=%d,dep[2]=%d,dep[3]=%d,dep[4]=%d", int(commit.LeaderId), int(commit.Instance), commit.Seq, int(commit.Deps[0]), int(commit.Deps[1]), int(commit.Deps[2]), int(commit.Deps[3]), int(commit.Deps[4]))
+
 	} else {
 		r.InstanceSpace[commit.Replica][int(commit.Instance)] = &Instance{
 			commit.Command,
@@ -1672,13 +1673,14 @@ func (r *Replica) handleCommitShort(commit *epaxosproto.CommitShort) {
 				r.ProposeChan <- p
 			}
 			inst.lb = nil
-			log.Printf("Inside handleCommit")
-			log.Printf("leader=%d, instance=%d, seq=%d, dep[0]=%d,dep[1]=%d,dep[2]=%d,dep[3]=%d,dep[4]=%d", int(commit.LeaderId), int(commit.Instance), commit.Seq, int(commit.Deps[0]), int(commit.Deps[1]), int(commit.Deps[2]), int(commit.Deps[3]), int(commit.Deps[4]))
 
 		}
 		inst.Seq = commit.Seq
 		inst.Deps = commit.Deps
 		inst.Status = epaxosproto.COMMITTED
+		log.Printf("Inside handleCommit")
+		log.Printf("leader=%d, instance=%d, seq=%d, dep[0]=%d,dep[1]=%d,dep[2]=%d,dep[3]=%d,dep[4]=%d", int(commit.LeaderId), int(commit.Instance), commit.Seq, int(commit.Deps[0]), int(commit.Deps[1]), int(commit.Deps[2]), int(commit.Deps[3]), int(commit.Deps[4]))
+
 	} else {
 		r.InstanceSpace[commit.Replica][commit.Instance] = &Instance{
 			nil,
