@@ -742,17 +742,17 @@ func (r *Replica) bcastPreAccept(replica int32, instance int32, ballot int32, cm
 	}*/
 
 	if replica == 0 && instance == 0 {
-		r.SendMsg(r.PreferredPeerOrder[1], r.preAcceptRPC, args)
-		r.SendMsg(r.PreferredPeerOrder[2], r.preAcceptRPC, args)
+		r.SendMsg(int32(1), r.preAcceptRPC, args)
+		r.SendMsg(int32(2), r.preAcceptRPC, args)
 	} else if replica == 0 && instance == 1 {
-		r.SendMsg(r.PreferredPeerOrder[1], r.preAcceptRPC, args)
-		r.SendMsg(r.PreferredPeerOrder[3], r.preAcceptRPC, args)
+		r.SendMsg(int32(1), r.preAcceptRPC, args)
+		r.SendMsg(int32(3), r.preAcceptRPC, args)
 	} else if replica == 2 && instance == 0 {
-		r.SendMsg(r.PreferredPeerOrder[0], r.preAcceptRPC, args)
-		r.SendMsg(r.PreferredPeerOrder[1], r.preAcceptRPC, args)
+		r.SendMsg(int32(0), r.preAcceptRPC, args)
+		r.SendMsg(int32(1), r.preAcceptRPC, args)
 	} else if replica == 4 && instance == 0 {
-		r.SendMsg(r.PreferredPeerOrder[0], r.preAcceptRPC, args)
-		r.SendMsg(r.PreferredPeerOrder[1], r.preAcceptRPC, args)
+		r.SendMsg(int32(0), r.preAcceptRPC, args)
+		r.SendMsg(int32(1), r.preAcceptRPC, args)
 	}
 }
 
@@ -761,7 +761,7 @@ var tpa epaxosproto.TryPreAccept
 func (r *Replica) bcastTryPreAccept(replica int32, instance int32, ballot int32, cmds []state.Command, seq int32, deps []int32) {
 	defer func() {
 		if err := recover(); err != nil {
-			dlog.Println("PreAccept bcast failed:", err)
+			log.Println("PreAccept bcast failed:", err)
 		}
 	}()
 	tpa.LeaderId = r.Id
