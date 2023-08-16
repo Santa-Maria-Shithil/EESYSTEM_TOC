@@ -411,7 +411,7 @@ func main() {
 			// checkAndUpdateViews(viewChangeChan, views)
 
 			// picking server for epaxos client
-			if isRandomLeader {
+			if isRandomLeader { //modified for proving scenario2
 				//leader = i % N
 				if i == 0 {
 					leader = 0
