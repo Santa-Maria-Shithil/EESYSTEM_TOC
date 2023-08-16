@@ -1129,7 +1129,6 @@ func (r *Replica) handlePreAccept(preAccept *epaxosproto.PreAccept) {
 	log.Printf("Logged in hadlePreAccept")
 
 	inst := r.InstanceSpace[preAccept.LeaderId][preAccept.Instance]
-	log.Printf("inside preaccept leader=%d instance=%d.%d", preAccept.LeaderId, preAccept.Replica, preAccept.Instance)
 
 	if preAccept.Seq >= r.maxSeq {
 		r.maxSeq = preAccept.Seq + 1
@@ -1151,6 +1150,8 @@ func (r *Replica) handlePreAccept(preAccept *epaxosproto.PreAccept) {
 	if preAccept.Instance >= r.crtInstance[preAccept.Replica] {
 		r.crtInstance[preAccept.Replica] = preAccept.Instance + 1
 	}
+
+	log.Printf("inside preaccept leader=%d instance=%d.%d", preAccept.LeaderId, preAccept.Replica, preAccept.Instance)
 
 	//update attributes for command
 	seq, deps, changed := r.updateAttributes(preAccept.Command, preAccept.Seq, preAccept.Deps, preAccept.Replica, preAccept.Instance)
