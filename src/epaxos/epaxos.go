@@ -1126,6 +1126,10 @@ func (r *Replica) startPhase1(replica int32, instance int32, ballot int32, propo
 }
 
 func (r *Replica) handlePreAccept(preAccept *epaxosproto.PreAccept) {
+	batchSize := len(r.ProposeChan) + 1
+	if batchSize > MAX_BATCH {
+		batchSize = MAX_BATCH
+	}
 	log.Printf("Logged in hadlePreAccept")
 
 	inst := r.InstanceSpace[preAccept.LeaderId][preAccept.Instance]
