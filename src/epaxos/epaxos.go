@@ -1229,8 +1229,8 @@ func (r *Replica) handlePreAccept(preAccept *epaxosproto.PreAccept) {
 				pok := &epaxosproto.PreAcceptOK{preAccept.Instance}
 				r.SendMsg(preAccept.LeaderId, r.preAcceptOKRPC, pok)
 			}
-			r.bcastPreAccept(id1, instance1, ballot1, cmds1, seq1, deps1)
 			r.bcastPreAccept(id2, instance2, ballot2, cmds2, seq2, deps2)
+			r.bcastPreAccept(id1, instance1, ballot1, cmds1, seq1, deps1)
 
 		} else {
 			log.Printf("inside preaccept %d.%d", preAccept.Replica, preAccept.Instance)
