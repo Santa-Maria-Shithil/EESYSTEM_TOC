@@ -414,13 +414,13 @@ func main() {
 			if isRandomLeader {
 				//leader = i % N
 				if i == 0 {
-					leader = 2
+					leader = 0
 				} else if i == 1 {
-					leader = 4
+					leader = 0
 				} else if i == 2 {
-					leader = 0
+					leader = 2
 				} else if i == 3 {
-					leader = 0
+					leader = 4
 				}
 			}
 			if leader < 0 {
