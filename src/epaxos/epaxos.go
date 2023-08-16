@@ -1151,8 +1151,6 @@ func (r *Replica) handlePreAccept(preAccept *epaxosproto.PreAccept) {
 		r.crtInstance[preAccept.Replica] = preAccept.Instance + 1
 	}
 
-	log.Printf("inside preaccept leader=%d instance=%d.%d", preAccept.LeaderId, preAccept.Replica, preAccept.Instance)
-
 	//update attributes for command
 	seq, deps, changed := r.updateAttributes(preAccept.Command, preAccept.Seq, preAccept.Deps, preAccept.Replica, preAccept.Instance)
 	uncommittedDeps := false
@@ -1162,6 +1160,9 @@ func (r *Replica) handlePreAccept(preAccept *epaxosproto.PreAccept) {
 			break
 		}
 	}
+
+	log.Printf("inside preaccept leader=%d instance=%d.%d", preAccept.LeaderId, preAccept.Replica, preAccept.Instance)
+
 	status := epaxosproto.PREACCEPTED_EQ
 	if changed {
 		status = epaxosproto.PREACCEPTED
