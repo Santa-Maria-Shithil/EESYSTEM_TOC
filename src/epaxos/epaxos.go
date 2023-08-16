@@ -911,10 +911,10 @@ func (r *Replica) updateAttributes(cmds []state.Command, seq int32, deps []int32
 		for i := 0; i < len(cmds); i++ {
 			//log.Printf(" inside update attributes instance=%d.%d, deps[%d]=%d", replica, instance, q, deps[q])
 			if d, present := (r.conflicts[q])[cmds[i].K]; present {
-				log.Printf("instance=%d.%d, d=%d, deps[%d]=%d", replica, instance, d, q, deps[q])
+				//log.Printf("instance=%d.%d, d=%d, deps[%d]=%d", replica, instance, d, q, deps[q])
 				if d > deps[q] {
 					deps[q] = d
-					log.Printf("instance=%d.%d, d=%d, deps[%d]=%d", replica, instance, d, q, deps[q])
+					//log.Printf("instance=%d.%d, d=%d, deps[%d]=%d", replica, instance, d, q, deps[q])
 					if seq <= r.InstanceSpace[q][d].Seq {
 						seq = r.InstanceSpace[q][d].Seq + 1
 					}
@@ -938,7 +938,7 @@ func (r *Replica) updateAttributes(cmds []state.Command, seq int32, deps []int32
 
 func (r *Replica) mergeAttributes(seq1 int32, deps1 []int32, seq2 int32, deps2 []int32) (int32, []int32, bool) {
 
-	log.Printf("inside mergeAttribute: seq1=%d deps1[0]=%d seq2=%d deps2[0]=%d", seq1, deps1[0], seq2, deps2[0])
+	//log.Printf("inside mergeAttribute: seq1=%d deps1[0]=%d seq2=%d deps2[0]=%d", seq1, deps1[0], seq2, deps2[0])
 
 	equal := true
 	if seq1 != seq2 {
@@ -1168,7 +1168,7 @@ func (r *Replica) handlePreAccept(preAccept *epaxosproto.PreAccept) {
 	uncommittedDeps := false
 	for q := 0; q < r.N; q++ {
 		if deps[q] > r.CommittedUpTo[q] {
-			log.Printf("q=%d", q)
+			//log.Printf("q=%d", q)
 			uncommittedDeps = true
 			break
 		}
@@ -1572,8 +1572,8 @@ func (r *Replica) handleCommit(commit *epaxosproto.Commit) {
 		r.crtInstance[commit.Replica] = commit.Instance + 1
 	}
 
-	//log.Printf("Inside handleCommit")
-	//log.Printf("instance=%d, seq=%d", int(commit.Instance), commit.Seq)
+	log.Printf("Inside handleCommit")
+	log.Printf("leader=%d, instance=%d, seq=%d, dep[0]=%d,dep[1]=%d,dep[2]=%d,dep[3]=%d,dep[4]=%d", int(commit.LeaderId), int(commit.Instance), commit.Seq, int(commit.Deps[0]), int(commit.Deps[1]), int(commit.Deps[2]), int(commit.Deps[3]), int(commit.Deps[4]))
 
 	if inst != nil {
 		if inst.lb != nil && inst.lb.clientProposals != nil && len(commit.Command) == 0 {
@@ -1636,6 +1636,8 @@ func (r *Replica) handleCommitShort(commit *epaxosproto.CommitShort) {
 	}
 
 	//log.Printf("inside commitshort instance id=%d, seq=%d, dep=%d", int(commit.Instance), int(commit.Seq), int(commit.Deps[0]))
+	log.Printf("Inside handleCommitShort")
+	log.Printf("leader=%d, instance=%d, seq=%d, dep[0]=%d,dep[1]=%d,dep[2]=%d,dep[3]=%d,dep[4]=%d", int(commit.LeaderId), int(commit.Instance), commit.Seq, int(commit.Deps[0]), int(commit.Deps[1]), int(commit.Deps[2]), int(commit.Deps[3]), int(commit.Deps[4]))
 
 	if inst != nil {
 		if inst.lb != nil && inst.lb.clientProposals != nil {
