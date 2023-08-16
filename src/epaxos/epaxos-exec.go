@@ -117,9 +117,9 @@ func (e *Exec) strongconnect(v *Instance, index *int) bool {
 			for idx := 0; idx < len(w.Cmds); idx++ {
 				val := w.Cmds[idx].Execute(e.r.State)
 				//log.Printf("execuiting the operatiionId=%d with seq=%d", w.Seq, int(w.lb.clientProposals[idx].CommandId))
-				//log.Printf("execuiting the operation with seq=%d", w.Seq)
+				log.Printf("execuiting the operation with seq=%d", w.Seq)
 				if e.r.Dreply && w.lb != nil && w.lb.clientProposals != nil {
-					log.Printf("execuiting the operatiionId=%d with seq=%d", int(w.lb.clientProposals[idx].CommandId), w.Seq)
+					//log.Printf("execuiting the operatiionId=%d with seq=%d", int(w.lb.clientProposals[idx].CommandId), w.Seq)
 					e.r.ReplyProposeTS(
 						&genericsmrproto.ProposeReplyTS{
 							TRUE,
@@ -128,9 +128,8 @@ func (e *Exec) strongconnect(v *Instance, index *int) bool {
 							w.lb.clientProposals[idx].Timestamp},
 						w.lb.clientProposals[idx].Reply)
 				}
-				w.Status = epaxosproto.EXECUTED
 			}
-
+			w.Status = epaxosproto.EXECUTED
 		}
 		stack = stack[0:l]
 	}
