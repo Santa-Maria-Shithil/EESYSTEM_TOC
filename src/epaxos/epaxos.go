@@ -1157,6 +1157,8 @@ func (r *Replica) handlePreAccept(preAccept *epaxosproto.PreAccept) {
 
 	//update attributes for command
 	seq, deps, changed := r.updateAttributes(preAccept.Command, preAccept.Seq, preAccept.Deps, preAccept.Replica, preAccept.Instance)
+	log.Printf("inside preaccept leader=%d instance=%d.%d", preAccept.LeaderId, preAccept.Replica, preAccept.Instance)
+
 	uncommittedDeps := false
 	for q := 0; q < r.N; q++ {
 		if deps[q] > r.CommittedUpTo[q] {
@@ -1165,8 +1167,6 @@ func (r *Replica) handlePreAccept(preAccept *epaxosproto.PreAccept) {
 			break
 		}
 	}
-
-	log.Printf("inside preaccept leader=%d instance=%d.%d", preAccept.LeaderId, preAccept.Replica, preAccept.Instance)
 
 	status := epaxosproto.PREACCEPTED_EQ
 	if changed {
