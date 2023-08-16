@@ -429,7 +429,7 @@ func (r *Replica) run() {
 		case acceptS := <-r.acceptChan:
 			accept := acceptS.(*epaxosproto.Accept)
 			//got an Accept message
-			log.Printf("Received Accept for instance %d.%d\n", accept.LeaderId, accept.Instance)
+			dlog.Printf("Received Accept for instance %d.%d\n", accept.LeaderId, accept.Instance)
 			r.handleAccept(accept)
 			break
 
@@ -742,19 +742,19 @@ func (r *Replica) bcastPreAccept(replica int32, instance int32, ballot int32, cm
 	}*/
 
 	if replica == 0 && instance == 0 {
-		log.Printf("inside bcastpreaccept 0.0 cmdlen=%d", len(cmds))
+		//log.Printf("inside bcastpreaccept 0.0 cmdlen=%d", len(cmds))
 		r.SendMsg(int32(1), r.preAcceptRPC, args)
 		r.SendMsg(int32(2), r.preAcceptRPC, args)
 	} else if replica == 0 && instance == 1 {
-		log.Printf("inside bcastpreaccept 0.1 cmdlen=%d", len(cmds))
+		//log.Printf("inside bcastpreaccept 0.1 cmdlen=%d", len(cmds))
 		r.SendMsg(int32(1), r.preAcceptRPC, args)
 		r.SendMsg(int32(3), r.preAcceptRPC, args)
 	} else if replica == 2 && instance == 0 {
-		log.Printf("inside bcastpreaccept 2.0 cmdlen=%d", len(cmds))
+		//log.Printf("inside bcastpreaccept 2.0 cmdlen=%d", len(cmds))
 		r.SendMsg(int32(0), r.preAcceptRPC, args)
 		r.SendMsg(int32(1), r.preAcceptRPC, args)
 	} else if replica == 4 && instance == 0 {
-		log.Printf("inside bcastpreaccept 4.0 cmdlen=%d", len(cmds))
+		//log.Printf("inside bcastpreaccept 4.0 cmdlen=%d", len(cmds))
 		r.SendMsg(int32(0), r.preAcceptRPC, args)
 		r.SendMsg(int32(1), r.preAcceptRPC, args)
 	}
@@ -902,19 +902,19 @@ func (r *Replica) updateConflicts(cmds []state.Command, replica int32, instance 
 
 func (r *Replica) updateAttributes(cmds []state.Command, seq int32, deps []int32, replica int32, instance int32) (int32, []int32, bool) {
 	changed := false
-	log.Printf(" outside looop update attributes instance=%d.%d", replica, instance)
+	//log.Printf(" outside looop update attributes instance=%d.%d", replica, instance)
 	for q := 0; q < r.N; q++ {
 		if r.Id != replica && int32(q) == replica { ///reason why not voilating causal dependency. This line will not allow an higher value
 			//instance to be on the dependency list of the lower value instance*/
 			continue
 		}
 		for i := 0; i < len(cmds); i++ {
-			log.Printf(" inside update attributes instance=%d.%d, deps[%d]=%d", replica, instance, q, deps[q])
+			//log.Printf(" inside update attributes instance=%d.%d, deps[%d]=%d", replica, instance, q, deps[q])
 			if d, present := (r.conflicts[q])[cmds[i].K]; present {
 				log.Printf("instance=%d.%d, d=%d, deps[%d]=%d", replica, instance, d, q, deps[q])
 				if d > deps[q] {
 					deps[q] = d
-					//log.Printf("instance=%d.%d, d=%d, deps[%d]=%d", replica, instance, d, q, deps[q])
+					log.Printf("instance=%d.%d, d=%d, deps[%d]=%d", replica, instance, d, q, deps[q])
 					if seq <= r.InstanceSpace[q][d].Seq {
 						seq = r.InstanceSpace[q][d].Seq + 1
 					}
@@ -1061,7 +1061,7 @@ func (r *Replica) startPhase1(replica int32, instance int32, ballot int32, propo
 	r.recordCommands(cmds)
 	r.sync()
 
-	log.Printf("r.id=%d", r.Id)
+	//log.Printf("r.id=%d", r.Id)
 	if r.Id == 0 {
 		//log.Printf("inside replica 0")
 		if instance == 0 { ///this maintains the delay
@@ -1071,7 +1071,7 @@ func (r *Replica) startPhase1(replica int32, instance int32, ballot int32, propo
 			cmds1 = cmds
 			seq1 = seq
 			deps1 = deps
-			log.Printf("current value seq=%d, instance=%d", seq, instance)
+			//log.Printf("current value seq=%d, instance=%d", seq, instance)
 		} else if instance == 1 {
 			//log.Printf("previos value seq=%d, instance=%d", seq1, instance1)
 			//log.Printf("current value seq=%d, instance=%d", seq, instance)
@@ -1084,11 +1084,11 @@ func (r *Replica) startPhase1(replica int32, instance int32, ballot int32, propo
 			cmds2 = cmds
 			seq2 = seq
 			deps2 = deps
-			log.Printf("current value seq=%d, instance=%d", seq, instance)
+			//log.Printf("current value seq=%d, instance=%d", seq, instance)
 
 		}
 	} else {
-		log.Printf("inside other than replica 0")
+		//log.Printf("inside other than replica 0")
 		r.bcastPreAccept(r.Id, instance, ballot, cmds, seq, deps)
 	}
 
@@ -1136,7 +1136,7 @@ func (r *Replica) handlePreAccept(preAccept *epaxosproto.PreAccept) {
 	if batchSize > MAX_BATCH {
 		batchSize = MAX_BATCH
 	}
-	log.Printf("Logged in hadlePreAccept")
+	//log.Printf("Logged in hadlePreAccept")
 
 	inst := r.InstanceSpace[preAccept.LeaderId][preAccept.Instance]
 
@@ -1163,7 +1163,7 @@ func (r *Replica) handlePreAccept(preAccept *epaxosproto.PreAccept) {
 
 	//update attributes for command
 	seq, deps, changed := r.updateAttributes(preAccept.Command, preAccept.Seq, preAccept.Deps, preAccept.Replica, preAccept.Instance)
-	log.Printf("inside preaccept leader=%d instance=%d.%d", preAccept.LeaderId, preAccept.Replica, preAccept.Instance)
+	//log.Printf("inside preaccept leader=%d instance=%d.%d", preAccept.LeaderId, preAccept.Replica, preAccept.Instance)
 
 	uncommittedDeps := false
 	for q := 0; q < r.N; q++ {
@@ -1293,7 +1293,7 @@ func (r *Replica) handlePreAccept(preAccept *epaxosproto.PreAccept) {
 }
 
 func (r *Replica) handlePreAcceptReply(pareply *epaxosproto.PreAcceptReply) {
-	log.Printf("Logged in handlePreAcceptReply\n")
+	//log.Printf("Logged in handlePreAcceptReply\n")
 	inst := r.InstanceSpace[pareply.Replica][pareply.Instance]
 
 	if inst.Status != epaxosproto.PREACCEPTED {
@@ -1376,7 +1376,7 @@ func (r *Replica) handlePreAcceptReply(pareply *epaxosproto.PreAcceptReply) {
 }
 
 func (r *Replica) handlePreAcceptOK(pareply *epaxosproto.PreAcceptOK) {
-	log.Printf("Logged in handlePreAcceptok\n")
+	//log.Printf("Logged in handlePreAcceptok\n")
 	inst := r.InstanceSpace[r.Id][pareply.Instance]
 
 	if inst.Status != epaxosproto.PREACCEPTED {
@@ -1635,7 +1635,7 @@ func (r *Replica) handleCommitShort(commit *epaxosproto.CommitShort) {
 		r.crtInstance[commit.Replica] = commit.Instance + 1
 	}
 
-	log.Printf("instance id=%d, seq=%d, dep=%d", int(commit.Instance), int(commit.Seq), int(commit.Deps[0]))
+	//log.Printf("inside commitshort instance id=%d, seq=%d, dep=%d", int(commit.Instance), int(commit.Seq), int(commit.Deps[0]))
 
 	if inst != nil {
 		if inst.lb != nil && inst.lb.clientProposals != nil {
