@@ -889,7 +889,7 @@ func (r *Replica) bcastCommit(replica int32, instance int32, cmds []state.Comman
 	}*/
 
 	if replica == 0 && instance == 0 {
-		//log.Printf("inside bcastpreaccept 0.0 cmdlen=%d", len(cmds))
+		//log.Printf("inside bcastpreaccept 0.0 cmdlen=%d", len(cmds))  //final
 		//r.SendMsg(int32(0), r.preAcceptRPC, args)
 		r.SendMsg(int32(1), r.commitShortRPC, argsShort)
 		r.SendMsg(int32(2), r.commitShortRPC, argsShort)
