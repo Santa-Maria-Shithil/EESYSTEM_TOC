@@ -980,14 +980,14 @@ func (r *Replica) updateAttributes(cmds []state.Command, seq int32, deps []int32
 			}
 		}
 	}
-	for i := 0; i < len(cmds); i++ {
+	/*for i := 0; i < len(cmds); i++ {
 		if s, present := r.maxSeqPerKey[cmds[i].K]; present {
 			if seq <= s {
 				changed = true
 				seq = s + 1
 			}
 		}
-	}
+	}*/
 
 	return seq, deps, changed
 }
