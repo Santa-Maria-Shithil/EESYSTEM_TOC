@@ -1,0 +1,724 @@
+@!@!@STARTMSG 2262:0 @!@!@
+TLC2 Version 2.16 of 31 December 2020 (rev: cdddf55)
+@!@!@ENDMSG 2262 @!@!@
+@!@!@STARTMSG 2187:0 @!@!@
+Running breadth-first search Model-Checking with fp 90 and seed 7287925500863963354 with 4 workers on 8 cores with 1214MB heap and 2730MB offheap memory [pid: 41091] (Mac OS X 10.16 x86_64, AdoptOpenJDK 14.0.1 x86_64, OffHeapDiskFPSet, DiskStateQueue).
+@!@!@ENDMSG 2187 @!@!@
+@!@!@STARTMSG 2220:0 @!@!@
+Starting SANY...
+@!@!@ENDMSG 2220 @!@!@
+Parsing file /Volumes/StudyMaterials/Research/Energy Efficient Distributed System Design/TLA+ Verification/HybridProtocol.toolbox/HybridProtocol.toolbox/Model_1/MC.tla
+Parsing file /Volumes/StudyMaterials/Research/Energy Efficient Distributed System Design/TLA+ Verification/HybridProtocol.toolbox/HybridProtocol.toolbox/Model_1/HybridProtocol.tla
+Parsing file /Applications/TLA+ Toolbox.app/Contents/Eclipse/plugins/org.lamport.tlatools_1.0.0.202012311918/tla2sany/StandardModules/TLC.tla
+Parsing file /Applications/TLA+ Toolbox.app/Contents/Eclipse/plugins/org.lamport.tlatools_1.0.0.202012311918/tla2sany/StandardModules/Naturals.tla
+Parsing file /Applications/TLA+ Toolbox.app/Contents/Eclipse/plugins/org.lamport.tlatools_1.0.0.202012311918/tla2sany/StandardModules/FiniteSets.tla
+Parsing file /Applications/TLA+ Toolbox.app/Contents/Eclipse/plugins/org.lamport.tlatools_1.0.0.202012311918/tla2sany/StandardModules/Sequences.tla
+Semantic processing of module Naturals
+Semantic processing of module Sequences
+Semantic processing of module FiniteSets
+Semantic processing of module HybridProtocol
+Semantic processing of module TLC
+Semantic processing of module MC
+@!@!@STARTMSG 2219:0 @!@!@
+SANY finished.
+@!@!@ENDMSG 2219 @!@!@
+@!@!@STARTMSG 2185:0 @!@!@
+Starting... (2023-11-29 07:11:22)
+@!@!@ENDMSG 2185 @!@!@
+@!@!@STARTMSG 2189:0 @!@!@
+Computing initial states...
+@!@!@ENDMSG 2189 @!@!@
+@!@!@STARTMSG 2190:0 @!@!@
+Finished computing initial states: 1 distinct state generated at 2023-11-29 07:11:22.
+@!@!@ENDMSG 2190 @!@!@
+@!@!@STARTMSG 1000:1 @!@!@
+TLC threw an unexpected exception.
+This was probably caused by an error in the spec or model.
+See the User Output or TLC Console for clues to what happened.
+The exception was a java.lang.RuntimeException
+: Attempted to apply EXCEPT construct to the value 3.
+@!@!@ENDMSG 1000 @!@!@
+@!@!@STARTMSG 2121:1 @!@!@
+The behavior up to this point is:
+@!@!@ENDMSG 2121 @!@!@
+@!@!@STARTMSG 2217:4 @!@!@
+1: <Initial predicate>
+/\ sentMsg = {}
+/\ leaderOfInst = <<{}, {}, {}, {}, {}>>
+/\ clk = <<1, 1, 1, 1, 1>>
+/\ cmdLog = <<{}, {}, {}, {}, {}>>
+/\ proposed = {}
+/\ crtInst = <<1, 1, 1, 1, 1>>
+/\ committed = ( <<1, 1>> :> {} @@
+  <<1, 2>> :> {} @@
+  <<2, 1>> :> {} @@
+  <<2, 2>> :> {} @@
+  <<3, 1>> :> {} @@
+  <<3, 2>> :> {} @@
+  <<4, 1>> :> {} @@
+  <<4, 2>> :> {} @@
+  <<5, 1>> :> {} @@
+  <<5, 2>> :> {} )
+/\ executed = <<{}, {}, {}, {}, {}>>
+/\ ballots = 1
+/\ preparing = <<{}, {}, {}, {}, {}>>
+
+@!@!@ENDMSG 2217 @!@!@
+@!@!@STARTMSG 2217:4 @!@!@
+2: <CommandLeaderAction line 315, col 9 to line 318, col 72 of module HybridProtocol>
+/\ sentMsg = { [ type |-> "commit",
+    src |-> 1,
+    dst |-> 2,
+    inst |-> <<1, 1>>,
+    ballot |-> <<0, 1>>,
+    cmd |-> 1,
+    deps |-> {},
+    seq |-> 3,
+    consistency |-> "causal",
+    ctxid |-> 1,
+    clk |-> 2 ],
+  [ type |-> "commit",
+    src |-> 1,
+    dst |-> 4,
+    inst |-> <<1, 1>>,
+    ballot |-> <<0, 1>>,
+    cmd |-> 1,
+    deps |-> {},
+    seq |-> 3,
+    consistency |-> "causal",
+    ctxid |-> 1,
+    clk |-> 2 ] }
+/\ leaderOfInst = <<{<<1, 1>>}, {}, {}, {}, {}>>
+/\ clk = <<1, 1, 1, 1, 1>>
+/\ cmdLog = << { [ inst |-> <<1, 1>>,
+       ballot |-> <<0, 1>>,
+       cmd |-> 1,
+       deps |-> {},
+       seq |-> 3,
+       consistency |-> "causal",
+       ctxid |-> 1,
+       status |-> "committed",
+       state |-> "done" ] },
+   {},
+   {},
+   {},
+   {} >>
+/\ proposed = {1}
+/\ crtInst = <<2, 1, 1, 1, 1>>
+/\ committed = ( <<1, 1>> :> {} @@
+  <<1, 2>> :> {} @@
+  <<2, 1>> :> {} @@
+  <<2, 2>> :> {} @@
+  <<3, 1>> :> {} @@
+  <<3, 2>> :> {} @@
+  <<4, 1>> :> {} @@
+  <<4, 2>> :> {} @@
+  <<5, 1>> :> {} @@
+  <<5, 2>> :> {} )
+/\ executed = <<{}, {}, {}, {}, {}>>
+/\ ballots = 1
+/\ preparing = <<{}, {}, {}, {}, {}>>
+
+@!@!@ENDMSG 2217 @!@!@
+@!@!@STARTMSG 2217:4 @!@!@
+3: <ReplicaAction line 323, col 10 to line 323, col 78 of module HybridProtocol>
+/\ sentMsg = { [ type |-> "commit",
+    src |-> 1,
+    dst |-> 2,
+    inst |-> <<1, 1>>,
+    ballot |-> <<0, 1>>,
+    cmd |-> 1,
+    deps |-> {},
+    seq |-> 3,
+    consistency |-> "causal",
+    ctxid |-> 1,
+    clk |-> 2 ],
+  [ type |-> "commit",
+    src |-> 1,
+    dst |-> 4,
+    inst |-> <<1, 1>>,
+    ballot |-> <<0, 1>>,
+    cmd |-> 1,
+    deps |-> {},
+    seq |-> 3,
+    consistency |-> "causal",
+    ctxid |-> 1,
+    clk |-> 2 ] }
+/\ leaderOfInst = <<{<<1, 1>>}, {}, {}, {}, {}>>
+/\ clk = 3
+/\ cmdLog = << { [ inst |-> <<1, 1>>,
+       ballot |-> <<0, 1>>,
+       cmd |-> 1,
+       deps |-> {},
+       seq |-> 3,
+       consistency |-> "causal",
+       ctxid |-> 1,
+       status |-> "committed",
+       state |-> "done" ] },
+   { [ inst |-> <<1, 1>>,
+       ballot |-> <<0, 1>>,
+       cmd |-> 1,
+       deps |-> {},
+       seq |-> 3,
+       consistency |-> "causal",
+       ctxid |-> 1,
+       status |-> "committed",
+       state |-> "done" ] },
+   {},
+   {},
+   {} >>
+/\ proposed = {1}
+/\ crtInst = <<2, 1, 1, 1, 1>>
+/\ committed = ( <<1, 1>> :> {<<1, {}, 3>>} @@
+  <<1, 2>> :> {} @@
+  <<2, 1>> :> {} @@
+  <<2, 2>> :> {} @@
+  <<3, 1>> :> {} @@
+  <<3, 2>> :> {} @@
+  <<4, 1>> :> {} @@
+  <<4, 2>> :> {} @@
+  <<5, 1>> :> {} @@
+  <<5, 2>> :> {} )
+/\ executed = <<{}, {}, {}, {}, {}>>
+/\ ballots = 1
+/\ preparing = <<{}, {}, {}, {}, {}>>
+
+@!@!@ENDMSG 2217 @!@!@
+@!@!@STARTMSG 2103:1 @!@!@
+The error occurred when TLC was evaluating the nested
+expressions at the following positions:
+0. Line 315, column 9 to line 318, column 72 in HybridProtocol
+1. Line 316, column 13 to line 318, column 72 in HybridProtocol
+2. Line 317, column 17 to line 318, column 72 in HybridProtocol
+3. Line 318, column 21 to line 318, column 72 in HybridProtocol
+4. Line 318, column 47 to line 318, column 72 in HybridProtocol
+5. Line 277, column 5 to line 285, column 70 in HybridProtocol
+6. Line 280, column 9 to line 285, column 70 in HybridProtocol
+7. Line 280, column 12 to line 280, column 40 in HybridProtocol
+8. Line 281, column 13 to line 282, column 90 in HybridProtocol
+9. Line 282, column 18 to line 282, column 90 in HybridProtocol
+10. Line 183, column 5 to line 274, column 15 in HybridProtocol
+11. Line 184, column 9 to line 247, column 61 in HybridProtocol
+12. Line 189, column 13 to line 247, column 61 in HybridProtocol
+13. Line 190, column 17 to line 212, column 57 in HybridProtocol
+14. Line 190, column 20 to line 199, column 59 in HybridProtocol
+15. Line 190, column 30 to line 199, column 59 in HybridProtocol
+16. Line 190, column 58 to line 199, column 58 in HybridProtocol
+17. Line 191, column 41 to line 199, column 58 in HybridProtocol
+18. Line 191, column 42 to line 199, column 57 in HybridProtocol
+19. Line 197, column 54 to line 197, column 59 in HybridProtocol
+20. Line 185, column 23 to line 185, column 75 in HybridProtocol
+21. Line 185, column 27 to line 185, column 75 in HybridProtocol
+22. Line 6, column 11 to line 6, column 68 in HybridProtocol
+23. Line 6, column 14 to line 6, column 19 in HybridProtocol
+24. Line 6, column 14 to line 6, column 14 in HybridProtocol
+25. Line 185, column 31 to line 185, column 74 in HybridProtocol
+26. Line 185, column 67 to line 185, column 74 in HybridProtocol
+27. Line 185, column 68 to line 185, column 73 in HybridProtocol
+28. Line 282, column 68 to line 282, column 82 in HybridProtocol
+29. Line 282, column 68 to line 282, column 73 in HybridProtocol
+30. Line 279, column 19 to line 279, column 49 in HybridProtocol
+
+
+@!@!@ENDMSG 2103 @!@!@
+@!@!@STARTMSG 2201:0 @!@!@
+The coverage statistics at 2023-11-29 07:11:23
+@!@!@ENDMSG 2201 @!@!@
+@!@!@STARTMSG 2773:0 @!@!@
+<Init line 157, col 1 to line 157, col 4 of module HybridProtocol>: 2:2
+@!@!@ENDMSG 2773 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 158, col 3 to line 167, col 33 of module HybridProtocol: 2
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2772:0 @!@!@
+<CommandLeaderAction line 314, col 1 to line 314, col 19 of module HybridProtocol (315 9 318 72)>: 1092:1710
+@!@!@ENDMSG 2772 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 280, col 12 to line 280, col 40 of module HybridProtocol: 285
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |line 280, col 24 to line 280, col 40 of module HybridProtocol: 290
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 183, col 8 to line 183, col 20 of module HybridProtocol: 1715
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 189, col 16 to line 189, col 43 of module HybridProtocol: 1715
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |line 189, col 16 to line 189, col 39 of module HybridProtocol: 1715
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||line 189, col 28 to line 189, col 38 of module HybridProtocol: 1715
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||line 188, col 26 to line 188, col 56 of module HybridProtocol: 1715
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||||line 188, col 45 to line 188, col 55 of module HybridProtocol: 1715
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2775:0 @!@!@
+  |||||line 187, col 27 to line 187, col 74 of module HybridProtocol: 1715:1715
+@!@!@ENDMSG 2775 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||||||line 187, col 53 to line 187, col 73 of module HybridProtocol: 323
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||||||line 187, col 36 to line 187, col 50 of module HybridProtocol: 1715
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 190, col 20 to line 199, col 59 of module HybridProtocol: 1710
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |line 190, col 30 to line 199, col 59 of module HybridProtocol: 1715
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||line 190, col 31 to line 190, col 36 of module HybridProtocol: 1715
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||line 190, col 45 to line 199, col 58 of module HybridProtocol: 1715
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||line 190, col 58 to line 199, col 58 of module HybridProtocol: 1715
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||line 190, col 59 to line 190, col 69 of module HybridProtocol: 1715
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||||line 190, col 63 to line 190, col 69 of module HybridProtocol: 1715
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||||line 186, col 24 to line 186, col 66 of module HybridProtocol: 1715
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||||||line 186, col 51 to line 186, col 65 of module HybridProtocol: 323
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||||||line 186, col 33 to line 186, col 47 of module HybridProtocol: 1715
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2775:0 @!@!@
+  |||line 191, col 41 to line 199, col 58 of module HybridProtocol: 1715:6432
+@!@!@ENDMSG 2775 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||||line 191, col 42 to line 199, col 57 of module HybridProtocol: 1715
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||||line 191, col 43 to line 191, col 57 of module HybridProtocol: 1715
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||||line 194, col 43 to line 194, col 59 of module HybridProtocol: 1715
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||||line 195, col 43 to line 195, col 54 of module HybridProtocol: 1715
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||||line 196, col 54 to line 196, col 60 of module HybridProtocol: 1715
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||||||line 184, col 24 to line 184, col 58 of module HybridProtocol: 1715
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||||||line 184, col 25 to line 184, col 32 of module HybridProtocol: 323
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||||||line 184, col 43 to line 184, col 57 of module HybridProtocol: 1715
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||||line 197, col 54 to line 197, col 59 of module HybridProtocol: 1715
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||||||line 185, col 23 to line 185, col 75 of module HybridProtocol: 1715
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||||||line 185, col 27 to line 185, col 75 of module HybridProtocol: 1715
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||||||||line 6, col 11 to line 6, col 68 of module HybridProtocol: 1715
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||||||||line 6, col 14 to line 6, col 19 of module HybridProtocol: 1715
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||||||||||line 6, col 14 to line 6, col 14 of module HybridProtocol: 1715
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||||||||||line 6, col 18 to line 6, col 19 of module HybridProtocol: 1710
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||||||||line 6, col 33 to line 6, col 68 of module HybridProtocol: 1710
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||||||||||line 6, col 50 to line 6, col 68 of module HybridProtocol: 2028
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||||||||||line 6, col 63 to line 6, col 68 of module HybridProtocol: 2664
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||||||||||line 6, col 59 to line 6, col 59 of module HybridProtocol: 2028
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||||||||||line 6, col 46 to line 6, col 46 of module HybridProtocol: 1710
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||||||||line 185, col 31 to line 185, col 74 of module HybridProtocol: 1715
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||||||||line 185, col 31 to line 185, col 60 of module HybridProtocol: 1715
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||||||||||line 185, col 32 to line 185, col 36 of module HybridProtocol: 323
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||||||||||line 185, col 45 to line 185, col 59 of module HybridProtocol: 1715
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2775:0 @!@!@
+  |||||||||line 185, col 67 to line 185, col 74 of module HybridProtocol: 1715:4812
+@!@!@ENDMSG 2775 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||||line 198, col 43 to line 198, col 60 of module HybridProtocol: 1710
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||||line 199, col 43 to line 199, col 55 of module HybridProtocol: 1710
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 200, col 20 to line 200, col 83 of module HybridProtocol: 1710
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 201, col 20 to line 212, col 57 of module HybridProtocol: 1710
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2775:0 @!@!@
+  |line 201, col 31 to line 212, col 57 of module HybridProtocol: 1710:16560
+@!@!@ENDMSG 2775 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||line 201, col 32 to line 201, col 47 of module HybridProtocol: 1710
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2775:0 @!@!@
+  ||line 202, col 41 to line 212, col 57 of module HybridProtocol: 1710:45204
+@!@!@ENDMSG 2775 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||line 202, col 42 to line 202, col 59 of module HybridProtocol: 1710
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||line 203, col 43 to line 203, col 59 of module HybridProtocol: 1710
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||line 204, col 43 to line 204, col 63 of module HybridProtocol: 1710
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||line 205, col 43 to line 205, col 56 of module HybridProtocol: 1710
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||line 206, col 43 to line 206, col 58 of module HybridProtocol: 1710
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||line 207, col 43 to line 207, col 53 of module HybridProtocol: 1710
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2775:0 @!@!@
+  |||line 208, col 51 to line 208, col 59 of module HybridProtocol: 1710:8260
+@!@!@ENDMSG 2775 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||||line 208, col 52 to line 208, col 58 of module HybridProtocol: 1710
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||||line 184, col 24 to line 184, col 58 of module HybridProtocol: 1710
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||||||line 184, col 25 to line 184, col 32 of module HybridProtocol: 318
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||||||line 184, col 43 to line 184, col 57 of module HybridProtocol: 1710
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2775:0 @!@!@
+  |||line 209, col 51 to line 209, col 58 of module HybridProtocol: 1710:8260
+@!@!@ENDMSG 2775 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||||line 209, col 52 to line 209, col 57 of module HybridProtocol: 1710
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||||line 185, col 23 to line 185, col 75 of module HybridProtocol: 1710
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||||||line 185, col 27 to line 185, col 75 of module HybridProtocol: 1710
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||||||line 6, col 11 to line 6, col 68 of module HybridProtocol: 1710
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||||||||line 6, col 14 to line 6, col 19 of module HybridProtocol: 1710
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||||||||line 6, col 33 to line 6, col 68 of module HybridProtocol: 1710
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||||||||line 6, col 50 to line 6, col 68 of module HybridProtocol: 2028
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||||||||||line 6, col 63 to line 6, col 68 of module HybridProtocol: 2664
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||||||||||line 6, col 59 to line 6, col 59 of module HybridProtocol: 2028
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||||||||line 6, col 46 to line 6, col 46 of module HybridProtocol: 1710
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||||||line 185, col 31 to line 185, col 74 of module HybridProtocol: 1710
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||||||||line 185, col 31 to line 185, col 60 of module HybridProtocol: 1710
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||||||||line 185, col 32 to line 185, col 36 of module HybridProtocol: 318
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||||||||line 185, col 45 to line 185, col 59 of module HybridProtocol: 1710
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2775:0 @!@!@
+  ||||||||line 185, col 67 to line 185, col 74 of module HybridProtocol: 1710:4812
+@!@!@ENDMSG 2775 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||line 210, col 43 to line 210, col 60 of module HybridProtocol: 1710
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||line 211, col 43 to line 211, col 55 of module HybridProtocol: 1710
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||line 212, col 43 to line 212, col 56 of module HybridProtocol: 1710
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 214, col 21 to line 223, col 59 of module HybridProtocol: 0
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 225, col 25 to line 234, col 43 of module HybridProtocol: 0
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 235, col 24 to line 235, col 87 of module HybridProtocol: 0
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 236, col 24 to line 247, col 61 of module HybridProtocol: 0
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 282, col 30 to line 282, col 30 of module HybridProtocol: 1715
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 282, col 33 to line 282, col 39 of module HybridProtocol: 1715
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 282, col 42 to line 282, col 42 of module HybridProtocol: 1710
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 282, col 45 to line 282, col 51 of module HybridProtocol: 1715
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 282, col 54 to line 282, col 62 of module HybridProtocol: 1715
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 282, col 65 to line 282, col 66 of module HybridProtocol: 1710
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 282, col 68 to line 282, col 82 of module HybridProtocol: 1715
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |line 282, col 68 to line 282, col 73 of module HybridProtocol: 1715
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||line 279, col 19 to line 279, col 49 of module HybridProtocol: 1715
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||line 279, col 20 to line 279, col 22 of module HybridProtocol: 1715
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||line 279, col 31 to line 279, col 48 of module HybridProtocol: 1715
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||line 279, col 44 to line 279, col 48 of module HybridProtocol: 1710
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |line 282, col 75 to line 282, col 81 of module HybridProtocol: 1710
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 282, col 84 to line 282, col 85 of module HybridProtocol: 1715
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 282, col 87 to line 282, col 89 of module HybridProtocol: 1710
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 281, col 22 to line 281, col 41 of module HybridProtocol: 290
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2775:0 @!@!@
+  |line 23, col 20 to line 23, col 61 of module HybridProtocol: 290:2005
+@!@!@ENDMSG 2775 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||line 23, col 21 to line 23, col 30 of module HybridProtocol: 1740
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||line 23, col 40 to line 23, col 60 of module HybridProtocol: 290
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2775:0 @!@!@
+  |||line 21, col 27 to line 21, col 78 of module HybridProtocol: 290:4640
+@!@!@ENDMSG 2775 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||||line 21, col 60 to line 21, col 77 of module HybridProtocol: 4640
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2775:0 @!@!@
+  ||||line 21, col 34 to line 21, col 56 of module HybridProtocol: 290:5220
+@!@!@ENDMSG 2775 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||line 23, col 59 to line 23, col 59 of module HybridProtocol: 290
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |line 281, col 34 to line 281, col 40 of module HybridProtocol: 290
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 283, col 12 to line 283, col 57 of module HybridProtocol: 1710
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 285, col 12 to line 285, col 70 of module HybridProtocol: 1710
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 318, col 55 to line 318, col 55 of module HybridProtocol: 290
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 318, col 58 to line 318, col 64 of module HybridProtocol: 290
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 318, col 66 to line 318, col 67 of module HybridProtocol: 290
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 318, col 69 to line 318, col 71 of module HybridProtocol: 285
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 318, col 36 to line 318, col 43 of module HybridProtocol: 62
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 317, col 28 to line 317, col 33 of module HybridProtocol: 62
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 316, col 23 to line 316, col 39 of module HybridProtocol: 62
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 315, col 19 to line 315, col 37 of module HybridProtocol: 150
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2772:0 @!@!@
+<ReplicaAction line 321, col 1 to line 321, col 13 of module HybridProtocol (323 10 323 78)>: 928:1858
+@!@!@ENDMSG 2772 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 323, col 33 to line 323, col 52 of module HybridProtocol: 4182
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |line 323, col 33 to line 323, col 41 of module HybridProtocol: 2324
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 290, col 12 to line 291, col 64 of module HybridProtocol: 1858
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |line 290, col 33 to line 291, col 63 of module HybridProtocol: 466
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |line 290, col 23 to line 290, col 28 of module HybridProtocol: 2324
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2775:0 @!@!@
+  ||line 288, col 19 to line 288, col 66 of module HybridProtocol: 2324:2790
+@!@!@ENDMSG 2775 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||line 288, col 46 to line 288, col 65 of module HybridProtocol: 826
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||line 288, col 28 to line 288, col 42 of module HybridProtocol: 2324
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 292, col 12 to line 301, col 62 of module HybridProtocol: 1858
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |line 292, col 22 to line 301, col 62 of module HybridProtocol: 1858
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||line 292, col 23 to line 292, col 28 of module HybridProtocol: 1858
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||line 292, col 37 to line 301, col 61 of module HybridProtocol: 1858
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||line 292, col 50 to line 301, col 61 of module HybridProtocol: 1858
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||line 292, col 51 to line 292, col 60 of module HybridProtocol: 1858
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||||line 292, col 55 to line 292, col 60 of module HybridProtocol: 1858
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||||line 288, col 19 to line 288, col 66 of module HybridProtocol: 1858
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||||||line 288, col 46 to line 288, col 65 of module HybridProtocol: 288
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||||||line 288, col 28 to line 288, col 42 of module HybridProtocol: 1858
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2775:0 @!@!@
+  |||line 293, col 37 to line 301, col 61 of module HybridProtocol: 1858:576
+@!@!@ENDMSG 2775 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 302, col 12 to line 303, col 67 of module HybridProtocol: 1858
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 304, col 12 to line 304, col 24 of module HybridProtocol: 1858
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |line 304, col 19 to line 304, col 24 of module HybridProtocol: 1858
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||line 289, col 19 to line 289, col 57 of module HybridProtocol: 1858
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||line 289, col 23 to line 289, col 57 of module HybridProtocol: 1858
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||||line 6, col 11 to line 6, col 68 of module HybridProtocol: 1858
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||||line 6, col 14 to line 6, col 19 of module HybridProtocol: 1858
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||||line 6, col 33 to line 6, col 68 of module HybridProtocol: 1858
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||||||line 6, col 50 to line 6, col 68 of module HybridProtocol: 3716
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||||||line 6, col 63 to line 6, col 68 of module HybridProtocol: 7432
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||||||line 6, col 59 to line 6, col 59 of module HybridProtocol: 3716
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||||||line 6, col 46 to line 6, col 46 of module HybridProtocol: 1858
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||||line 289, col 27 to line 289, col 56 of module HybridProtocol: 1858
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 305, col 12 to line 306, col 53 of module HybridProtocol: 1858
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 323, col 64 to line 323, col 70 of module HybridProtocol: 2324
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 323, col 73 to line 323, col 76 of module HybridProtocol: 2324
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 323, col 22 to line 323, col 28 of module HybridProtocol: 717
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2202:0 @!@!@
+End of statistics.
+@!@!@ENDMSG 2202 @!@!@
+@!@!@STARTMSG 2200:0 @!@!@
+Progress(4) at 2023-11-29 07:11:23: 3,477 states generated (78,635 s/min), 2,021 distinct states found (45,706 ds/min), 1,874 states left on queue.
+@!@!@ENDMSG 2200 @!@!@
+@!@!@STARTMSG 2199:0 @!@!@
+3477 states generated, 2021 distinct states found, 1874 states left on queue.
+@!@!@ENDMSG 2199 @!@!@
+@!@!@STARTMSG 2186:0 @!@!@
+Finished in 2673ms at (2023-11-29 07:11:23)
+@!@!@ENDMSG 2186 @!@!@
