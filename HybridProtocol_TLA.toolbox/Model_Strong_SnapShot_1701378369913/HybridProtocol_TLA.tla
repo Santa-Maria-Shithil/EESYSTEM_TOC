@@ -494,7 +494,7 @@ Phase1Slow(cleader, i, Q) ==
                                     seq : {finalSeq},
                                     consistency : {record.consistency},
                                     ctxid : {record.ctxid},
-                                    clk : {newClk[cleader]}])
+                                    clk : newClk[cleader]])
                         /\ clk' = [clk EXCEPT ![cleader] = @+1]
                         /\ UNCHANGED << proposed, executed, crtInst, leaderOfInst,
                                         committed, ballots, preparing >>
@@ -678,5 +678,5 @@ THEOREM Spec => ([]TypeOK) /\ Nontriviality /\ Stability /\ Consistency
 
 =============================================================================
 \* Modification History
-\* Last modified Thu Nov 30 16:07:11 EST 2023 by santamariashithil
+\* Last modified Thu Nov 30 16:05:06 EST 2023 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil

@@ -457,6 +457,50 @@ Phase1Fast(cleader, i, Q) ==
                 /\ UNCHANGED << proposed, executed, crtInst, ballots, preparing >>   
    
                                
+Phase1Slow(cleader, i, Q) ==
+    /\ i \in leaderOfInst[cleader]
+    /\ Q \in SlowQuorums(cleader)
+    /\ \E record \in cmdLog[cleader]:
+        /\ record.inst = i
+        /\ record.status = "pre-accepted"
+        /\ LET replies == {msg \in sentMsg: 
+                                /\ msg.inst = i 
+                                /\ msg.type = "pre-accept-reply" 
+                                /\ msg.dst = cleader 
+                                /\ msg.src \in Q
+                                /\ msg.ballot = record.ballot} IN
+            /\ (\A replica \in (Q \ {cleader}): \E msg \in replies: msg.src = replica)
+            /\ LET finalDeps == UNION {msg.deps : msg \in replies}
+                   finalSeq == Max({msg.seq : msg \in replies}) IN   
+                        /\ cmdLog' = [cmdLog EXCEPT ![cleader] = (@ \ {record}) \cup 
+                                                {[inst   |-> i,
+                                                  status |-> "accepted",
+                                                  state  |-> "done", 
+                                                  ballot |-> record.ballot,
+                                                  cmd    |-> record.cmd,
+                                                  deps   |-> finalDeps,
+                                                  seq    |-> finalSeq,
+                                                  consistency |-> record.consistency, 
+                                                  ctxid |-> record.ctxid ]}]
+                        /\ LET newClk == [clk EXCEPT ![cleader] = @+1] IN \E SQ \in SlowQuorums(cleader):
+                           (sentMsg' = (sentMsg \ replies) \cup
+                                    [type : {"accept"},
+                                    src : {cleader},
+                                    dst : SQ \ {cleader},
+                                    inst : {i},
+                                    ballot: {record.ballot},
+                                    cmd : {record.cmd},
+                                    deps : {finalDeps},
+                                    seq : {finalSeq},
+                                    consistency : {record.consistency},
+                                    ctxid : {record.ctxid},
+                                    clk : {newClk[cleader]}])
+                        /\ clk' = [clk EXCEPT ![cleader] = @+1]
+                        /\ UNCHANGED << proposed, executed, crtInst, leaderOfInst,
+                                        committed, ballots, preparing >>
+                                               
+                               
+                               
 Commit(replica, cmsg) ==
     IF cmsg.consistency = "causal" THEN
         LET oldRec == {rec \in cmdLog[replica] : rec.inst = cmsg.inst}
@@ -575,7 +619,9 @@ CommandLeaderAction ==
                 \E ctx \in Ctx_id:
                     \E cleader \in Replicas : Propose(C, cleader,cl,ctx))
     \/ (\E cleader \in Replicas : \E inst \in leaderOfInst[cleader] :
-            \/ (\E Q \in FastQuorums(cleader) : Phase1Fast(cleader, inst, Q)))
+            \/ (\E Q \in FastQuorums(cleader) : Phase1Fast(cleader, inst, Q))
+            \/ (\E Q \in SlowQuorums(cleader) : Phase1Slow(cleader, inst, Q))
+            )
    
             
 ReplicaAction ==
@@ -632,5 +678,5 @@ THEOREM Spec => ([]TypeOK) /\ Nontriviality /\ Stability /\ Consistency
 
 =============================================================================
 \* Modification History
-\* Last modified Thu Nov 30 14:16:51 EST 2023 by santamariashithil
+\* Last modified Thu Nov 30 16:07:11 EST 2023 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil

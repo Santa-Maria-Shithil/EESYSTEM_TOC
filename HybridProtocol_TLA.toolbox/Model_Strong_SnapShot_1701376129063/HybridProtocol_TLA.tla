@@ -471,18 +471,18 @@ Phase1Slow(cleader, i, Q) ==
                                 /\ msg.ballot = record.ballot} IN
             /\ (\A replica \in (Q \ {cleader}): \E msg \in replies: msg.src = replica)
             /\ LET finalDeps == UNION {msg.deps : msg \in replies}
-                   finalSeq == Max({msg.seq : msg \in replies}) IN   
+                   finalSeq == Max({msg.seq : msg \in replies}) 
+                   waitingRecs == {rec \in cmdLog[cleader]: rec.state = "waiting"} 
+                   waitingInst == {rec.inst: rec \in waitingRecs} IN 
+                   IF Cardinality(waitingInst) = 0 THEN   
                         /\ cmdLog' = [cmdLog EXCEPT ![cleader] = (@ \ {record}) \cup 
                                                 {[inst   |-> i,
                                                   status |-> "accepted",
-                                                  state  |-> "done", 
                                                   ballot |-> record.ballot,
                                                   cmd    |-> record.cmd,
                                                   deps   |-> finalDeps,
-                                                  seq    |-> finalSeq,
-                                                  consistency |-> record.consistency, 
-                                                  ctxid |-> record.ctxid ]}]
-                        /\ LET newClk == [clk EXCEPT ![cleader] = @+1] IN \E SQ \in SlowQuorums(cleader):
+                                                  seq    |-> finalSeq ]}]
+                        /\ \E SQ \in SlowQuorums(cleader):
                            (sentMsg' = (sentMsg \ replies) \cup
                                     [type : {"accept"},
                                     src : {cleader},
@@ -491,14 +491,11 @@ Phase1Slow(cleader, i, Q) ==
                                     ballot: {record.ballot},
                                     cmd : {record.cmd},
                                     deps : {finalDeps},
-                                    seq : {finalSeq},
-                                    consistency : {record.consistency},
-                                    ctxid : {record.ctxid},
-                                    clk : {newClk[cleader]}])
-                        /\ clk' = [clk EXCEPT ![cleader] = @+1]
+                                    seq : {finalSeq}])
                         /\ UNCHANGED << proposed, executed, crtInst, leaderOfInst,
                                         committed, ballots, preparing >>
-                                               
+                   ELSE
+                        TRUE
                                
                                
 Commit(replica, cmsg) ==
@@ -678,5 +675,5 @@ THEOREM Spec => ([]TypeOK) /\ Nontriviality /\ Stability /\ Consistency
 
 =============================================================================
 \* Modification History
-\* Last modified Thu Nov 30 16:07:11 EST 2023 by santamariashithil
+\* Last modified Thu Nov 30 15:27:00 EST 2023 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil
