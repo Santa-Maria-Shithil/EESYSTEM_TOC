@@ -2,7 +2,7 @@
 TLC2 Version 2.16 of 31 December 2020 (rev: cdddf55)
 @!@!@ENDMSG 2262 @!@!@
 @!@!@STARTMSG 2187:0 @!@!@
-Running breadth-first search Model-Checking with fp 35 and seed 6546716657287001454 with 4 workers on 8 cores with 1214MB heap and 2730MB offheap memory [pid: 13978] (Mac OS X 10.16 x86_64, AdoptOpenJDK 14.0.1 x86_64, OffHeapDiskFPSet, DiskStateQueue).
+Running breadth-first search Model-Checking with fp 103 and seed 675855973938896128 with 4 workers on 8 cores with 1214MB heap and 2730MB offheap memory [pid: 13852] (Mac OS X 10.16 x86_64, AdoptOpenJDK 14.0.1 x86_64, OffHeapDiskFPSet, DiskStateQueue).
 @!@!@ENDMSG 2187 @!@!@
 @!@!@STARTMSG 2220:0 @!@!@
 Starting SANY...
@@ -23,29 +23,29 @@ Semantic processing of module MC
 SANY finished.
 @!@!@ENDMSG 2219 @!@!@
 @!@!@STARTMSG 2185:0 @!@!@
-Starting... (2023-12-11 10:23:44)
+Starting... (2023-12-11 10:12:17)
 @!@!@ENDMSG 2185 @!@!@
 @!@!@STARTMSG 2189:0 @!@!@
 Computing initial states...
 @!@!@ENDMSG 2189 @!@!@
 @!@!@STARTMSG 2190:0 @!@!@
-Finished computing initial states: 1 distinct state generated at 2023-12-11 10:23:45.
+Finished computing initial states: 1 distinct state generated at 2023-12-11 10:12:18.
 @!@!@ENDMSG 2190 @!@!@
 @!@!@STARTMSG 2200:0 @!@!@
-Progress(6) at 2023-12-11 10:23:48: 107,782 states generated (107,782 s/min), 30,259 distinct states found (30,259 ds/min), 23,820 states left on queue.
+Progress(6) at 2023-12-11 10:12:21: 127,002 states generated (127,002 s/min), 34,481 distinct states found (34,481 ds/min), 26,662 states left on queue.
 @!@!@ENDMSG 2200 @!@!@
 @!@!@STARTMSG 2200:0 @!@!@
-Progress(10) at 2023-12-11 10:24:48: 4,263,651 states generated (4,155,869 s/min), 611,455 distinct states found (581,196 ds/min), 162,236 states left on queue.
+Progress(10) at 2023-12-11 10:13:21: 4,146,983 states generated (4,019,981 s/min), 599,135 distinct states found (564,654 ds/min), 166,582 states left on queue.
 @!@!@ENDMSG 2200 @!@!@
 @!@!@STARTMSG 2193:0 @!@!@
 Model checking completed. No error has been found.
   Estimates of the probability that TLC did not check all reachable states
   because two distinct states had the same fingerprint:
   calculated (optimistic):  val = 2.1E-7
-  based on the actual fingerprints:  val = 5.6E-7
+  based on the actual fingerprints:  val = 3.4E-8
 @!@!@ENDMSG 2193 @!@!@
 @!@!@STARTMSG 2201:0 @!@!@
-The coverage statistics at 2023-12-11 10:25:24
+The coverage statistics at 2023-12-11 10:14:02
 @!@!@ENDMSG 2201 @!@!@
 @!@!@STARTMSG 2773:0 @!@!@
 <Init line 157, col 1 to line 157, col 4 of module HybridProtocol_TLA>: 1:1
@@ -90,7 +90,7 @@ The coverage statistics at 2023-12-11 10:25:24
   line 339, col 16 to line 339, col 22 of module HybridProtocol_TLA: 3851405
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2772:0 @!@!@
-<CommandLeaderAction line 631, col 1 to line 631, col 19 of module HybridProtocol_TLA (632 9 635 72)>: 4442:28860
+<CommandLeaderAction line 631, col 1 to line 631, col 19 of module HybridProtocol_TLA (632 9 635 72)>: 4500:28860
 @!@!@ENDMSG 2772 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
   line 330, col 12 to line 330, col 40 of module HybridProtocol_TLA: 4810
@@ -153,7 +153,7 @@ The coverage statistics at 2023-12-11 10:25:24
   ||||||line 197, col 33 to line 197, col 47 of module HybridProtocol_TLA: 28860
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2775:0 @!@!@
-  |||line 202, col 41 to line 210, col 58 of module HybridProtocol_TLA: 28860:179100
+  |||line 202, col 41 to line 210, col 58 of module HybridProtocol_TLA: 28860:179524
 @!@!@ENDMSG 2775 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
   ||||line 202, col 42 to line 210, col 57 of module HybridProtocol_TLA: 28860
@@ -237,13 +237,13 @@ The coverage statistics at 2023-12-11 10:25:24
   line 212, col 20 to line 223, col 57 of module HybridProtocol_TLA: 28860
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2775:0 @!@!@
-  |line 212, col 31 to line 223, col 57 of module HybridProtocol_TLA: 28860:163200
+  |line 212, col 31 to line 223, col 57 of module HybridProtocol_TLA: 28860:164880
 @!@!@ENDMSG 2775 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
   ||line 212, col 32 to line 212, col 47 of module HybridProtocol_TLA: 28860
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2775:0 @!@!@
-  ||line 213, col 41 to line 223, col 57 of module HybridProtocol_TLA: 28860:683640
+  ||line 213, col 41 to line 223, col 57 of module HybridProtocol_TLA: 28860:684360
 @!@!@ENDMSG 2775 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
   |||line 213, col 42 to line 213, col 59 of module HybridProtocol_TLA: 28860
@@ -654,7 +654,7 @@ The coverage statistics at 2023-12-11 10:25:24
   line 636, col 47 to line 636, col 67 of module HybridProtocol_TLA: 3851405
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2772:0 @!@!@
-<ReplicaAction line 642, col 1 to line 642, col 13 of module HybridProtocol_TLA (645 13 645 81)>: 765838:5006400
+<ReplicaAction line 642, col 1 to line 642, col 13 of module HybridProtocol_TLA (645 13 645 81)>: 765780:5006400
 @!@!@ENDMSG 2772 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
   line 645, col 36 to line 645, col 55 of module HybridProtocol_TLA: 20402400
@@ -738,7 +738,7 @@ The coverage statistics at 2023-12-11 10:25:24
   ||||||line 521, col 32 to line 521, col 46 of module HybridProtocol_TLA: 5006400
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2775:0 @!@!@
-  |||line 529, col 45 to line 537, col 69 of module HybridProtocol_TLA: 5006400:5762568
+  |||line 529, col 45 to line 537, col 69 of module HybridProtocol_TLA: 5006400:5762896
 @!@!@ENDMSG 2775 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
   line 538, col 20 to line 539, col 75 of module HybridProtocol_TLA: 5006400
@@ -843,10 +843,10 @@ The coverage statistics at 2023-12-11 10:25:24
   line 645, col 25 to line 645, col 31 of module HybridProtocol_TLA: 3851405
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2772:0 @!@!@
-<Next line 653, col 1 to line 653, col 4 of module HybridProtocol_TLA (657 8 658 126)>: 0:770281
+<Next line 653, col 1 to line 653, col 4 of module HybridProtocol_TLA (657 8 658 88)>: 0:770281
 @!@!@ENDMSG 2772 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  line 658, col 13 to line 658, col 107 of module HybridProtocol_TLA: 536165
+  line 658, col 13 to line 658, col 69 of module HybridProtocol_TLA: 536165
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
   |line 658, col 36 to line 658, col 69 of module HybridProtocol_TLA: 10389600
@@ -855,22 +855,19 @@ The coverage statistics at 2023-12-11 10:25:24
   ||line 658, col 36 to line 658, col 46 of module HybridProtocol_TLA: 5194800
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  |line 658, col 74 to line 658, col 107 of module HybridProtocol_TLA: 5194800
-@!@!@ENDMSG 2221 @!@!@
-@!@!@STARTMSG 2221:0 @!@!@
   |line 658, col 25 to line 658, col 33 of module HybridProtocol_TLA: 3851405
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
   line 657, col 18 to line 657, col 25 of module HybridProtocol_TLA: 770281
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  line 658, col 113 to line 658, col 126 of module HybridProtocol_TLA: 770281
+  line 658, col 75 to line 658, col 88 of module HybridProtocol_TLA: 770281
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2202:0 @!@!@
 End of statistics.
 @!@!@ENDMSG 2202 @!@!@
 @!@!@STARTMSG 2200:0 @!@!@
-Progress(11) at 2023-12-11 10:25:24: 5,805,542 states generated (3,413,418 s/min), 770,281 distinct states found (452,893 ds/min), 0 states left on queue.
+Progress(11) at 2023-12-11 10:14:02: 5,805,542 states generated (3,273,278 s/min), 770,281 distinct states found (434,299 ds/min), 0 states left on queue.
 @!@!@ENDMSG 2200 @!@!@
 @!@!@STARTMSG 2199:0 @!@!@
 5805542 states generated, 770281 distinct states found, 0 states left on queue.
@@ -882,5 +879,5 @@ The depth of the complete state graph search is 11.
 The average outdegree of the complete state graph is 1 (minimum is 0, the maximum 31 and the 95th percentile is 4).
 @!@!@ENDMSG 2268 @!@!@
 @!@!@STARTMSG 2186:0 @!@!@
-Finished in 102061ms at (2023-12-11 10:25:24)
+Finished in 106437ms at (2023-12-11 10:14:02)
 @!@!@ENDMSG 2186 @!@!@

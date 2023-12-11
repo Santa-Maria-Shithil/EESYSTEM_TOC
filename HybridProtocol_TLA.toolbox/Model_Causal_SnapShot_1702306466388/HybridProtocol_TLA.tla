@@ -400,7 +400,7 @@ Phase1Reply(replica) ==
                                               seq    |-> newSeq,
                                               consistency |-> msg.consistency,
                                               ctxid |-> msg.ctxid ]}]
-                        /\ sentMsg' = (sentMsg \ {msg}) \cup
+                             /\ sentMsg' = (sentMsg \ {msg}) \cup
                                             {[type  |-> "pre-accept-reply",
                                               src   |-> replica,
                                               dst   |-> msg.src,
@@ -412,8 +412,8 @@ Phase1Reply(replica) ==
                                               consistency |-> msg.consistency,
                                               ctxid |-> msg.ctxid,
                                               clk |-> newClk]}
-                        /\ clk' = [clk EXCEPT ![replica] = newClk]
-                        /\ UNCHANGED << proposed, crtInst, executed, leaderOfInst,
+                             /\ clk' = [clk EXCEPT ![replica] = newClk]
+                             /\ UNCHANGED << proposed, crtInst, executed, leaderOfInst,
                                         committed, ballots, preparing >>
                             
 Phase1Fast(cleader, i, Q) ==
@@ -484,32 +484,35 @@ Phase1Slow(cleader, i, Q) ==
             /\ LET finalDeps == UNION {msg.deps : msg \in replies}
                    finalSeq == Max({msg.seq : msg \in replies})
                    waitingInst == FindingWaitingInst(finalDeps) IN   
-                        /\ cmdLog' = [cmdLog EXCEPT ![cleader] = (@ \ {record}) \cup 
-                                                {[inst   |-> i,
-                                                  status |-> "accepted",
-                                                  state  |-> "done", 
-                                                  ballot |-> record.ballot,
-                                                  cmd    |-> record.cmd,
-                                                  deps   |-> finalDeps,
-                                                  seq    |-> finalSeq,
-                                                  consistency |-> record.consistency, 
-                                                  ctxid |-> record.ctxid ]}]
-                        /\ LET newClk == [clk EXCEPT ![cleader] = @+1] IN \E SQ \in SlowQuorums(cleader):
-                           (sentMsg' = (sentMsg \ replies) \cup
-                                    [type : {"accept"},
-                                    src : {cleader},
-                                    dst : SQ \ {cleader},
-                                    inst : {i},
-                                    ballot: {record.ballot},
-                                    cmd : {record.cmd},
-                                    deps : {finalDeps},
-                                    seq : {finalSeq},
-                                    consistency : {record.consistency},
-                                    ctxid : {record.ctxid},
-                                    clk : {newClk[cleader]}])
-                        /\ clk' = [clk EXCEPT ![cleader] = @+1]
-                        /\ UNCHANGED << proposed, executed, crtInst, leaderOfInst,
-                                        committed, ballots, preparing >>
+                        IF Cardinality(waitingInst) = 0 THEN
+                            /\ cmdLog' = [cmdLog EXCEPT ![cleader] = (@ \ {record}) \cup 
+                                                    {[inst   |-> i,
+                                                      status |-> "accepted",
+                                                      state  |-> "done", 
+                                                      ballot |-> record.ballot,
+                                                      cmd    |-> record.cmd,
+                                                      deps   |-> finalDeps,
+                                                      seq    |-> finalSeq,
+                                                      consistency |-> record.consistency, 
+                                                      ctxid |-> record.ctxid ]}]
+                            /\ LET newClk == [clk EXCEPT ![cleader] = @+1] IN \E SQ \in SlowQuorums(cleader):
+                               (sentMsg' = (sentMsg \ replies) \cup
+                                        [type : {"accept"},
+                                        src : {cleader},
+                                        dst : SQ \ {cleader},
+                                        inst : {i},
+                                        ballot: {record.ballot},
+                                        cmd : {record.cmd},
+                                        deps : {finalDeps},
+                                        seq : {finalSeq},
+                                        consistency : {record.consistency},
+                                        ctxid : {record.ctxid},
+                                        clk : {newClk[cleader]}])
+                            /\ clk' = [clk EXCEPT ![cleader] = @+1]
+                            /\ UNCHANGED << proposed, executed, crtInst, leaderOfInst,
+                                            committed, ballots, preparing >>
+                         ELSE
+                            TRUE
                                                
                                
                                
@@ -658,6 +661,12 @@ Next ==
 
 Spec == Init /\ [][Next]_vars
 
+(***************************************************************************)
+(* Termination Property                                                    *)
+(***************************************************************************)
+
+Termination == <>(\A self \in Replicas: cmdLog[self] = "committed")
+
 
 (***************************************************************************)
 (* Theorems                                                                *)
@@ -690,5 +699,5 @@ THEOREM Spec => ([]TypeOK) /\ Nontriviality /\ Stability /\ Consistency
 
 =============================================================================
 \* Modification History
-\* Last modified Thu Nov 30 16:40:59 EST 2023 by santamariashithil
+\* Last modified Mon Dec 11 09:52:21 EST 2023 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil

@@ -167,17 +167,28 @@ Init ==
   /\ clk = [r \in Replicas |-> 1]
 
 
+(***************************************************************************)
+(* Helper Functions                                                        *)
+(***************************************************************************)
 
-(***************************************************************************)
-(* Actions                                                                 *)
-(***************************************************************************)
 RECURSIVE checkWaiting(_)
 checkWaiting(cleader) == LET waitingRecs== {rec \in cmdLog[cleader]: rec.state = "waiting"} 
                          waitingInst=={rec.inst: rec \in waitingRecs} IN
                          IF Cardinality(waitingInst) = 0 THEN
                             "ready"
                          ELSE checkWaiting(cleader)
-                            
+                         
+FindingWaitingInst(finalDeps) ==
+    LET waitingRecs(deps) == {rec \in cmdLog[deps]: rec.state = "waiting"}
+        waitingInst(deps) == {rec.inst: rec \in waitingRecs(deps)}
+        allWaitingInst == UNION({waitingInst(deps): deps \in finalDeps})
+    IN
+        allWaitingInst
+
+
+(***************************************************************************)
+(* Actions                                                                 *)
+(***************************************************************************)
 
 StartPhase1(C, cleader, Q, inst, ballot, oldMsg, oldClk,cl,ctx) ==
     IF cl = "causal" THEN
@@ -389,7 +400,7 @@ Phase1Reply(replica) ==
                                               seq    |-> newSeq,
                                               consistency |-> msg.consistency,
                                               ctxid |-> msg.ctxid ]}]
-                        /\ sentMsg' = (sentMsg \ {msg}) \cup
+                             /\ sentMsg' = (sentMsg \ {msg}) \cup
                                             {[type  |-> "pre-accept-reply",
                                               src   |-> replica,
                                               dst   |-> msg.src,
@@ -401,8 +412,8 @@ Phase1Reply(replica) ==
                                               consistency |-> msg.consistency,
                                               ctxid |-> msg.ctxid,
                                               clk |-> newClk]}
-                        /\ clk' = [clk EXCEPT ![replica] = newClk]
-                        /\ UNCHANGED << proposed, crtInst, executed, leaderOfInst,
+                             /\ clk' = [clk EXCEPT ![replica] = newClk]
+                             /\ UNCHANGED << proposed, crtInst, executed, leaderOfInst,
                                         committed, ballots, preparing >>
                             
 Phase1Fast(cleader, i, Q) ==
@@ -456,6 +467,54 @@ Phase1Fast(cleader, i, Q) ==
                 /\ clk' = [clk EXCEPT ![cleader] = @+1]
                 /\ UNCHANGED << proposed, executed, crtInst, ballots, preparing >>   
    
+                               
+Phase1Slow(cleader, i, Q) ==
+    /\ i \in leaderOfInst[cleader]
+    /\ Q \in SlowQuorums(cleader)
+    /\ \E record \in cmdLog[cleader]:
+        /\ record.inst = i
+        /\ record.status = "pre-accepted"
+        /\ LET replies == {msg \in sentMsg: 
+                                /\ msg.inst = i 
+                                /\ msg.type = "pre-accept-reply" 
+                                /\ msg.dst = cleader 
+                                /\ msg.src \in Q
+                                /\ msg.ballot = record.ballot} IN
+            /\ (\A replica \in (Q \ {cleader}): \E msg \in replies: msg.src = replica)
+            /\ LET finalDeps == UNION {msg.deps : msg \in replies}
+                   finalSeq == Max({msg.seq : msg \in replies})
+                   waitingInst == FindingWaitingInst(finalDeps) IN   
+                        IF Cardinality(waitingInst) = 0 THEN
+                            /\ cmdLog' = [cmdLog EXCEPT ![cleader] = (@ \ {record}) \cup 
+                                                    {[inst   |-> i,
+                                                      status |-> "accepted",
+                                                      state  |-> "done", 
+                                                      ballot |-> record.ballot,
+                                                      cmd    |-> record.cmd,
+                                                      deps   |-> finalDeps,
+                                                      seq    |-> finalSeq,
+                                                      consistency |-> record.consistency, 
+                                                      ctxid |-> record.ctxid ]}]
+                            /\ LET newClk == [clk EXCEPT ![cleader] = @+1] IN \E SQ \in SlowQuorums(cleader):
+                               (sentMsg' = (sentMsg \ replies) \cup
+                                        [type : {"accept"},
+                                        src : {cleader},
+                                        dst : SQ \ {cleader},
+                                        inst : {i},
+                                        ballot: {record.ballot},
+                                        cmd : {record.cmd},
+                                        deps : {finalDeps},
+                                        seq : {finalSeq},
+                                        consistency : {record.consistency},
+                                        ctxid : {record.ctxid},
+                                        clk : {newClk[cleader]}])
+                            /\ clk' = [clk EXCEPT ![cleader] = @+1]
+                            /\ UNCHANGED << proposed, executed, crtInst, leaderOfInst,
+                                            committed, ballots, preparing >>
+                         ELSE
+                            TRUE
+                                               
+                               
                                
 Commit(replica, cmsg) ==
     IF cmsg.consistency = "causal" THEN
@@ -538,7 +597,7 @@ Commit(replica, cmsg) ==
                                         rec.ballot[1] <= cmsg.ballot[1])
                 /\ cmdLog' = [cmdLog EXCEPT ![replica] = (@ \ oldRec) \cup 
                                             {[inst     |-> cmsg.inst,
-                                              status   |-> "strongly-comitted-committed",
+                                              status   |-> "strongly-comitted",
                                               state    |-> "waiting",
                                               ballot   |-> cmsg.ballot,
                                               cmd      |-> cmsg.cmd,
@@ -575,7 +634,9 @@ CommandLeaderAction ==
                 \E ctx \in Ctx_id:
                     \E cleader \in Replicas : Propose(C, cleader,cl,ctx))
     \/ (\E cleader \in Replicas : \E inst \in leaderOfInst[cleader] :
-            \/ (\E Q \in FastQuorums(cleader) : Phase1Fast(cleader, inst, Q)))
+            \/ (\E Q \in FastQuorums(cleader) : Phase1Fast(cleader, inst, Q))
+            \/ (\E Q \in SlowQuorums(cleader) : Phase1Slow(cleader, inst, Q))
+            )
    
             
 ReplicaAction ==
@@ -592,6 +653,9 @@ ReplicaAction ==
 Next == 
     \/ CommandLeaderAction
     \/ ReplicaAction
+    \/ (* Disjunct to prevent deadlock on termination *)
+      ((\A r \in Replicas:
+            \A inst \in cmdLog[r]: inst.status = "causally-committed" \/ inst.status = "strongly-committed") /\ UNCHANGED vars)
 
 
 (***************************************************************************)
@@ -599,6 +663,13 @@ Next ==
 (***************************************************************************)
 
 Spec == Init /\ [][Next]_vars
+
+(***************************************************************************)
+(* Termination Property                                                    *)
+(***************************************************************************)
+
+Termination == <>((\A r \in Replicas:
+            \A inst \in cmdLog[r]: inst.status = "causally-committed" \/ inst.status = "strongly-committed"))
 
 
 (***************************************************************************)
@@ -632,5 +703,5 @@ THEOREM Spec => ([]TypeOK) /\ Nontriviality /\ Stability /\ Consistency
 
 =============================================================================
 \* Modification History
-\* Last modified Thu Nov 30 14:16:51 EST 2023 by santamariashithil
+\* Last modified Mon Dec 11 10:23:37 EST 2023 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil
