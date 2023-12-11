@@ -2,30 +2,30 @@
 EXTENDS HybridProtocol_TLA, TLC
 
 \* CONSTANT definitions @modelParameterConstants:0MaxBallot
-const_170138064607896000 == 
+const_170232058713774000 == 
 10
 ----
 
 \* CONSTANT definitions @modelParameterConstants:1Replicas
-const_170138064607897000 == 
+const_170232058713775000 == 
 {1,2,3,4,5}
 ----
 
 \* CONSTANT definitions @modelParameterConstants:2Consistency_level
-const_170138064607898000 == 
+const_170232058713776000 == 
 {"strong"}
 ----
 
 \* CONSTANT definitions @modelParameterConstants:3Ctx_id
-const_170138064607899000 == 
+const_170232058713777000 == 
 {1}
 ----
 
 \* CONSTANT definitions @modelParameterConstants:4Commands
-const_1701380646078100000 == 
+const_170232058713778000 == 
 {1,2}
 ----
 
 =============================================================================
 \* Modification History
-\* Created Thu Nov 30 16:44:06 EST 2023 by santamariashithil
+\* Created Mon Dec 11 13:49:47 EST 2023 by santamariashithil
