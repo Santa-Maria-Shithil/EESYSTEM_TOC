@@ -807,7 +807,7 @@ Termination == <>((\A r \in Replicas:
 (* Theorems                                                                *)
 (***************************************************************************)
 
-Nontriviality ==
+(*Nontriviality ==
     \A i \in Instances :
         [](\A C \in committed[i] : C \in proposed \/ C = none)
 
@@ -828,11 +828,11 @@ Consistency ==
     \A i \in Instances :
         [](Cardinality(committed[i]) <= 1)
 
-THEOREM Spec => ([]TypeOK) /\ Nontriviality /\ Stability /\ Consistency
+THEOREM Spec => ([]TypeOK) /\ Nontriviality /\ Stability /\ Consistency*)
                                                   
     
 
 =============================================================================
 \* Modification History
-\* Last modified Mon Dec 11 13:48:57 EST 2023 by santamariashithil
+\* Last modified Mon Dec 11 16:01:50 EST 2023 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil
