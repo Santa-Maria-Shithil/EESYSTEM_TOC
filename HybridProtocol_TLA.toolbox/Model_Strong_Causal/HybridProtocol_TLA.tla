@@ -826,9 +826,294 @@ SendPrepare(replica, i, Q) ==
     /\ ballots' = ballots + 1
     /\ preparing' = [preparing EXCEPT ![replica] = @ \cup {i}]
     /\ UNCHANGED << cmdLog, proposed, executed, crtInst,
-                    leaderOfInst, committed >>
+                    leaderOfInst, committed,clk >>
+                    
+ ReplyPrepare(replica) ==
+    \E msg \in sentMsg : 
+        /\ msg.type = "prepare"
+        /\ msg.dst = replica
+        /\ \/ \E rec \in cmdLog[replica] : 
+                /\ rec.inst = msg.inst
+                /\ msg.ballot[1] > rec.ballot[1]
+                /\ sentMsg' = (sentMsg \ {msg}) \cup
+                            {[type  |-> "prepare-reply",
+                              src   |-> replica,
+                              dst   |-> msg.src,
+                              inst  |-> rec.inst,
+                              ballot|-> msg.ballot,
+                              prev_ballot|-> rec.ballot,
+                              status|-> rec.status,
+                              state |-> rec.state,
+                              cmd   |-> rec.cmd,
+                              deps  |-> rec.deps,
+                              seq   |-> rec.seq,
+                              consistency |-> rec.consistency,
+                              ctxid |-> rec.ctxid]}
+                 /\ cmdLog' = [cmdLog EXCEPT ![replica] = (@ \ {rec}) \cup
+                            {[inst  |-> rec.inst,
+                              status|-> rec.status,
+                              state |-> rec.state, 
+                              ballot|-> msg.ballot,
+                              cmd   |-> rec.cmd,
+                              deps  |-> rec.deps,
+                              seq   |-> rec.seq,
+                              consistency |-> rec.consistency,
+                              ctxid |-> rec.ctxid]}]
+                 /\ IF rec.inst \in leaderOfInst[replica] THEN
+                        /\ leaderOfInst' = [leaderOfInst EXCEPT ![replica] = 
+                                                                @ \ {rec.inst}]
+                        /\ UNCHANGED << proposed, executed, committed,
+                                        crtInst, ballots, preparing,clk >>
+                    ELSE UNCHANGED << proposed, executed, committed, crtInst,
+                                      ballots, preparing, leaderOfInst,clk >>
+                        
+           \/ /\ ~(\E rec \in cmdLog[replica] : rec.inst = msg.inst)
+              /\ sentMsg' = (sentMsg \ {msg}) \cup
+                            {[type  |-> "prepare-reply",
+                              src   |-> replica,
+                              dst   |-> msg.src,
+                              inst  |-> msg.inst,
+                              ballot|-> msg.ballot,
+                              prev_ballot|-> << 0, replica >>,
+                              status|-> "not-seen",
+                              state |-> none,
+                              cmd   |-> none,
+                              deps  |-> {},
+                              seq   |-> 0,
+                              consistency |-> none,
+                              ctxid |-> none]}
+              /\ cmdLog' = [cmdLog EXCEPT ![replica] = @ \cup
+                            {[inst  |-> msg.inst,
+                              status|-> "not-seen",
+                              state |-> none,
+                              ballot|-> msg.ballot,
+                              cmd   |-> none,
+                              deps  |-> {},
+                              seq   |-> 0,
+                              consistency|-> none,
+                              ctxid |-> none]}]
+              /\ UNCHANGED << proposed, executed, committed, crtInst, ballots,
+                              leaderOfInst, preparing,clk >>       
+                              
+PrepareFinalize(replica, i, Q) ==
+    /\ i \in preparing[replica]
+    /\ \E rec \in cmdLog[replica] :
+       /\ rec.inst = i
+       /\ rec.status \notin {"causally-committed", "strongly-committed", "executed"}
+       
+       /\ LET replies == {msg \in sentMsg : 
+                        /\ msg.inst = i
+                        /\ msg.type = "prepare-reply"
+                        /\ msg.dst = replica
+                        /\ msg.ballot = rec.ballot}
+            newClk == [clk EXCEPT ![replica] = @ + 1] IN
+            /\ (\A rep \in Q : \E msg \in replies : msg.src = rep)
+            /\  \/ \E com \in replies :
+                        /\ (com.status \in {"causally-committed", "strongly-committed", "executed"})
+                        /\ preparing' = [preparing EXCEPT ![replica] = @ \ {i}]
+                        /\ clk' = newClk
+                        /\ sentMsg' = sentMsg \ replies
+                        /\ UNCHANGED << cmdLog, proposed, executed, crtInst, leaderOfInst,
+                                        committed, ballots>>
+                \/ /\ ~(\E msg \in replies : msg.status \in {"causally-committed", "strongly-committed", "executed"})
+                   /\ \E acc \in replies :
+                        /\ acc.status = "accepted"
+                        /\ (\A msg \in (replies \ {acc}) : 
+                            (msg.prev_ballot[1] <= acc.prev_ballot[1] \/ 
+                             msg.status # "accepted"))
+                        /\ clk' = newClk
+                        /\ sentMsg' = (sentMsg \ replies) \cup
+                                 [type  : {"accept"},
+                                  src   : {replica},
+                                  dst   : Q \ {replica},
+                                  inst  : {i},
+                                  ballot: {rec.ballot},
+                                  cmd   : {acc.cmd},
+                                  deps  : {acc.deps},
+                                  seq   : {acc.seq},
+                                  consistency : {acc.consistency},
+                                  ctxid : {acc.ctxid}]
+                        /\ cmdLog' = [cmdLog EXCEPT ![replica] = (@ \ {rec}) \cup
+                                {[inst  |-> i,
+                                  status|-> "accepted",
+                                  state |-> "done",
+                                  ballot|-> rec.ballot,
+                                  cmd   |-> acc.cmd,
+                                  deps  |-> acc.deps,
+                                  seq   |-> acc.seq,
+                                  consistency |-> acc.consistency,
+                                  ctxid |-> acc.ctxid]}]
+                         /\ preparing' = [preparing EXCEPT ![replica] = @ \ {i}]
+                         /\ leaderOfInst' = [leaderOfInst EXCEPT ![replica] = @ \cup {i}]
+                         /\ UNCHANGED << proposed, executed, crtInst, committed, ballots>>
+                \/ /\ ~(\E msg \in replies : 
+                        msg.status \in {"accepted", "causally-committed", "strongly-committed", "executed"})
+                   /\ LET preaccepts == {msg \in replies : msg.status = "pre-accepted"} IN
+                       (\/  /\ \A p1, p2 \in preaccepts :
+                                    p1.cmd = p2.cmd /\ p1.deps = p2.deps /\ p1.seq = p2.seq
+                            /\ ~(\E pl \in preaccepts : pl.src = i[1])
+                            /\ Cardinality(preaccepts) >= Cardinality(Q) - 1
+                            /\ LET pac == CHOOSE pac \in preaccepts : TRUE IN
+                                /\ clk' = newClk
+                                /\ sentMsg' = (sentMsg \ replies) \cup
+                                         [type  : {"accept"},
+                                          src   : {replica},
+                                          dst   : Q \ {replica},
+                                          inst  : {i},
+                                          ballot: {rec.ballot},
+                                          cmd   : {pac.cmd},
+                                          deps  : {pac.deps},
+                                          seq   : {pac.seq},
+                                          consistency : {pac.consistency},
+                                          ctxid : {pac.ctxid}]
+                                /\ cmdLog' = [cmdLog EXCEPT ![replica] = (@ \ {rec}) \cup
+                                        {[inst  |-> i,
+                                          status|-> "accepted",
+                                          ballot|-> rec.ballot,
+                                          cmd   |-> pac.cmd,
+                                          deps  |-> pac.deps,
+                                          seq   |-> pac.seq,
+                                          consistency |-> pac.consistency,
+                                          ctxid |-> pac.ctxid]}]
+                                 /\ preparing' = [preparing EXCEPT ![replica] = @ \ {i}]
+                                 /\ leaderOfInst' = [leaderOfInst EXCEPT ![replica] = @ \cup {i}]
+                                 /\ UNCHANGED << proposed, executed, crtInst, committed, ballots >>
+                        \/  /\ \A p1, p2 \in preaccepts : p1.cmd = p2.cmd /\ 
+                                                          p1.deps = p2.deps /\
+                                                          p1.seq = p2.seq
+                            /\ ~(\E pl \in preaccepts : pl.src = i[1])
+                            /\ Cardinality(preaccepts) < Cardinality(Q) - 1
+                            /\ Cardinality(preaccepts) >= Cardinality(Q) \div 2
+                            /\ LET pac == CHOOSE pac \in preaccepts : TRUE IN
+                                /\ clk' = newClk
+                                /\ sentMsg' = (sentMsg \ replies) \cup
+                                         [type  : {"try-pre-accept"},
+                                          src   : {replica},
+                                          dst   : Q,
+                                          inst  : {i},
+                                          ballot: {rec.ballot},
+                                          cmd   : {pac.cmd},
+                                          deps  : {pac.deps},
+                                          seq   : {pac.seq},
+                                          consistency : {pac.consistency},
+                                          ctxid : {pac.ctxid}]
+                                /\ preparing' = [preparing EXCEPT ![replica] = @ \ {i}]
+                                /\ leaderOfInst' = [leaderOfInst EXCEPT ![replica] = @ \cup {i}]
+                                /\ UNCHANGED << cmdLog, proposed, executed,
+                                                crtInst, committed, ballots>>
+                        \/  /\ \/ \E p1, p2 \in preaccepts : p1.cmd # p2.cmd \/ 
+                                                             p1.deps # p2.deps \/
+                                                             p1.seq # p2.seq
+                               \/ \E pl \in preaccepts : pl.src = i[1]
+                               \/ Cardinality(preaccepts) < Cardinality(Q) \div 2
+                            /\ preaccepts # {}
+                            /\ LET pac == CHOOSE pac \in preaccepts : pac.cmd # none IN
+                                /\ StartPhase1(pac.cmd, replica, Q, i, rec.ballot, replies, newClk[replica], pac.conistency,pac.ctxid)
+                                /\ preparing' = [preparing EXCEPT ![replica] = @ \ {i}]
+                                /\ UNCHANGED << proposed, executed, crtInst, committed, ballots>>)
+                \/  /\ \A msg \in replies : msg.status = "not-seen"
+                    /\ StartPhase1(none, replica, Q, i, rec.ballot, replies, newClk[replica], none, none)
+                    /\ preparing' = [preparing EXCEPT ![replica] = @ \ {i}]
+                    /\ UNCHANGED << proposed, executed, crtInst, committed, ballots >>   
                     
                     
+ReplyTryPreaccept(replica) ==
+    \E tpa \in sentMsg :
+        /\ tpa.type = "try-pre-accept" 
+        /\ tpa.dst = replica
+        /\ LET oldRec == {rec \in cmdLog[replica] : rec.inst = tpa.inst}
+           newClk == [clk EXCEPT ![replica] = @ + 1] IN
+            /\ \A rec \in oldRec : rec.ballot[1] <= tpa.ballot[1] /\ 
+                                   rec.status \notin {"accepted",  "causally-committed", "strongly-committed", "executed"}
+            /\ \/ (\E rec \in cmdLog[replica] \ oldRec:
+                        /\ tpa.inst \notin rec.deps
+                        /\ \/ rec.inst \notin tpa.deps
+                           \/ rec.seq >= tpa.seq
+                        /\ clk'=newClk
+                        /\ sentMsg' = (sentMsg \ {tpa}) \cup
+                                    {[type  |-> "try-pre-accept-reply",
+                                      src   |-> replica,
+                                      dst   |-> tpa.src,
+                                      inst  |-> tpa.inst,
+                                      ballot|-> tpa.ballot,
+                                      status|-> rec.status,
+                                      state |-> rec.state,
+                                      consistency |-> rec.consistency,
+                                      ctxid |-> rec.ctxid]})
+                        /\ UNCHANGED << cmdLog, proposed, executed, committed, crtInst,
+                                        ballots, leaderOfInst, preparing >>
+               \/ /\ (\A rec \in cmdLog[replica] \ oldRec: 
+                            tpa.inst \in rec.deps \/ (rec.inst \in tpa.deps /\
+                                                      rec.seq < tpa.seq))
+                  /\ sentMsg' = (sentMsg \ {tpa}) \cup
+                                    {[type  |-> "try-pre-accept-reply",
+                                      src   |-> replica,
+                                      dst   |-> tpa.src,
+                                      inst  |-> tpa.inst,
+                                      ballot|-> tpa.ballot,
+                                      status|-> "OK",
+                                      state |-> tpa.state,
+                                      consistency |-> tpa.consistency,
+                                      ctxid |-> tpa.ctxid]}
+                  /\ clk'=newClk
+                  /\ cmdLog' = [cmdLog EXCEPT ![replica] = (@ \ oldRec) \cup
+                                    {[inst  |-> tpa.inst,
+                                      status|-> "pre-accepted",
+                                      state |-> "done",
+                                      ballot|-> tpa.ballot,
+                                      cmd   |-> tpa.cmd,
+                                      deps  |-> tpa.deps,
+                                      seq   |-> tpa.seq,
+                                      consistency |-> tpa.consistency,
+                                      ctxid |-> tpa.ctxid]}]
+                  /\ UNCHANGED << proposed, executed, committed, crtInst, ballots,
+                                  leaderOfInst, preparing >>
+                      
+             
+FinalizeTryPreAccept(cleader, i, Q) ==
+    \E rec \in cmdLog[cleader]:
+        /\ rec.inst = i
+        /\ LET tprs == {msg \in sentMsg : msg.type = "try-pre-accept-reply" /\
+                            msg.dst = cleader /\ msg.inst = i /\
+                            msg.ballot = rec.ballot} 
+            newClk == [clk EXCEPT ![cleader] = @ + 1] IN
+            /\ \A r \in Q: \E tpr \in tprs : tpr.src = r
+            /\ \/ /\ \A tpr \in tprs: tpr.status = "OK"
+                  /\ sentMsg' = (sentMsg \ tprs) \cup
+                             [type  : {"accept"},
+                              src   : {cleader},
+                              dst   : Q \ {cleader},
+                              inst  : {i},
+                              ballot: {rec.ballot},
+                              cmd   : {rec.cmd},
+                              deps  : {rec.deps},
+                              seq   : {rec.seq},
+                              state : {rec.state},
+                              consistency : {rec.consistency},
+                              ctxid : {rec.ctxid}]
+                  /\ clk'=newClk            
+                  /\ cmdLog' = [cmdLog EXCEPT ![cleader] = (@ \ {rec}) \cup
+                            {[inst  |-> i,
+                              status|-> "accepted",
+                              ballot|-> rec.ballot,
+                              cmd   |-> rec.cmd,
+                              deps  |-> rec.deps,
+                              seq   |-> rec.seq,
+                              state |-> rec.state,
+                              consistency |-> rec.consistency,
+                              ctxid |-> rec.ctxid]}]
+                  /\ UNCHANGED << proposed, executed, committed, crtInst, ballots,
+                                  leaderOfInst, preparing >>
+               \/ /\ \E tpr \in tprs: tpr.status \in {"accepted", "committed", "executed"}
+                  /\ StartPhase1(rec.cmd, cleader, Q, i, rec.ballot, tprs, newClk[cleader], rec.consistency, rec.ctxid)
+                  /\ UNCHANGED << proposed, executed, committed, crtInst, ballots,
+                                  leaderOfInst, preparing >>
+               \/ /\ \E tpr \in tprs: tpr.status = "pre-accepted"
+                  /\ \A tpr \in tprs: tpr.status \in {"OK", "pre-accepted"}
+                  /\ sentMsg' = sentMsg \ tprs
+                  /\ leaderOfInst' = [leaderOfInst EXCEPT ![cleader] = @ \ {i}]
+                  /\ UNCHANGED << cmdLog, proposed, executed, committed, crtInst,
+                                  ballots, preparing >> 
 
 (***************************************************************************)
 (* Action groups                                                           *)
@@ -843,6 +1128,7 @@ CommandLeaderAction ==
             \/ (\E Q \in FastQuorums(cleader) : Phase1Fast(cleader, inst, Q))
             \/ (\E Q \in SlowQuorums(cleader) : Phase1Slow(cleader, inst, Q))
             \/ (\E Q \in SlowQuorums(cleader) : Phase2Finalize(cleader, inst, Q))
+            \/ (\E Q \in SlowQuorums(cleader) : FinalizeTryPreAccept(cleader, inst, Q))
             )
    
             
@@ -851,10 +1137,14 @@ ReplicaAction ==
         (\/ Phase1Reply(replica)
          \/ \E cmsg \in sentMsg : (cmsg.type = "commit" /\ Commit(replica, cmsg))
          \/ Phase2Reply(replica)
-         (*\/ \E i \in Instances : 
+         \/ \E i \in Instances : 
             /\ crtInst[i[1]] > i[2] (* This condition states that the instance has *) 
                                     (* been started by its original owner          *)
-            /\ \E Q \in SlowQuorums(replica) : SendPrepare(replica, i, Q)*)
+            /\ \E Q \in SlowQuorums(replica) : SendPrepare(replica, i, Q)
+         \/ ReplyPrepare(replica)
+         \/ \E i \in preparing[replica] :
+            \E Q \in SlowQuorums(replica) : PrepareFinalize(replica, i, Q)
+         \/ ReplyTryPreaccept(replica)
         )
 
 
@@ -915,5 +1205,5 @@ THEOREM Spec => ([]TypeOK) /\ Nontriviality /\ Stability /\ Consistency*)
 
 =============================================================================
 \* Modification History
-\* Last modified Wed Dec 27 10:28:25 EST 2023 by santamariashithil
+\* Last modified Wed Jan 03 06:51:18 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil

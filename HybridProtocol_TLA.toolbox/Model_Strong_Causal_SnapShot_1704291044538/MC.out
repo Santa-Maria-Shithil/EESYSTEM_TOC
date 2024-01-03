@@ -1,0 +1,141 @@
+@!@!@STARTMSG 2262:0 @!@!@
+TLC2 Version 2.16 of 31 December 2020 (rev: cdddf55)
+@!@!@ENDMSG 2262 @!@!@
+@!@!@STARTMSG 2187:0 @!@!@
+Running breadth-first search Model-Checking with fp 113 and seed -8205502275863853124 with 4 workers on 8 cores with 1214MB heap and 2730MB offheap memory [pid: 784] (Mac OS X 10.16 x86_64, AdoptOpenJDK 14.0.1 x86_64, OffHeapDiskFPSet, DiskStateQueue).
+@!@!@ENDMSG 2187 @!@!@
+@!@!@STARTMSG 2220:0 @!@!@
+Starting SANY...
+@!@!@ENDMSG 2220 @!@!@
+Parsing file /Volumes/StudyMaterials/Project/EESYSTEM_TOC/HybridProtocol_TLA.toolbox/Model_Strong_Causal/MC.tla
+Parsing file /Volumes/StudyMaterials/Project/EESYSTEM_TOC/HybridProtocol_TLA.toolbox/Model_Strong_Causal/HybridProtocol_TLA.tla
+Parsing file /Applications/TLA+ Toolbox.app/Contents/Eclipse/plugins/org.lamport.tlatools_1.0.0.202012311918/tla2sany/StandardModules/TLC.tla
+Parsing file /Applications/TLA+ Toolbox.app/Contents/Eclipse/plugins/org.lamport.tlatools_1.0.0.202012311918/tla2sany/StandardModules/Naturals.tla
+Parsing file /Applications/TLA+ Toolbox.app/Contents/Eclipse/plugins/org.lamport.tlatools_1.0.0.202012311918/tla2sany/StandardModules/FiniteSets.tla
+Parsing file /Applications/TLA+ Toolbox.app/Contents/Eclipse/plugins/org.lamport.tlatools_1.0.0.202012311918/tla2sany/StandardModules/Sequences.tla
+Semantic processing of module Naturals
+Semantic processing of module Sequences
+Semantic processing of module FiniteSets
+Semantic processing of module HybridProtocol_TLA
+Semantic processing of module TLC
+Semantic processing of module MC
+@!@!@STARTMSG 2219:0 @!@!@
+SANY finished.
+@!@!@ENDMSG 2219 @!@!@
+@!@!@STARTMSG 2185:0 @!@!@
+Starting... (2024-01-03 09:10:41)
+@!@!@ENDMSG 2185 @!@!@
+@!@!@STARTMSG 2189:0 @!@!@
+Computing initial states...
+@!@!@ENDMSG 2189 @!@!@
+@!@!@STARTMSG 2190:0 @!@!@
+Finished computing initial states: 1 distinct state generated at 2024-01-03 09:10:42.
+@!@!@ENDMSG 2190 @!@!@
+@!@!@STARTMSG 2266:1 @!@!@
+The second argument of <= should be an integer, but instead it is:
+{10}
+@!@!@ENDMSG 2266 @!@!@
+@!@!@STARTMSG 2121:1 @!@!@
+The behavior up to this point is:
+@!@!@ENDMSG 2121 @!@!@
+@!@!@STARTMSG 2217:4 @!@!@
+1: <Initial predicate>
+/\ sentMsg = {}
+/\ executed = <<{}, {}, {}, {}, {}>>
+/\ crtInst = <<1, 1, 1, 1, 1>>
+/\ clk = <<1, 1, 1, 1, 1>>
+/\ ballots = 1
+/\ cmdLog = <<{}, {}, {}, {}, {}>>
+/\ leaderOfInst = <<{}, {}, {}, {}, {}>>
+/\ committed = ( <<1, 1>> :> {} @@
+  <<1, 2>> :> {} @@
+  <<2, 1>> :> {} @@
+  <<2, 2>> :> {} @@
+  <<3, 1>> :> {} @@
+  <<3, 2>> :> {} @@
+  <<4, 1>> :> {} @@
+  <<4, 2>> :> {} @@
+  <<5, 1>> :> {} @@
+  <<5, 2>> :> {} )
+/\ proposed = {}
+/\ preparing = <<{}, {}, {}, {}, {}>>
+
+@!@!@ENDMSG 2217 @!@!@
+@!@!@STARTMSG 2217:4 @!@!@
+2: <CommandLeaderAction line 1123, col 9 to line 1126, col 72 of module HybridProtocol_TLA>
+/\ sentMsg = { [ type |-> "commit",
+    src |-> 1,
+    dst |-> 2,
+    inst |-> <<1, 1>>,
+    ballot |-> <<0, 1>>,
+    cmd |-> 1,
+    deps |-> {},
+    seq |-> 3,
+    consistency |-> "causal",
+    ctxid |-> 1,
+    clk |-> 2 ],
+  [ type |-> "commit",
+    src |-> 1,
+    dst |-> 4,
+    inst |-> <<1, 1>>,
+    ballot |-> <<0, 1>>,
+    cmd |-> 1,
+    deps |-> {},
+    seq |-> 3,
+    consistency |-> "causal",
+    ctxid |-> 1,
+    clk |-> 2 ] }
+/\ executed = <<{}, {}, {}, {}, {}>>
+/\ crtInst = <<2, 1, 1, 1, 1>>
+/\ clk = <<2, 1, 1, 1, 1>>
+/\ ballots = 1
+/\ cmdLog = << { [ inst |-> <<1, 1>>,
+       ballot |-> <<0, 1>>,
+       cmd |-> 1,
+       deps |-> {},
+       seq |-> 3,
+       consistency |-> "causal",
+       ctxid |-> 1,
+       status |-> "causally-committed",
+       state |-> "done" ] },
+   {},
+   {},
+   {},
+   {} >>
+/\ leaderOfInst = <<{<<1, 1>>}, {}, {}, {}, {}>>
+/\ committed = ( <<1, 1>> :> {} @@
+  <<1, 2>> :> {} @@
+  <<2, 1>> :> {} @@
+  <<2, 2>> :> {} @@
+  <<3, 1>> :> {} @@
+  <<3, 2>> :> {} @@
+  <<4, 1>> :> {} @@
+  <<4, 2>> :> {} @@
+  <<5, 1>> :> {} @@
+  <<5, 2>> :> {} )
+/\ proposed = {1}
+/\ preparing = <<{}, {}, {}, {}, {}>>
+
+@!@!@ENDMSG 2217 @!@!@
+@!@!@STARTMSG 2103:1 @!@!@
+The error occurred when TLC was evaluating the nested
+expressions at the following positions:
+0. Line 1141, column 13 to line 1143, column 73 in HybridProtocol_TLA
+1. Line 1141, column 16 to line 1141, column 35 in HybridProtocol_TLA
+2. Line 1143, column 16 to line 1143, column 73 in HybridProtocol_TLA
+3. Line 1143, column 48 to line 1143, column 73 in HybridProtocol_TLA
+4. Line 814, column 5 to line 829, column 50 in HybridProtocol_TLA
+5. Line 814, column 8 to line 814, column 37 in HybridProtocol_TLA
+6. Line 816, column 8 to line 816, column 27 in HybridProtocol_TLA
+
+
+@!@!@ENDMSG 2103 @!@!@
+@!@!@STARTMSG 2200:0 @!@!@
+Progress(4) at 2024-01-03 09:10:42: 312 states generated (6,464 s/min), 306 distinct states found (6,339 ds/min), 301 states left on queue.
+@!@!@ENDMSG 2200 @!@!@
+@!@!@STARTMSG 2199:0 @!@!@
+312 states generated, 306 distinct states found, 301 states left on queue.
+@!@!@ENDMSG 2199 @!@!@
+@!@!@STARTMSG 2186:0 @!@!@
+Finished in 2927ms at (2024-01-03 09:10:42)
+@!@!@ENDMSG 2186 @!@!@
