@@ -133,7 +133,6 @@ TypeOK ==
                                        seq: Nat,
                                        consistency: Consistency_level \cup {none},
                                        ctxid: Ctx_id \cup {none}
-                         
                                        ]]
     /\ proposed \in SUBSET Commands
     /\ executed \in [Replicas -> SUBSET (Nat \X Commands)]
@@ -812,7 +811,6 @@ Commit(replica, cmsg) ==
 
 SendPrepare(replica, i, Q) ==
     /\ i \notin leaderOfInst[replica]
-    \*/\ i \notin preparing[replica]
     /\ ballots <= MaxBallot
     /\ ~(\E rec \in cmdLog[replica] :
                         /\ rec.inst = i
@@ -1104,7 +1102,7 @@ FinalizeTryPreAccept(cleader, i, Q) ==
                               ctxid |-> rec.ctxid]}]
                   /\ UNCHANGED << proposed, executed, committed, crtInst, ballots,
                                   leaderOfInst, preparing >>
-               \/ /\ \E tpr \in tprs: tpr.status \in {"accepted", "committed", "executed"}
+               \/ /\ \E tpr \in tprs: tpr.status \in {"accepted", "causally-committed", "strongly-committed", "executed"}
                   /\ StartPhase1(rec.cmd, cleader, Q, i, rec.ballot, tprs, newClk[cleader], rec.consistency, rec.ctxid)
                   /\ UNCHANGED << proposed, executed, committed, crtInst, ballots,
                                   leaderOfInst, preparing >>
@@ -1114,6 +1112,19 @@ FinalizeTryPreAccept(cleader, i, Q) ==
                   /\ leaderOfInst' = [leaderOfInst EXCEPT ![cleader] = @ \ {i}]
                   /\ UNCHANGED << cmdLog, proposed, executed, committed, crtInst,
                                   ballots, preparing >> 
+                                  
+(***************************************************************************)
+(* Command Execution Actions                                               *)
+(***************************************************************************)
+
+ExecuteCommand(replica, i) == 
+     \E rec \in cmdLog[replica]:
+        /\ rec.inst = i
+    
+
+    
+
+
 
 (***************************************************************************)
 (* Action groups                                                           *)
@@ -1128,8 +1139,13 @@ CommandLeaderAction ==
             \/ (\E Q \in FastQuorums(cleader) : Phase1Fast(cleader, inst, Q))
             \/ (\E Q \in SlowQuorums(cleader) : Phase1Slow(cleader, inst, Q))
             \/ (\E Q \in SlowQuorums(cleader) : Phase2Finalize(cleader, inst, Q))
-            \/ (\E Q \in SlowQuorums(cleader) : FinalizeTryPreAccept(cleader, inst, Q))
-            )
+            \/ (\E Q \in SlowQuorums(cleader) : FinalizeTryPreAccept(cleader, inst, Q)))
+    \/ \E replica \in Replicas: 
+            \E inst \in cmdLog[replica]: ExecuteCommand(replica, inst)
+    
+    
+  
+            
    
             
 ReplicaAction ==
@@ -1145,7 +1161,8 @@ ReplicaAction ==
          \/ \E i \in preparing[replica] :
             \E Q \in SlowQuorums(replica) : PrepareFinalize(replica, i, Q)
          \/ ReplyTryPreaccept(replica)
-        )
+         \/ \E inst \in cmdLog[replica]: ExecuteCommand(replica, inst)
+         )
 
 
 (***************************************************************************)
@@ -1165,6 +1182,16 @@ Next ==
 (***************************************************************************)
 
 Spec == Init /\ [][Next]_vars
+
+(***************************************************************************)
+(* Safety Property                                                         *)
+(***************************************************************************)
+
+
+
+(***************************************************************************)
+(* Liveness Property                                                       *)
+(***************************************************************************)
 
 (***************************************************************************)
 (* Termination Property                                                    *)
@@ -1205,5 +1232,5 @@ THEOREM Spec => ([]TypeOK) /\ Nontriviality /\ Stability /\ Consistency*)
 
 =============================================================================
 \* Modification History
-\* Last modified Wed Jan 03 06:51:18 EST 2024 by santamariashithil
+\* Last modified Tue Jan 09 15:30:50 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil
