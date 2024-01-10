@@ -121,7 +121,7 @@ Message ==
 
  
 VARIABLES cmdLog, proposed, executed, sentMsg, crtInst, leaderOfInst,
-          committed, ballots, preparing, clk
+          committed, ballots, preparing, clk (*scc*)
 
 TypeOK ==
     /\ cmdLog \in [Replicas -> SUBSET [inst: Instances, 
@@ -132,7 +132,9 @@ TypeOK ==
                                        deps: SUBSET Instances,
                                        seq: Nat,
                                        consistency: Consistency_level \cup {none},
-                                       ctxid: Ctx_id \cup {none}
+                                       ctxid: Ctx_id \cup {none},
+                                       scc_set: [Commands -> SUBSET Instances]  (* cmdLog[r].scc_set[c]
+                                       *)
                                        ]]
     /\ proposed \in SUBSET Commands
     /\ executed \in [Replicas -> SUBSET (Nat \X Commands)]
@@ -145,6 +147,8 @@ TypeOK ==
     /\ ballots \in Nat
     /\ preparing \in [Replicas -> SUBSET Instances]
     /\ clk \in [Replicas -> Nat]
+    (*/\ scc \in [Commands -> SUBSET Instances]*)
+   
     
 vars == << cmdLog, proposed, executed, sentMsg, crtInst, leaderOfInst, 
            committed, ballots, preparing, clk >>
@@ -164,6 +168,7 @@ Init ==
   /\ ballots = 1
   /\ preparing = [r \in Replicas |-> {}]
   /\ clk = [r \in Replicas |-> 1]
+  (*/\ scc = [c \in Commands |-> {}]*)
 
 
 (***************************************************************************)
@@ -1117,9 +1122,62 @@ FinalizeTryPreAccept(cleader, i, Q) ==
 (* Command Execution Actions                                               *)
 (***************************************************************************)
 
+BoundedSeq(S, n) == UNION {[1..i -> S] : i \in 0..n}  (* this is generating all possible paths among 
+all the instances of the system*)
+BSeq(S) == BoundedSeq(S, Cardinality(S)+1)
+
+(*
+{ << >>,
+     <<1>>,
+     <<2>>,
+     <<3>>,
+     <<1, 1>>,
+     <<1, 2>>,
+     <<1, 3>>,
+     <<2, 1>>,
+     <<2, 2>>,
+     <<2, 3>>,
+     <<3, 1>>,
+     <<3, 2>>,
+     <<3, 3>>
+     .
+     .
+}
+*)
+
+NewDepPathSet(replica, deps) ==
+    {p \in BSeq(Instances) : /\ p /= <<>>
+                          /\ \forall i \in 1 .. (Len(p)-1) : (*this is checking wehther each pair of vertex (of an edge)
+                          in the path is also a part of the dependency graph.  Checking this by finsing whether the 
+                          first vertex of the edge is the instance itself and the second vertex of the edge is in the dependency
+                          graph of the instance*)
+                            \E rec \in cmdLog[replica]: 
+                                /\ rec.inst = p[i]
+                                /\ p[i+1] \in rec.deps
+                             
+                             }
+
+AreconnectedIn(replica, m,n,deps) == 
+    \exists p \in NewDepPathSet(replica, deps) : (p[1] = m) /\ (p[Len(p)] = n)
+
+
+IsStronglyConnectedSCC(replica, deps,scc) == 
+    \forall m,n \in scc: m/=n => AreConnectedIn(replica, m,n,deps)
+
+
+FindSCC(replica, i, deps) ==
+    scc \in SUBSET deps:
+        /\ IsStronglyConnectedSCC(replica, deps,scc)
+        
+
+   
+
 ExecuteCommand(replica, i) == 
      \E rec \in cmdLog[replica]:
         /\ rec.inst = i
+        /\ rec.status = "causally-committed" \/ rec.status = "strongly-committed"
+        /\ LET scc_set = FindSCC(replica,i,rec.deps)
+        
     
 
     
@@ -1232,5 +1290,5 @@ THEOREM Spec => ([]TypeOK) /\ Nontriviality /\ Stability /\ Consistency*)
 
 =============================================================================
 \* Modification History
-\* Last modified Tue Jan 09 15:30:50 EST 2024 by santamariashithil
+\* Last modified Wed Jan 10 17:52:11 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil

@@ -1120,10 +1120,11 @@ FinalizeTryPreAccept(cleader, i, Q) ==
 (* Command Execution Actions                                               *)
 (***************************************************************************)
 
-
-(*FindSCC(replica, i, deps) ==*)
+(*
+FindSCC(replica, i, deps) == 
     
     
+*)
 
 
 ExecuteCommand(replica, i) == 
@@ -1244,5 +1245,5 @@ THEOREM Spec => ([]TypeOK) /\ Nontriviality /\ Stability /\ Consistency*)
 
 =============================================================================
 \* Modification History
-\* Last modified Tue Jan 09 16:52:54 EST 2024 by santamariashithil
+\* Last modified Tue Jan 09 16:32:14 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil
