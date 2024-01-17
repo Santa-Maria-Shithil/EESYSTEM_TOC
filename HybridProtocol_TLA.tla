@@ -1148,9 +1148,9 @@ BSeq(S) == BoundedSeq(S, Cardinality(S)+1)
 }
 *)
 
-NewDepPathSet(replica) ==
+NewDepPathSet(replica,G) ==
     {
-    p \in BSeq(Instances) : /\ p /= <<>>
+    p \in BSeq(G) : /\ p /= <<>>
                           /\ \forall i \in 1 .. (Len(p)-1) : (*this is checking wehther each pair of vertex (of an edge)
                           in the path is also a part of the dependency graph.  Checking this by finding whether the 
                           first vertex of the edge is the instance itself and the second vertex of the edge is in the dependency
@@ -1161,13 +1161,13 @@ NewDepPathSet(replica) ==
                              
                              }
 
-AreConnectedIn(replica, m,n) == 
-    \E p \in NewDepPathSet(replica) : (p[1]=m) /\ (p[Len(p)] = n)
+AreConnectedIn(replica, m,n,G) == 
+    \E p \in NewDepPathSet(replica,G) : (p[1]=m) /\ (p[Len(p)] = n)
 
 
 
-IsStronglyConnectedSCC(replica,i,scc) == 
-    \A m,n \in scc: m#n => AreConnectedIn(replica,m,n)
+IsStronglyConnectedSCC(replica,i,scc,G) == 
+    \A m,n \in scc: m#n => AreConnectedIn(replica,m,n,G)
         
 
 
@@ -1175,16 +1175,38 @@ IsStronglyConnectedSCC(replica,i,scc) ==
 FindAllInstances(replica, i) ==   (* finding all the instances of the command log *)
     {rec.inst: rec \in cmdLog[replica] 
         }
+        
+        
+SccTidSet(replica, i, dep, tid) == 
+{
+    tid_set \in SUBSET UNION {dep,{<<replica,i>>}}:
+    /\ tid \in tid_set
+    /\ IsStronglyConnectedSCC(replica, i , tid_set, UNION {dep,{<<replica,i>>}})
+    (*/\ \forall m \in DOMAIN dep:
+         AreStronglyConnectedIn(m, tid, dep) => m \in tid_set*)
+         }
+         
+FindSpecificInstance(replica,i) == (*find a specific instance*)
+    {rec \in cmdLog[replica] : rec.inst = <<replica, i>> }
+         
+FindDeps(replica, i) == (*find the dependency of a specific instance*)
+    { rec.deps: rec \in FindSpecificInstance(replica,i)}
+    
+    
+
 
    
-FindSCC(replica, i) ==
+FindSCC(replica, i) == 
 {
    scc \in SUBSET FindAllInstances(replica, i): 
-    /\ IsStronglyConnectedSCC(replica, i, scc)
+    /\ IsStronglyConnectedSCC(replica, i, scc, Instances)
+    /\ LET dep == FindDeps(replica, i) 
+        dep2 == CHOOSE s \in dep  : TRUE IN
+        /\ \E tid \in scc: scc \in SccTidSet(replica, i, dep2, tid)
 }
 
 
-        
+
 
    
 
@@ -1307,5 +1329,5 @@ THEOREM Spec => ([]TypeOK) /\ Nontriviality /\ Stability /\ Consistency*)
 
 =============================================================================
 \* Modification History
-\* Last modified Wed Jan 17 03:45:33 EST 2024 by santamariashithil
+\* Last modified Wed Jan 17 08:21:06 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil
