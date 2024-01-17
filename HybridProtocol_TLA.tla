@@ -1126,6 +1126,9 @@ BoundedSeq(S, n) == UNION {[1..i -> S] : i \in 0..n}  (* this is generating all 
 all the instances of the system*)
 BSeq(S) == BoundedSeq(S, Cardinality(S)+1)
 
+
+
+
 (*
 { << >>,
      <<1>>,
@@ -1145,10 +1148,11 @@ BSeq(S) == BoundedSeq(S, Cardinality(S)+1)
 }
 *)
 
-NewDepPathSet(replica, deps) ==
-    {p \in BSeq(Instances) : /\ p /= <<>>
+NewDepPathSet(replica) ==
+    {
+    p \in BSeq(Instances) : /\ p /= <<>>
                           /\ \forall i \in 1 .. (Len(p)-1) : (*this is checking wehther each pair of vertex (of an edge)
-                          in the path is also a part of the dependency graph.  Checking this by finsing whether the 
+                          in the path is also a part of the dependency graph.  Checking this by finding whether the 
                           first vertex of the edge is the instance itself and the second vertex of the edge is in the dependency
                           graph of the instance*)
                             \E rec \in cmdLog[replica]: 
@@ -1157,17 +1161,29 @@ NewDepPathSet(replica, deps) ==
                              
                              }
 
-AreconnectedIn(replica, m,n,deps) == 
-    \exists p \in NewDepPathSet(replica, deps) : (p[1] = m) /\ (p[Len(p)] = n)
+AreConnectedIn(replica, m,n) == 
+    \E p \in NewDepPathSet(replica) : (p[1]=m) /\ (p[Len(p)] = n)
 
 
-IsStronglyConnectedSCC(replica, deps,scc) == 
-    \forall m,n \in scc: m/=n => AreConnectedIn(replica, m,n,deps)
+
+IsStronglyConnectedSCC(replica,i,scc) == 
+    \A m,n \in scc: m#n => AreConnectedIn(replica,m,n)
+        
 
 
-FindSCC(replica, i, deps) ==
-    scc \in SUBSET deps:
-        /\ IsStronglyConnectedSCC(replica, deps,scc)
+
+FindAllInstances(replica, i) ==   (* finding all the instances of the command log *)
+    {rec.inst: rec \in cmdLog[replica] 
+        }
+
+   
+FindSCC(replica, i) ==
+{
+   scc \in SUBSET FindAllInstances(replica, i): 
+    /\ IsStronglyConnectedSCC(replica, i, scc)
+}
+
+
         
 
    
@@ -1176,7 +1192,8 @@ ExecuteCommand(replica, i) ==
      \E rec \in cmdLog[replica]:
         /\ rec.inst = i
         /\ rec.status = "causally-committed" \/ rec.status = "strongly-committed"
-        /\ LET scc_set = FindSCC(replica,i,rec.deps)
+        /\ LET scc_set = FindSCC(replica,i,rec.deps) IN
+                
         
     
 
@@ -1290,5 +1307,5 @@ THEOREM Spec => ([]TypeOK) /\ Nontriviality /\ Stability /\ Consistency*)
 
 =============================================================================
 \* Modification History
-\* Last modified Wed Jan 10 17:52:11 EST 2024 by santamariashithil
+\* Last modified Wed Jan 17 03:45:33 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil
