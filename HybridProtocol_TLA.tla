@@ -1122,6 +1122,8 @@ FinalizeTryPreAccept(cleader, i, Q) ==
 (* Command Execution Actions                                               *)
 (***************************************************************************)
 
+
+
 BoundedSeq(S, n) == UNION {[1..i -> S] : i \in 0..n}  (* this is generating all possible paths among 
 all the instances of the system*)
 BSeq(S) == BoundedSeq(S, Cardinality(S)+1)
@@ -1176,14 +1178,18 @@ FindAllInstances(replica, i) ==   (* finding all the instances of the command lo
     {rec.inst: rec \in cmdLog[replica] 
         }
         
+AreStronglyConnectedIn(replica, m, n, G) ==
+    /\ AreConnectedIn(replica, m, n, G)
+    /\ AreConnectedIn(replica, n, m, G)
+        
         
 SccTidSet(replica, i, dep, tid) == 
 {
     tid_set \in SUBSET UNION {dep,{<<replica,i>>}}:
     /\ tid \in tid_set
     /\ IsStronglyConnectedSCC(replica, i , tid_set, UNION {dep,{<<replica,i>>}})
-    (*/\ \forall m \in DOMAIN dep:
-         AreStronglyConnectedIn(m, tid, dep) => m \in tid_set*)
+    /\ \forall m \in dep:
+         AreStronglyConnectedIn(replica, m, tid, dep) => m \in tid_set
          }
          
 FindSpecificInstance(replica,i) == (*find a specific instance*)
@@ -1192,7 +1198,23 @@ FindSpecificInstance(replica,i) == (*find a specific instance*)
 FindDeps(replica, i) == (*find the dependency of a specific instance*)
     { rec.deps: rec \in FindSpecificInstance(replica,i)}
     
-    
+MaxSequence(allSequences) == 
+    CHOOSE seq \in allSequences : \A otherSeq \in allSequences : Cardinality(seq) >= Cardinality(otherSeq)
+
+MinSetCover(allSequences) == 
+    LET
+        RECURSIVE minCover(_, _)
+        minCover(SeqSet, Cover) ==
+            IF SeqSet = {}
+            THEN Cover
+            ELSE
+                LET seq == MaxSequence(SeqSet) IN
+                    IF (\E inst \in Cover: \E i \in inst : i \in seq) /\ (Cover # {}) THEN
+                        minCover(SeqSet \ {seq}, Cover)
+                    ELSE
+                        minCover(SeqSet \ {seq}, Cover \cup {seq})
+    IN
+        minCover(allSequences, {})
 
 
    
@@ -1205,6 +1227,10 @@ FindSCC(replica, i) ==
         /\ \E tid \in scc: scc \in SccTidSet(replica, i, dep2, tid)
 }
 
+FinalSCC(replica,i) ==
+{
+    MinSetCover(FindSCC(replica, i))
+}
 
 
 
@@ -1329,5 +1355,5 @@ THEOREM Spec => ([]TypeOK) /\ Nontriviality /\ Stability /\ Consistency*)
 
 =============================================================================
 \* Modification History
-\* Last modified Wed Jan 17 08:21:06 EST 2024 by santamariashithil
+\* Last modified Sun Jan 21 22:03:04 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil
