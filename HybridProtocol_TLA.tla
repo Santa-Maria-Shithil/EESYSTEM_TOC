@@ -1122,8 +1122,6 @@ FinalizeTryPreAccept(cleader, i, Q) ==
 (* Command Execution Actions                                               *)
 (***************************************************************************)
 
-
-
 BoundedSeq(S, n) == UNION {[1..i -> S] : i \in 0..n}  (* this is generating all possible paths among 
 all the instances of the system*)
 BSeq(S) == BoundedSeq(S, Cardinality(S)+1)
@@ -1192,11 +1190,11 @@ SccTidSet(replica, i, dep, tid) ==
          AreStronglyConnectedIn(replica, m, tid, dep) => m \in tid_set
          }
          
-FindSpecificInstance(replica,i) == (*find a specific instance*)
-    {rec \in cmdLog[replica] : rec.inst = <<replica, i>> }
+FindSpecificInstance(replica, inst) == (*find a specific instance*)
+    {rec \in cmdLog[replica] : rec.inst = inst} 
          
 FindDeps(replica, i) == (*find the dependency of a specific instance*)
-    { rec.deps: rec \in FindSpecificInstance(replica,i)}
+    { rec.deps: rec \in FindSpecificInstance("a",<<replica,i>>)}   (*--replace replica value--*)
     
 MaxSequence(allSequences) == 
     CHOOSE seq \in allSequences : \A otherSeq \in allSequences : Cardinality(seq) >= Cardinality(otherSeq)
@@ -1228,19 +1226,65 @@ FindSCC(replica, i) ==
 }
 
 FinalSCC(replica,i) ==
-{
     MinSetCover(FindSCC(replica, i))
-}
 
 
 
-   
+(*************Ordering Instances in SCC**************)
+
+FindSeq(replica, inst) == (*find the sequence number of a specific instance*)
+    {rec.seq: rec \in FindSpecificInstance(replica,inst)}
+    
+ChoosingSetElement(replica,i) == 
+    CHOOSE inst \in FindSeq(replica,i): TRUE
+
+MinSeq(allInstances) ==
+    CHOOSE inst \in allInstances : \A otherInst \in allInstances : 
+        ChoosingSetElement("a", <<inst[1],inst[2]>>) <= ChoosingSetElement("a",<<otherInst[1],otherInst[2]>>)(*--replace replica value--*)
+
+OrderingInstancesFirstLevel(scc) ==  (*ordering based on sequence number (ascending)*)
+     LET
+        RECURSIVE minCover(_, _)
+        minCover(SeqSet, Cover) ==
+            IF SeqSet = {}
+            THEN Cover
+            ELSE
+                LET seq == MinSeq(SeqSet) IN
+                        minCover(SeqSet \ {seq}, Append(Cover,seq))
+     IN
+       minCover(scc, <<>>)
+    
+
+OrderingInstancesSecondLevel(scc) ==  (*ordering the instances among themeselves from the same replica according to the instance number (ascending)*) 
+    LET
+        orderedSccNodes == OrderingInstancesFirstLevel(scc)
+        RECURSIVE secondLevelOrdering(_,_)
+        secondLevelOrdering(sccSet, index) == 
+            IF index = Len(orderedSccNodes)
+            THEN sccSet
+            ELSE 
+                LET 
+                    itemToSwap == sccSet[index] IN
+                    (*IF itemToSwap[1] = item[i][1] /\ itemToSwap[2] >= item[i][2] 
+                    THEN sccSet[index] == item[i]
+                        sccSet[i] == itemToSwap
+                    ELSE
+                        sccSet[index] == sccSet[index]
+                        sccSet[i] == sccSet[i]*)
+                    sccSet[i] == itemToSwap : i \in index..Len(sccSet)
+                    
+                                  
+    IN
+        secondLevelOrdering(orderedSccNodes,1)
+                        
+
 
 ExecuteCommand(replica, i) == 
      \E rec \in cmdLog[replica]:
         /\ rec.inst = i
         /\ rec.status = "causally-committed" \/ rec.status = "strongly-committed"
-        /\ LET scc_set = FindSCC(replica,i,rec.deps) IN
+        /\ LET scc_set == FinalSCC(replica,i) IN 
+        
                 
         
     
@@ -1355,5 +1399,5 @@ THEOREM Spec => ([]TypeOK) /\ Nontriviality /\ Stability /\ Consistency*)
 
 =============================================================================
 \* Modification History
-\* Last modified Sun Jan 21 22:03:04 EST 2024 by santamariashithil
+\* Last modified Wed Jan 24 03:04:58 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil
