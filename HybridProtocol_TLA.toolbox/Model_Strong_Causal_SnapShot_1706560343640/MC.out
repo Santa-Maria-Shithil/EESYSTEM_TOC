@@ -2,7 +2,7 @@
 TLC2 Version 2.16 of 31 December 2020 (rev: cdddf55)
 @!@!@ENDMSG 2262 @!@!@
 @!@!@STARTMSG 2187:0 @!@!@
-Running breadth-first search Model-Checking with fp 67 and seed 8227937329692548043 with 4 workers on 8 cores with 1214MB heap and 2730MB offheap memory [pid: 18159] (Mac OS X 10.16 x86_64, AdoptOpenJDK 14.0.1 x86_64, OffHeapDiskFPSet, DiskStateQueue).
+Running breadth-first search Model-Checking with fp 81 and seed 8336155747100951003 with 4 workers on 8 cores with 1214MB heap and 2730MB offheap memory [pid: 4347] (Mac OS X 10.16 x86_64, AdoptOpenJDK 14.0.1 x86_64, OffHeapDiskFPSet, DiskStateQueue).
 @!@!@ENDMSG 2187 @!@!@
 @!@!@STARTMSG 2220:0 @!@!@
 Starting SANY...
@@ -23,15 +23,14 @@ Semantic processing of module MC
 SANY finished.
 @!@!@ENDMSG 2219 @!@!@
 @!@!@STARTMSG 2185:0 @!@!@
-Starting... (2024-01-09 16:54:16)
+Starting... (2024-01-29 15:31:30)
 @!@!@ENDMSG 2185 @!@!@
-@!@!@STARTMSG 2105:1 @!@!@
-Evaluating assumption line 35, col 8 to line 35, col 66 of module MC failed.
-@!@!@STARTMSG 2280:0 @!@!@
-In evaluation, the identifier cmdLog is either undefined or not an operator.
-line 31, col 1 to line 31, col 6 of module MC
-@!@!@ENDMSG 2280 @!@!@
-@!@!@ENDMSG 2105 @!@!@
-@!@!@STARTMSG 2186:0 @!@!@
-Finished in 2198ms at (2024-01-09 16:54:17)
-@!@!@ENDMSG 2186 @!@!@
+@!@!@STARTMSG 2189:0 @!@!@
+Computing initial states...
+@!@!@ENDMSG 2189 @!@!@
+@!@!@STARTMSG 2190:0 @!@!@
+Finished computing initial states: 1 distinct state generated at 2024-01-29 15:31:31.
+@!@!@ENDMSG 2190 @!@!@
+@!@!@STARTMSG 2200:0 @!@!@
+Progress(5) at 2024-01-29 15:31:34: 38,527 states generated (38,527 s/min), 27,319 distinct states found (27,319 ds/min), 26,877 states left on queue.
+@!@!@ENDMSG 2200 @!@!@

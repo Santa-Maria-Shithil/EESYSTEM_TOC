@@ -60,7 +60,7 @@ Instances == Replicas \X (1..Cardinality(Commands))
 (* The possible status of a command in the log of a replica.               *)
 (***************************************************************************)
 
-Status == {"not-seen", "pre-accepted", "accepted", "causally-committed", "strongly-comitted"}
+Status == {"not-seen", "pre-accepted", "accepted", "causally-committed", "strongly-comitted", "executed" , "discarded"}
 State == {"ready", "waiting", "done"}
 
 
@@ -109,13 +109,13 @@ Message ==
 (*                    leader                                                   *)
 (*          leaderOfInst = the set of instances each replica has               *)
 (*                         started but not yet finalized                       *)
-(*          committed = maps commands to set of commit attributs               *)
+(*          committed = maps commands to set of commit attributes               *)
 (*                      tuples                                                 *)
 (*          ballots = largest ballot number used by any                        *)
 (*                    replica                                                  *)
 (*          preparing = set of instances that each replica is                  *)
 (*                      currently preparing (i.e. recovering)                  *) 
-(*                                                                             *)
+(*          clk = clock values for each of the replica                         *)
 (*                                                                             *)
 (*******************************************************************************)
 
@@ -189,6 +189,9 @@ FindingWaitingInst(finalDeps) ==
     IN
         allWaitingInst
 
+IsAllCommitted == \A replica \in Replicas :
+                           LET recs ==  {rec.inst: rec \in cmdLog[replica]} IN
+                                /\ \A rec \in recs: rec.status = "causally-committed" \/ rec.status = "strongly-committed" \/ rec.status = "executed" \/ rec.status = "discarded"
 
 (***************************************************************************)
 (* Actions                                                                 *)
@@ -224,6 +227,7 @@ StartPhase1Causal(C, cleader, Q, inst, ballot, oldMsg, oldClk,cl,ctx) ==
                                           consistency : {cl},
                                           ctxid : {ctx},
                                           clk : {oldClk}]
+
            ELSE
                  /\ cmdLog' = [cmdLog EXCEPT ![cleader] = (@ \ oldRecs) \cup 
                                         {[inst   |-> inst,
@@ -1261,16 +1265,58 @@ ExecuteCommand(replica, i) ==
      \E rec \in cmdLog[replica]:
         /\ rec.inst = i
         /\ rec.status = "causally-committed" \/ rec.status = "strongly-committed"
-        (*/\ LET scc_set == OrderingInstancesFirstLevel(FinalSCC(replica,i)) IN *)
-            
-        
+        /\ LET scc_set == FinalSCC(replica,i) IN (*finding all scc *)
+            /\ \A scc \in scc_set: 
+                \A instant \in OrderingInstancesFirstLevel(scc): (*ordering each scc *)
+                    \E rec2 \in cmdLog[instant[1]]:
+                        /\rec2.inst=instant[2]
+                        /\ IF rec2.cmd.op.type = "r" THEN  (*checking whether the operation is read or write*)
+                            /\cmdLog' = [cmdLog EXCEPT ![instant[1]] = (@ \ instant[2]) \cup
+                                            {[inst   |-> rec2.inst,
+                                              status |-> "executed",
+                                              state  |-> rec2.state,
+                                              ballot |-> rec2.ballot,
+                                              cmd    |-> rec2.cmd,
+                                              deps   |-> rec2.deps,
+                                              seq    |-> rec2.seq,
+                                              consistency |-> rec2.consistency,
+                                              ctxid |-> rec2.ctxid ]}]
+                            /\UNCHANGED <<proposed, executed, sentMsg, crtInst, leaderOfInst,
+                                    committed, ballots, preparing, clk>>
+                           
+                           ELSE 
+                            LET 
+                                recs == {rec3 \in cmdLog[replica]: rec3.state = "executed" /\ rec3.cmd.op.key = rec2.cmd.op.key} (* finding the instant that has the same key as the instant that we are going to execute *)
+                                seq == {rec4.seq: rec4 \in recs} (* finding the seq number of the last write *) IN
+                                    IF rec2.seq > seq THEN
+                                        /\cmdLog' = [cmdLog EXCEPT ![instant[1]] = (@ \ instant[2]) \cup
+                                            {[inst   |-> rec2.inst,
+                                              status |-> "executed", (* latest write win *)
+                                              state  |-> rec2.state,
+                                              ballot |-> rec2.ballot,
+                                              cmd    |-> rec2.cmd,
+                                              deps   |-> rec2.deps,
+                                              seq    |-> rec2.seq,
+                                              consistency |-> rec2.consistency,
+                                              ctxid |-> rec2.ctxid ]}]
+                                       /\UNCHANGED <<proposed, executed, sentMsg, crtInst, leaderOfInst,
+                                         committed, ballots, preparing, clk>>
+                                    ELSE
+                                        /\cmdLog' = [cmdLog EXCEPT ![instant[1]] = (@ \ instant[2]) \cup
+                                            {[inst   |-> rec2.inst,
+                                              status |-> "discarded",
+                                              state  |-> rec2.state,
+                                              ballot |-> rec2.ballot,
+                                              cmd    |-> rec2.cmd,
+                                              deps   |-> rec2.deps,
+                                              seq    |-> rec2.seq,
+                                              consistency |-> rec2.consistency,
+                                              ctxid |-> rec2.ctxid ]}]
+                                       /\UNCHANGED <<proposed, executed, sentMsg, crtInst, leaderOfInst,
+                                         committed, ballots, preparing, clk>>
+
+(*<<<<"a", 0>>, <<"b", 0>>, <<"c", 0>>, <<"a", 1>>>>*) 
                 
-        
-    
-
-    
-
-
 
 (***************************************************************************)
 (* Action groups                                                           *)
@@ -1286,8 +1332,8 @@ CommandLeaderAction ==
             \/ (\E Q \in SlowQuorums(cleader) : Phase1Slow(cleader, inst, Q))
             \/ (\E Q \in SlowQuorums(cleader) : Phase2Finalize(cleader, inst, Q))
             \/ (\E Q \in SlowQuorums(cleader) : FinalizeTryPreAccept(cleader, inst, Q)))
-    (*\/ \E replica \in Replicas: 
-            \E inst \in cmdLog[replica]: ExecuteCommand(replica, inst)*)
+    \/ \E replica \in Replicas: 
+            \E inst \in cmdLog[replica]: ExecuteCommand(replica, inst)
     
     
   
@@ -1307,7 +1353,7 @@ ReplicaAction ==
          \/ \E i \in preparing[replica] :
             \E Q \in SlowQuorums(replica) : PrepareFinalize(replica, i, Q)
          \/ ReplyTryPreaccept(replica)
-         (*\/ \E inst \in cmdLog[replica]: ExecuteCommand(replica, inst)*)
+         \/ \E inst \in cmdLog[replica]: ExecuteCommand(replica, inst)
          )
 
 
@@ -1319,8 +1365,10 @@ Next ==
     \/ CommandLeaderAction
     \/ ReplicaAction
     \/ (* Disjunct to prevent deadlock on termination *)
+      (*((\A r \in Replicas:
+            \A inst \in cmdLog[r]: inst.status = "causally-committed" \/ inst.status = "strongly-committed") /\ UNCHANGED vars)*)
       ((\A r \in Replicas:
-            \A inst \in cmdLog[r]: inst.status = "causally-committed" \/ inst.status = "strongly-committed") /\ UNCHANGED vars)
+            \A inst \in cmdLog[r]: inst.status = "executed" \/ inst.status = "discarded") /\ UNCHANGED vars)
 
 
 (***************************************************************************)
@@ -1332,8 +1380,30 @@ Spec == Init /\ [][Next]_vars
 (***************************************************************************)
 (* Safety Property                                                         *)
 (***************************************************************************)
+Nontriviality ==  (* Checking whether any command committed by any replica has been proposed by a client. *)
+    \A i \in Instances :
+        (\A C \in committed[i] : C[1] \in proposed \/ C[1] = none)
+        
+Stability == (* For any replica, the set of committed commands at any time is a subset of the committed commands at any later time. *)
+    \A replica \in Replicas :
+        \A i \in Instances :
+            \A C \in Commands :
+                ((\E rec1 \in cmdLog[replica] :
+                    /\ rec1.inst = i
+                    /\ rec1.cmd = C
+                    /\ rec1.status \in {"causally-committed", "strongly-committed", "executed", "discarded"}) =>
+                    (\E rec2 \in cmdLog[replica] :
+                        /\ rec2.inst = i
+                        /\ rec2.cmd = C
+                        /\ rec2.status \in {"causally-committed", "strongly-committed", "executed", "discarded"}))
 
 
+(*Consistency == (* Two replicas can never have different commands committed for the same instance. *)
+    \A i \in Instances :
+        [](Cardinality(committed[i]) <= 1)*)
+        
+(*IsAllInstancesCommittedSame == LET pc == IsAllCommitted IN (* checking whether all instances across all the replicas committed the same commands *)
+                                pc = TRUE => IsSameCommitted (* here we have to check whether all instances have the same command *) *)
 
 (***************************************************************************)
 (* Liveness Property                                                       *)
@@ -1343,40 +1413,14 @@ Spec == Init /\ [][Next]_vars
 (* Termination Property                                                    *)
 (***************************************************************************)
 
+(*Termination == <>((\A r \in Replicas:
+            \A inst \in cmdLog[r]: inst.status = "causally-committed" \/ inst.status = "strongly-committed"))*)
 Termination == <>((\A r \in Replicas:
-            \A inst \in cmdLog[r]: inst.status = "causally-committed" \/ inst.status = "strongly-committed"))
-
-
-(***************************************************************************)
-(* Theorems                                                                *)
-(***************************************************************************)
-
-(*Nontriviality ==
-    \A i \in Instances :
-        [](\A C \in committed[i] : C \in proposed \/ C = none)
-
-Stability ==
-    \A replica \in Replicas :
-        \A i \in Instances :
-            \A C \in Commands :
-                []((\E rec1 \in cmdLog[replica] :
-                    /\ rec1.inst = i
-                    /\ rec1.cmd = C
-                    /\ rec1.status \in {"committed", "executed"}) =>
-                    [](\E rec2 \in cmdLog[replica] :
-                        /\ rec2.inst = i
-                        /\ rec2.cmd = C
-                        /\ rec2.status \in {"committed", "executed"}))
-
-Consistency ==
-    \A i \in Instances :
-        [](Cardinality(committed[i]) <= 1)
-
-THEOREM Spec => ([]TypeOK) /\ Nontriviality /\ Stability /\ Consistency*)
-                                                  
+            \A inst \in cmdLog[r]: inst.status = "executed" \/ inst.status = "discarded"))
+                                       
     
 
 =============================================================================
 \* Modification History
-\* Last modified Sun Jan 28 21:02:11 EST 2024 by santamariashithil
+\* Last modified Mon Jan 29 15:31:20 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil

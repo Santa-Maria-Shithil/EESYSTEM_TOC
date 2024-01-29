@@ -1286,7 +1286,7 @@ ExecuteCommand(replica, i) ==
                            
                            ELSE 
                             LET 
-                                recs == {rec3 \in cmdLog[replica]: rec3.state = "executed" /\ rec3.cmd.op.key = rec2.cmd.op.key} (* finding the instant that has the same key as the instant that we are going to execute *)
+                                recs == {rec3 \in cmdLog[replica]: rec3.state = "executed" /\ rec3.cmd.op.key = rec2.cmd.op.key} (* finding the instance that has the same key as the instance that we are going to execute *)
                                 seq == {rec4.seq: rec4 \in recs} (* finding the seq number of the last write *) IN
                                     IF rec2.seq > seq THEN
                                         /\cmdLog' = [cmdLog EXCEPT ![instant[1]] = (@ \ instant[2]) \cup
@@ -1384,23 +1384,36 @@ Nontriviality ==  (* Checking whether any command committed by any replica has b
     \A i \in Instances :
         (\A C \in committed[i] : C[1] \in proposed \/ C[1] = none)
         
+        
+Consistency == (* Two replicas can never have different commands committed for the same instance. *)
+    \A i \in Instances :
+        (Cardinality(committed[i]) <= 1)
+        
+        
 Stability == (* For any replica, the set of committed commands at any time is a subset of the committed commands at any later time. *)
     \A replica \in Replicas :
         \A i \in Instances :
             \A C \in Commands :
-                []((\E rec1 \in cmdLog[replica] :
+                ((\E rec1 \in cmdLog[replica] :
                     /\ rec1.inst = i
                     /\ rec1.cmd = C
                     /\ rec1.status \in {"causally-committed", "strongly-committed", "executed", "discarded"}) =>
-                    [](\E rec2 \in cmdLog[replica] :
+                    (\E rec2 \in cmdLog[replica] :
                         /\ rec2.inst = i
                         /\ rec2.cmd = C
                         /\ rec2.status \in {"causally-committed", "strongly-committed", "executed", "discarded"}))
 
 
-(*Consistency == (* Two replicas can never have different commands committed for the same instance. *)
-    \A i \in Instances :
-        [](Cardinality(committed[i]) <= 1)*)
+ExecutionConsistency ==  \A replica1 \in Replicas:(* All the operations should be executed in the same order in all the replicas *)
+                            \A rec1 \in cmdLog[replica1]:
+                                /\ rec1.status \in {"causally-committed", "strongly-committed", "executed", "discarded"}
+                                /\ LET scc_set1 == FinalSCC(replica1,rec1.inst) IN 
+                                    /\ \A replica2 \in (Replicas \ replica1): 
+                                        /\ \A rec2 \in cmdLog[replica2]: 
+                                            /\ rec2.inst = rec1.inst
+                                            /\ rec2.status \in  {"causally-committed", "strongly-committed", "executed", "discarded"}
+                                            /\ LET scc_set2 == FinalSCC(replica2,rec2.inst) IN
+                                                /\ scc_set1 = scc_set2
         
 (*IsAllInstancesCommittedSame == LET pc == IsAllCommitted IN (* checking whether all instances across all the replicas committed the same commands *)
                                 pc = TRUE => IsSameCommitted (* here we have to check whether all instances have the same command *) *)
@@ -1422,5 +1435,5 @@ Termination == <>((\A r \in Replicas:
 
 =============================================================================
 \* Modification History
-\* Last modified Mon Jan 29 15:22:10 EST 2024 by santamariashithil
+\* Last modified Mon Jan 29 18:05:14 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil

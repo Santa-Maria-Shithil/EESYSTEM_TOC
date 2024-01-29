@@ -1384,18 +1384,22 @@ Nontriviality ==  (* Checking whether any command committed by any replica has b
     \A i \in Instances :
         (\A C \in committed[i] : C[1] \in proposed \/ C[1] = none)
         
-(*Stability == (* For any replica, the set of committed com-mands at any time is a subset of the committed commands at any later time. *)
+Consistency == (* Two replicas can never have different commands committed for the same instance. *)
+    \A i \in Instances :
+        (Cardinality(committed[i]) <= 1)
+        
+Stability == (* For any replica, the set of committed commands at any time is a subset of the committed commands at any later time. *)
     \A replica \in Replicas :
         \A i \in Instances :
             \A C \in Commands :
-                []((\E rec1 \in cmdLog[replica] :
+                ((\E rec1 \in cmdLog[replica] :
                     /\ rec1.inst = i
                     /\ rec1.cmd = C
                     /\ rec1.status \in {"causally-committed", "strongly-committed", "executed", "discarded"}) =>
-                    [](\E rec2 \in cmdLog[replica] :
+                    (\E rec2 \in cmdLog[replica] :
                         /\ rec2.inst = i
                         /\ rec2.cmd = C
-                        /\ rec2.status \in {"causally-committed", "strongly-committed", "executed", "discarded"}))*)
+                        /\ rec2.status \in {"causally-committed", "strongly-committed", "executed", "discarded"}))
 
 
 (*Consistency == (* Two replicas can never have different commands committed for the same instance. *)
@@ -1422,5 +1426,5 @@ Termination == <>((\A r \in Replicas:
 
 =============================================================================
 \* Modification History
-\* Last modified Mon Jan 29 15:19:30 EST 2024 by santamariashithil
+\* Last modified Mon Jan 29 15:37:54 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil
