@@ -1261,26 +1261,9 @@ ExecuteCommand(replica, i) ==
      \E rec \in cmdLog[replica]:
         /\ rec.inst = i
         /\ rec.status = "causally-committed" \/ rec.status = "strongly-committed"
-        /\ LET scc_set == FinalSCC(replica,i) IN 
-            /\ \A scc \in scc_set: 
-                \A instant \in OrderingInstancesFirstLevel(scc):
-                    \E rec2 \in cmdLog[instant[1]]:
-                        /\rec2.inst=instant[2]
-                        /\ cmdLog' = [cmdLog EXCEPT ![instant[1]] = (@ \ instant[2]) \cup
-                                            {[inst   |-> rec2.inst,
-                                              status |-> "executed",
-                                              state  |-> "done",
-                                              ballot |-> rec2.ballot,
-                                              cmd    |-> rec2.cmd,
-                                              deps   |-> rec2.deps,
-                                              seq    |-> rec2.seq,
-                                              consistency |-> rec2.consistency,
-                                              ctxid |-> rec2.ctxid ]}]
+        (*/\ LET scc_set == OrderingInstancesFirstLevel(FinalSCC(replica,i)) IN *)
             
-            
-
-
-(*<<<<"a", 0>>, <<"b", 0>>, <<"c", 0>>, <<"a", 1>>>>*) 
+        
                 
         
     
@@ -1395,5 +1378,5 @@ THEOREM Spec => ([]TypeOK) /\ Nontriviality /\ Stability /\ Consistency*)
 
 =============================================================================
 \* Modification History
-\* Last modified Mon Jan 29 03:42:08 EST 2024 by santamariashithil
+\* Last modified Mon Jan 29 02:10:34 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil
