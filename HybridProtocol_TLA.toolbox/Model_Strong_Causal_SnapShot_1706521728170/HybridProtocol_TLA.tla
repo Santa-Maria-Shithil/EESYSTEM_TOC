@@ -109,13 +109,13 @@ Message ==
 (*                    leader                                                   *)
 (*          leaderOfInst = the set of instances each replica has               *)
 (*                         started but not yet finalized                       *)
-(*          committed = maps commands to set of commit attributes               *)
+(*          committed = maps commands to set of commit attributs               *)
 (*                      tuples                                                 *)
 (*          ballots = largest ballot number used by any                        *)
 (*                    replica                                                  *)
 (*          preparing = set of instances that each replica is                  *)
 (*                      currently preparing (i.e. recovering)                  *) 
-(*          clk = clock values for each of the replica                         *)
+(*                                                                             *)
 (*                                                                             *)
 (*******************************************************************************)
 
@@ -189,9 +189,6 @@ FindingWaitingInst(finalDeps) ==
     IN
         allWaitingInst
 
-IsAllCommitted == \A replica \in Replicas :
-                           LET recs ==  {rec.inst: rec \in cmdLog[replica]} IN
-                                /\ \A rec \in recs: rec.status = "causally-committed" \/ rec.status = "strongly-committed" \/ rec.status = "executed" \/ rec.status = "discarded"
 
 (***************************************************************************)
 (* Actions                                                                 *)
@@ -227,7 +224,6 @@ StartPhase1Causal(C, cleader, Q, inst, ballot, oldMsg, oldClk,cl,ctx) ==
                                           consistency : {cl},
                                           ctxid : {ctx},
                                           clk : {oldClk}]
-
            ELSE
                  /\ cmdLog' = [cmdLog EXCEPT ![cleader] = (@ \ oldRecs) \cup 
                                         {[inst   |-> inst,
@@ -1380,30 +1376,8 @@ Spec == Init /\ [][Next]_vars
 (***************************************************************************)
 (* Safety Property                                                         *)
 (***************************************************************************)
-Nontriviality ==  (* Checking whether any command committed by any replica has been proposed by a client. *)
-    \A i \in Instances :
-        (\A C \in committed[i] : C[1] \in proposed \/ C[1] = none)
-        
-Stability == (* For any replica, the set of committed commands at any time is a subset of the committed commands at any later time. *)
-    \A replica \in Replicas :
-        \A i \in Instances :
-            \A C \in Commands :
-                []((\E rec1 \in cmdLog[replica] :
-                    /\ rec1.inst = i
-                    /\ rec1.cmd = C
-                    /\ rec1.status \in {"causally-committed", "strongly-committed", "executed", "discarded"}) =>
-                    [](\E rec2 \in cmdLog[replica] :
-                        /\ rec2.inst = i
-                        /\ rec2.cmd = C
-                        /\ rec2.status \in {"causally-committed", "strongly-committed", "executed", "discarded"}))
 
 
-(*Consistency == (* Two replicas can never have different commands committed for the same instance. *)
-    \A i \in Instances :
-        [](Cardinality(committed[i]) <= 1)*)
-        
-(*IsAllInstancesCommittedSame == LET pc == IsAllCommitted IN (* checking whether all instances across all the replicas committed the same commands *)
-                                pc = TRUE => IsSameCommitted (* here we have to check whether all instances have the same command *) *)
 
 (***************************************************************************)
 (* Liveness Property                                                       *)
@@ -1417,10 +1391,37 @@ Stability == (* For any replica, the set of committed commands at any time is a 
             \A inst \in cmdLog[r]: inst.status = "causally-committed" \/ inst.status = "strongly-committed"))*)
 Termination == <>((\A r \in Replicas:
             \A inst \in cmdLog[r]: inst.status = "executed" \/ inst.status = "discarded"))
-                                       
+
+(***************************************************************************)
+(* Theorems                                                                *)
+(***************************************************************************)
+
+(*Nontriviality ==
+    \A i \in Instances :
+        [](\A C \in committed[i] : C \in proposed \/ C = none)
+
+Stability ==
+    \A replica \in Replicas :
+        \A i \in Instances :
+            \A C \in Commands :
+                []((\E rec1 \in cmdLog[replica] :
+                    /\ rec1.inst = i
+                    /\ rec1.cmd = C
+                    /\ rec1.status \in {"committed", "executed"}) =>
+                    [](\E rec2 \in cmdLog[replica] :
+                        /\ rec2.inst = i
+                        /\ rec2.cmd = C
+                        /\ rec2.status \in {"committed", "executed"}))
+
+Consistency ==
+    \A i \in Instances :
+        [](Cardinality(committed[i]) <= 1)
+
+THEOREM Spec => ([]TypeOK) /\ Nontriviality /\ Stability /\ Consistency*)
+                                                  
     
 
 =============================================================================
 \* Modification History
-\* Last modified Mon Jan 29 15:22:10 EST 2024 by santamariashithil
+\* Last modified Mon Jan 29 04:19:51 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil

@@ -2,7 +2,7 @@
 TLC2 Version 2.16 of 31 December 2020 (rev: cdddf55)
 @!@!@ENDMSG 2262 @!@!@
 @!@!@STARTMSG 2187:0 @!@!@
-Running breadth-first search Model-Checking with fp 36 and seed -8066742159494586197 with 4 workers on 8 cores with 1214MB heap and 2730MB offheap memory [pid: 3972] (Mac OS X 10.16 x86_64, AdoptOpenJDK 14.0.1 x86_64, OffHeapDiskFPSet, DiskStateQueue).
+Running breadth-first search Model-Checking with fp 108 and seed -7664087761647273618 with 4 workers on 8 cores with 1214MB heap and 2730MB offheap memory [pid: 3947] (Mac OS X 10.16 x86_64, AdoptOpenJDK 14.0.1 x86_64, OffHeapDiskFPSet, DiskStateQueue).
 @!@!@ENDMSG 2187 @!@!@
 @!@!@STARTMSG 2220:0 @!@!@
 Starting SANY...
@@ -23,17 +23,14 @@ Semantic processing of module MC
 SANY finished.
 @!@!@ENDMSG 2219 @!@!@
 @!@!@STARTMSG 2185:0 @!@!@
-Starting... (2024-01-29 15:19:39)
+Starting... (2024-01-29 15:09:31)
 @!@!@ENDMSG 2185 @!@!@
-@!@!@STARTMSG 2189:0 @!@!@
-Computing initial states...
-@!@!@ENDMSG 2189 @!@!@
-@!@!@STARTMSG 2190:0 @!@!@
-Finished computing initial states: 1 distinct state generated at 2024-01-29 15:19:40.
-@!@!@ENDMSG 2190 @!@!@
-@!@!@STARTMSG 2200:0 @!@!@
-Progress(5) at 2024-01-29 15:19:43: 71,647 states generated (71,647 s/min), 50,761 distinct states found (50,761 ds/min), 50,278 states left on queue.
-@!@!@ENDMSG 2200 @!@!@
-@!@!@STARTMSG 2200:0 @!@!@
-Progress(6) at 2024-01-29 15:20:43: 8,874,088 states generated (8,802,441 s/min), 6,300,924 distinct states found (6,250,163 ds/min), 6,171,476 states left on queue.
-@!@!@ENDMSG 2200 @!@!@
+@!@!@STARTMSG 2146:1 @!@!@
+The invariant Nontriviality is not a state predicate (one with no primes or temporal operators).
+Note that a bug can cause TLC to incorrectly report this error.
+If you believe your TLA+ or PlusCal specification to be correct,
+please check if this bug described in LevelNode.java starting at line 590ff affects you.
+@!@!@ENDMSG 2146 @!@!@
+@!@!@STARTMSG 2186:0 @!@!@
+Finished in 1536ms at (2024-01-29 15:09:31)
+@!@!@ENDMSG 2186 @!@!@

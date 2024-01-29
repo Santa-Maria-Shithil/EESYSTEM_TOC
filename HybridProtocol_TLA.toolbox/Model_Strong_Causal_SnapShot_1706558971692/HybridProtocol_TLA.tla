@@ -1382,9 +1382,9 @@ Spec == Init /\ [][Next]_vars
 (***************************************************************************)
 Nontriviality ==  (* Checking whether any command committed by any replica has been proposed by a client. *)
     \A i \in Instances :
-        (\A C \in committed[i] : C[1] \in proposed \/ C[1] = none)
+        [](\A C \in committed[i] : C \in proposed \/ C = none)
         
-Stability == (* For any replica, the set of committed commands at any time is a subset of the committed commands at any later time. *)
+Stability == (* For any replica, the set of committed com-mands at any time is a subset of the committed commands at any later time. *)
     \A replica \in Replicas :
         \A i \in Instances :
             \A C \in Commands :
@@ -1398,9 +1398,9 @@ Stability == (* For any replica, the set of committed commands at any time is a 
                         /\ rec2.status \in {"causally-committed", "strongly-committed", "executed", "discarded"}))
 
 
-(*Consistency == (* Two replicas can never have different commands committed for the same instance. *)
+Consistency == (* Two replicas can never have different commands committed for the same instance. *)
     \A i \in Instances :
-        [](Cardinality(committed[i]) <= 1)*)
+        [](Cardinality(committed[i]) <= 1)
         
 (*IsAllInstancesCommittedSame == LET pc == IsAllCommitted IN (* checking whether all instances across all the replicas committed the same commands *)
                                 pc = TRUE => IsSameCommitted (* here we have to check whether all instances have the same command *) *)
@@ -1422,5 +1422,5 @@ Termination == <>((\A r \in Replicas:
 
 =============================================================================
 \* Modification History
-\* Last modified Mon Jan 29 15:22:10 EST 2024 by santamariashithil
+\* Last modified Mon Jan 29 15:08:35 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil
