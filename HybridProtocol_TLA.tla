@@ -60,7 +60,7 @@ Instances == Replicas \X (1..Cardinality(Commands))
 (* The possible status of a command in the log of a replica.               *)
 (***************************************************************************)
 
-Status == {"not-seen", "pre-accepted", "accepted", "causally-committed", "strongly-comitted"}
+Status == {"not-seen", "pre-accepted", "accepted", "causally-committed", "strongly-comitted", "executed" , "discarded"}
 State == {"ready", "waiting", "done"}
 
 
@@ -1261,33 +1261,58 @@ ExecuteCommand(replica, i) ==
      \E rec \in cmdLog[replica]:
         /\ rec.inst = i
         /\ rec.status = "causally-committed" \/ rec.status = "strongly-committed"
-        /\ LET scc_set == FinalSCC(replica,i) IN 
+        /\ LET scc_set == FinalSCC(replica,i) IN (*finding all scc *)
             /\ \A scc \in scc_set: 
-                \A instant \in OrderingInstancesFirstLevel(scc):
+                \A instant \in OrderingInstancesFirstLevel(scc): (*ordering each scc *)
                     \E rec2 \in cmdLog[instant[1]]:
                         /\rec2.inst=instant[2]
-                        /\ cmdLog' = [cmdLog EXCEPT ![instant[1]] = (@ \ instant[2]) \cup
+                        /\ IF rec2.cmd.op.type = "r" THEN  (*checking whether the operation is read or write*)
+                            /\cmdLog' = [cmdLog EXCEPT ![instant[1]] = (@ \ instant[2]) \cup
                                             {[inst   |-> rec2.inst,
                                               status |-> "executed",
-                                              state  |-> "done",
+                                              state  |-> rec2.state,
                                               ballot |-> rec2.ballot,
                                               cmd    |-> rec2.cmd,
                                               deps   |-> rec2.deps,
                                               seq    |-> rec2.seq,
                                               consistency |-> rec2.consistency,
                                               ctxid |-> rec2.ctxid ]}]
-            
-            
-
+                            /\UNCHANGED <<proposed, executed, sentMsg, crtInst, leaderOfInst,
+                                    committed, ballots, preparing, clk>>
+                           
+                           ELSE 
+                            LET 
+                                recs == {rec3 \in cmdLog[replica]: rec3.state = "executed" /\ rec3.cmd.op.key = rec2.cmd.op.key} (* finding the instant that has the same key as the instant that we are going to execute *)
+                                seq == {rec4.seq: rec4 \in recs} (* finding the seq number of the last write *) IN
+                                    IF rec2.seq > seq THEN
+                                        /\cmdLog' = [cmdLog EXCEPT ![instant[1]] = (@ \ instant[2]) \cup
+                                            {[inst   |-> rec2.inst,
+                                              status |-> "executed", (* latest write win *)
+                                              state  |-> rec2.state,
+                                              ballot |-> rec2.ballot,
+                                              cmd    |-> rec2.cmd,
+                                              deps   |-> rec2.deps,
+                                              seq    |-> rec2.seq,
+                                              consistency |-> rec2.consistency,
+                                              ctxid |-> rec2.ctxid ]}]
+                                       /\UNCHANGED <<proposed, executed, sentMsg, crtInst, leaderOfInst,
+                                         committed, ballots, preparing, clk>>
+                                    ELSE
+                                        /\cmdLog' = [cmdLog EXCEPT ![instant[1]] = (@ \ instant[2]) \cup
+                                            {[inst   |-> rec2.inst,
+                                              status |-> "discarded",
+                                              state  |-> rec2.state,
+                                              ballot |-> rec2.ballot,
+                                              cmd    |-> rec2.cmd,
+                                              deps   |-> rec2.deps,
+                                              seq    |-> rec2.seq,
+                                              consistency |-> rec2.consistency,
+                                              ctxid |-> rec2.ctxid ]}]
+                                       /\UNCHANGED <<proposed, executed, sentMsg, crtInst, leaderOfInst,
+                                         committed, ballots, preparing, clk>>
 
 (*<<<<"a", 0>>, <<"b", 0>>, <<"c", 0>>, <<"a", 1>>>>*) 
                 
-        
-    
-
-    
-
-
 
 (***************************************************************************)
 (* Action groups                                                           *)
@@ -1395,5 +1420,5 @@ THEOREM Spec => ([]TypeOK) /\ Nontriviality /\ Stability /\ Consistency*)
 
 =============================================================================
 \* Modification History
-\* Last modified Mon Jan 29 03:42:08 EST 2024 by santamariashithil
+\* Last modified Mon Jan 29 04:13:24 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil
