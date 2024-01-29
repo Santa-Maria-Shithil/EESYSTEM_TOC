@@ -1,5 +1,5 @@
 ------------------------- MODULE HybridProtocol_TLA -------------------------
-EXTENDS Naturals, FiniteSets
+EXTENDS Naturals, FiniteSets, Sequences
 
 -----------------------------------------------------------------------------
 
@@ -121,7 +121,7 @@ Message ==
 
  
 VARIABLES cmdLog, proposed, executed, sentMsg, crtInst, leaderOfInst,
-          committed, ballots, preparing, clk
+          committed, ballots, preparing, clk (*scc*)
 
 TypeOK ==
     /\ cmdLog \in [Replicas -> SUBSET [inst: Instances, 
@@ -147,6 +147,7 @@ TypeOK ==
     /\ ballots \in Nat
     /\ preparing \in [Replicas -> SUBSET Instances]
     /\ clk \in [Replicas -> Nat]
+    (*/\ scc \in [Commands -> SUBSET Instances]*)
    
     
 vars == << cmdLog, proposed, executed, sentMsg, crtInst, leaderOfInst, 
@@ -167,6 +168,7 @@ Init ==
   /\ ballots = 1
   /\ preparing = [r \in Replicas |-> {}]
   /\ clk = [r \in Replicas |-> 1]
+  (*/\ scc = [c \in Commands |-> {}]*)
 
 
 (***************************************************************************)
@@ -1120,17 +1122,149 @@ FinalizeTryPreAccept(cleader, i, Q) ==
 (* Command Execution Actions                                               *)
 (***************************************************************************)
 
+BoundedSeq(S, n) == UNION {[1..i -> S] : i \in 0..n}  (* this is generating all possible paths among 
+all the instances of the system*)
+BSeq(S) == BoundedSeq(S, Cardinality(S)+1)
 
-(*FindSCC(replica, i, deps) ==*)
+
+NewDepPathSet(replica,G) ==
+    {
+    p \in BSeq(G) : /\ p /= <<>>
+                          /\ \forall i \in 1 .. (Len(p)-1) : (*this is checking wehther each pair of vertex (of an edge)
+                          in the path is also a part of the dependency graph.  Checking this by finding whether the 
+                          first vertex of the edge is the instance itself and the second vertex of the edge is in the dependency
+                          graph of the instance*)
+                            \E rec \in cmdLog[replica]: 
+                                /\ rec.inst = p[i]
+                                /\ p[i+1] \in rec.deps
+                             
+                             }
+
+AreConnectedIn(replica, m,n,G) == 
+    \E p \in NewDepPathSet(replica,G) : (p[1]=m) /\ (p[Len(p)] = n)
+
+
+
+IsStronglyConnectedSCC(replica,i,scc,G) == 
+    \A m,n \in scc: m#n => AreConnectedIn(replica,m,n,G)
+        
+
+
+FindAllInstances(replica, i) ==   (* finding all the instances of the command log *)
+    {rec.inst: rec \in cmdLog[replica] 
+        }
+        
+AreStronglyConnectedIn(replica, m, n, G) ==
+    /\ AreConnectedIn(replica, m, n, G)
+    /\ AreConnectedIn(replica, n, m, G)
+        
+        
+SccTidSet(replica, i, dep, tid) == 
+{
+    tid_set \in SUBSET UNION {dep,{<<replica,i>>}}:
+    /\ tid \in tid_set
+    /\ IsStronglyConnectedSCC(replica, i , tid_set, UNION {dep,{<<replica,i>>}})
+    /\ \forall m \in dep:
+         AreStronglyConnectedIn(replica, m, tid, dep) => m \in tid_set
+         }
+         
+FindSpecificInstance(replica, inst) == (*find a specific instance*)
+    {rec \in cmdLog[replica] : rec.inst = inst} 
+         
+FindDeps(replica, i) == (*find the dependency of a specific instance*)
+    { rec.deps: rec \in FindSpecificInstance("a",<<replica,i>>)}   (*--replace replica value--*)
     
+MaxSequence(allSequences) == 
+    CHOOSE seq \in allSequences : \A otherSeq \in allSequences : Cardinality(seq) >= Cardinality(otherSeq)
+
+MinSetCover(allSequences) == 
+    LET
+        RECURSIVE minCover(_, _)
+        minCover(SeqSet, Cover) ==
+            IF SeqSet = {}
+            THEN Cover
+            ELSE
+                LET seq == MaxSequence(SeqSet) IN
+                    IF (\E inst \in Cover: \E i \in inst : i \in seq) /\ (Cover # {}) THEN
+                        minCover(SeqSet \ {seq}, Cover)
+                    ELSE
+                        minCover(SeqSet \ {seq}, Cover \cup {seq})
+    IN
+        minCover(allSequences, {})
+
+
+   
+FindSCC(replica, i) == 
+{
+   scc \in SUBSET FindAllInstances(replica, i): 
+    /\ IsStronglyConnectedSCC(replica, i, scc, Instances)
+    /\ LET dep == FindDeps(replica, i) 
+        dep2 == CHOOSE s \in dep  : TRUE IN
+        /\ \E tid \in scc: scc \in SccTidSet(replica, i, dep2, tid)
+}
+
+FinalSCC(replica,i) ==
+    MinSetCover(FindSCC(replica, i))
+
+
+
+(*************Ordering Instances in SCC**************)
+
+FindSeq(replica, inst) == (*find the sequence number of a specific instance*)
+    {rec.seq: rec \in FindSpecificInstance(replica,inst)}
     
+ChoosingSetElement(replica,i) == 
+    CHOOSE inst \in FindSeq(replica,i): TRUE
+
+MinSeq(allInstances) ==
+    CHOOSE inst \in allInstances : \A otherInst \in allInstances : 
+        ChoosingSetElement("a", <<inst[1],inst[2]>>) <= ChoosingSetElement("a",<<otherInst[1],otherInst[2]>>)(*--replace replica value--*)
+
+OrderingInstancesFirstLevel(scc) ==  (*ordering based on sequence number (ascending)*)
+     LET
+        RECURSIVE minCover(_, _)
+        minCover(SeqSet, Cover) ==
+            IF SeqSet = {}
+            THEN Cover
+            ELSE
+                LET seq == MinSeq(SeqSet) IN
+                        minCover(SeqSet \ {seq}, Append(Cover,seq))
+     IN
+       minCover(scc, <<>>)
+    
+
+(*OrderingInstancesSecondLevel(scc) ==  (*ordering the instances among themeselves from the same replica according to the instance number (ascending)*) 
+    LET
+        orderedSccNodes == OrderingInstancesFirstLevel(scc)
+        RECURSIVE secondLevelOrdering(_,_)
+        secondLevelOrdering(sccSet, index) == 
+            IF index = Len(orderedSccNodes)
+            THEN sccSet
+            ELSE 
+                LET 
+                    itemToSwap == sccSet[index] IN
+                    (*IF itemToSwap[1] = item[i][1] /\ itemToSwap[2] >= item[i][2] 
+                    THEN sccSet[index] == item[i]
+                        sccSet[i] == itemToSwap
+                    ELSE
+                        sccSet[index] == sccSet[index]
+                        sccSet[i] == sccSet[i]*)
+                    sccSet[i] == itemToSwap : i \in index..Len(sccSet)
+                    
+                                  
+    IN
+        secondLevelOrdering(orderedSccNodes,1)*)
+                        
 
 
 ExecuteCommand(replica, i) == 
      \E rec \in cmdLog[replica]:
         /\ rec.inst = i
         /\ rec.status = "causally-committed" \/ rec.status = "strongly-committed"
-        (*/\ LET scc_set = FindSCC(replica,i,rec.deps)*)
+        (*/\ LET scc_set == OrderingInstancesFirstLevel(FinalSCC(replica,i)) IN *)
+            
+        
+                
         
     
 
@@ -1152,8 +1286,8 @@ CommandLeaderAction ==
             \/ (\E Q \in SlowQuorums(cleader) : Phase1Slow(cleader, inst, Q))
             \/ (\E Q \in SlowQuorums(cleader) : Phase2Finalize(cleader, inst, Q))
             \/ (\E Q \in SlowQuorums(cleader) : FinalizeTryPreAccept(cleader, inst, Q)))
-    \/ \E replica \in Replicas: 
-            \E inst \in cmdLog[replica]: ExecuteCommand(replica, inst)
+    (*\/ \E replica \in Replicas: 
+            \E inst \in cmdLog[replica]: ExecuteCommand(replica, inst)*)
     
     
   
@@ -1173,7 +1307,7 @@ ReplicaAction ==
          \/ \E i \in preparing[replica] :
             \E Q \in SlowQuorums(replica) : PrepareFinalize(replica, i, Q)
          \/ ReplyTryPreaccept(replica)
-         \/ \E inst \in cmdLog[replica]: ExecuteCommand(replica, inst)
+         (*\/ \E inst \in cmdLog[replica]: ExecuteCommand(replica, inst)*)
          )
 
 
@@ -1244,5 +1378,5 @@ THEOREM Spec => ([]TypeOK) /\ Nontriviality /\ Stability /\ Consistency*)
 
 =============================================================================
 \* Modification History
-\* Last modified Tue Jan 09 16:52:54 EST 2024 by santamariashithil
+\* Last modified Sun Jan 28 21:02:11 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil

@@ -1378,5 +1378,5 @@ THEOREM Spec => ([]TypeOK) /\ Nontriviality /\ Stability /\ Consistency*)
 
 =============================================================================
 \* Modification History
-\* Last modified Sun Jan 28 21:02:11 EST 2024 by santamariashithil
+\* Last modified Sun Jan 28 20:54:52 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil

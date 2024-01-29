@@ -1,0 +1,65 @@
+@!@!@STARTMSG 2262:0 @!@!@
+TLC2 Version 2.16 of 31 December 2020 (rev: cdddf55)
+@!@!@ENDMSG 2262 @!@!@
+@!@!@STARTMSG 2187:0 @!@!@
+Running breadth-first search Model-Checking with fp 87 and seed -6687737131611036552 with 4 workers on 8 cores with 1214MB heap and 2730MB offheap memory [pid: 1377] (Mac OS X 10.16 x86_64, AdoptOpenJDK 14.0.1 x86_64, OffHeapDiskFPSet, DiskStateQueue).
+@!@!@ENDMSG 2187 @!@!@
+@!@!@STARTMSG 2220:0 @!@!@
+Starting SANY...
+@!@!@ENDMSG 2220 @!@!@
+Parsing file /Volumes/StudyMaterials/Project/EESYSTEM_TOC/HybridProtocol_TLA.toolbox/Model_Strong_Causal/MC.tla
+Parsing file /Volumes/StudyMaterials/Project/EESYSTEM_TOC/HybridProtocol_TLA.toolbox/Model_Strong_Causal/HybridProtocol_TLA.tla
+Parsing file /Applications/TLA+ Toolbox.app/Contents/Eclipse/plugins/org.lamport.tlatools_1.0.0.202012311918/tla2sany/StandardModules/TLC.tla
+Parsing file /Applications/TLA+ Toolbox.app/Contents/Eclipse/plugins/org.lamport.tlatools_1.0.0.202012311918/tla2sany/StandardModules/Naturals.tla
+Parsing file /Applications/TLA+ Toolbox.app/Contents/Eclipse/plugins/org.lamport.tlatools_1.0.0.202012311918/tla2sany/StandardModules/FiniteSets.tla
+Parsing file /Applications/TLA+ Toolbox.app/Contents/Eclipse/plugins/org.lamport.tlatools_1.0.0.202012311918/tla2sany/StandardModules/Sequences.tla
+Semantic processing of module Naturals
+Semantic processing of module Sequences
+Semantic processing of module FiniteSets
+Semantic processing of module HybridProtocol_TLA
+Semantic processing of module TLC
+Semantic processing of module MC
+@!@!@STARTMSG 2219:0 @!@!@
+SANY finished.
+@!@!@ENDMSG 2219 @!@!@
+@!@!@STARTMSG 2185:0 @!@!@
+Starting... (2024-01-28 21:00:22)
+@!@!@ENDMSG 2185 @!@!@
+@!@!@STARTMSG 2189:0 @!@!@
+Computing initial states...
+@!@!@ENDMSG 2189 @!@!@
+@!@!@STARTMSG 1000:1 @!@!@
+@!@!@STARTMSG 2181:0 @!@!@
+Attempted to compute cardinality of the value
+<< <<[op |-> {[key |-> "x", type |-> "w"]}]>>,
+   <<[op |-> {[key |-> "y", type |-> "r"]}]>> >>
+@!@!@ENDMSG 2181 @!@!@
+@!@!@ENDMSG 1000 @!@!@
+@!@!@STARTMSG 2103:1 @!@!@
+The error occurred when TLC was evaluating the nested
+expressions at the following positions:
+0. Line 161, column 3 to line 170, column 33 in HybridProtocol_TLA
+1. Line 161, column 6 to line 161, column 17 in HybridProtocol_TLA
+2. Line 162, column 6 to line 162, column 37 in HybridProtocol_TLA
+3. Line 163, column 6 to line 163, column 18 in HybridProtocol_TLA
+4. Line 164, column 6 to line 164, column 39 in HybridProtocol_TLA
+5. Line 165, column 6 to line 165, column 37 in HybridProtocol_TLA
+6. Line 166, column 6 to line 166, column 43 in HybridProtocol_TLA
+7. Line 167, column 6 to line 167, column 41 in HybridProtocol_TLA
+8. Line 167, column 18 to line 167, column 41 in HybridProtocol_TLA
+9. Line 167, column 25 to line 167, column 33 in HybridProtocol_TLA
+10. Line 57, column 14 to line 57, column 51 in HybridProtocol_TLA
+11. Line 57, column 27 to line 57, column 50 in HybridProtocol_TLA
+12. Line 57, column 30 to line 57, column 50 in HybridProtocol_TLA
+
+
+@!@!@ENDMSG 2103 @!@!@
+@!@!@STARTMSG 2200:0 @!@!@
+Progress(1) at 2024-01-28 21:00:23: 0 states generated (0 s/min), 0 distinct states found (0 ds/min), 0 states left on queue.
+@!@!@ENDMSG 2200 @!@!@
+@!@!@STARTMSG 2199:0 @!@!@
+0 states generated, 0 distinct states found, 0 states left on queue.
+@!@!@ENDMSG 2199 @!@!@
+@!@!@STARTMSG 2186:0 @!@!@
+Finished in 2559ms at (2024-01-28 21:00:23)
+@!@!@ENDMSG 2186 @!@!@
