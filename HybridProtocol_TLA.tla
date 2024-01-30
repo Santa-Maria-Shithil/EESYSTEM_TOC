@@ -192,13 +192,30 @@ FindingWaitingInst(finalDeps) ==
 IsAllCommitted == \A replica \in Replicas : (* check whether all the commands are committed across all the replicas *)
                            LET recs ==  {rec.inst: rec \in cmdLog[replica]} IN
                                 /\ \A rec \in recs: rec.status = "causally-committed" \/ rec.status = "strongly-committed" \/ rec.status = "executed" \/ rec.status = "discarded"
+MaxSeq(Replica) == LET recs == {rec: rec \in cmdLog[Replica] } IN
+                        CHOOSE rec \in recs : \A otherrecs \in recs:
+                            rec.seq >= otherrecs.seq 
+
+
 
 (***************************************************************************)
 (* Actions                                                                 *)
 (***************************************************************************)
 
 StartPhase1Causal(C, cleader, Q, inst, ballot, oldMsg, oldClk,cl,ctx) ==
-        LET newDeps == {rec.inst: rec \in cmdLog[cleader]} 
+        LET recs1 == {rec \in cmdLog[cleader]: rec.ctxid = ctx}
+           deps1 == {rec.inst: rec \in recs1} (* same session dependency *)
+           maxRec == MaxSeq(cleader) (* selecting the rec with the highest sequence number in this specific replica *)
+           recs2 == {rec \in cmdLog[cleader]: rec.state = "executed" /\ rec.cmd.op.type = "w" /\ rec.cmd.op.key = C.op.key  /\ rec.seq = maxRec.seq /\ C.op.type = "r"} 
+           (* rec.state = "executed" /\ rec.cmd.op.type = "w" => latest executed write 
+           rec.cmd.op.key = C.op.key  => key of the command to commit and the dependecy is the same.
+           rec.seq = maxRec.seq => select the rec with the maximum seq that means the latest write operation
+           C.op.type = "r" => will add this dependency only if the command to commit is a read command *)
+           inst2 == {rec.inst: rec \in recs2}
+           deps2 == {inst2} (* get from dependency *)
+           deps == deps1 \cup deps2 (* taking union of same session dependency and get from dependency to calculate the transitive dependency *)
+       
+            newDeps == {rec.inst: rec \in cmdLog[cleader]} 
             newSeq == 1 + Max({t.seq: t \in cmdLog[cleader]} \cup {oldClk}) 
             oldRecs == {rec \in cmdLog[cleader] : rec.inst = inst}
             waitingRecs== {rec \in cmdLog[cleader]: rec.state = "waiting"} 
@@ -1286,7 +1303,7 @@ ExecuteCommand(replica, i) ==
                            
                            ELSE 
                             LET 
-                                recs == {rec3 \in cmdLog[replica]: rec3.state = "executed" /\ rec3.cmd.op.key = rec2.cmd.op.key} (* finding the instance that has the same key as the instance that we are going to execute *)
+                                recs == {rec3 \in cmdLog[replica]: rec3.state = "executed" /\ rec3.cmd.op.key = rec2.cmd.op.key /\ rec3.cmd.op.type = rec2.cmd.op.key} (* finding the instance that has the same key as the instance that we are going to execute *)
                                 seq == {rec4.seq: rec4 \in recs} (* finding the seq number of the last write *) IN
                                     IF rec2.seq > seq THEN
                                         /\cmdLog' = [cmdLog EXCEPT ![instant[1]] = (@ \ instant[2]) \cup
@@ -1420,6 +1437,10 @@ ExecutionConsistency ==  \A replica1 \in Replicas:(* All the operations should b
                                                                 /\ ordered_scc1 = ordered_scc2 (*finally checking whether the scc order for a specific instance over all the replicas are same or not *)
         
 
+(*CausalOrdering == (* Checking whether causal ordering is violating or not *)*)
+                
+                
+
 (***************************************************************************)
 (* Liveness Property                                                       *)
 (***************************************************************************)
@@ -1442,5 +1463,5 @@ Termination == <>((\A r \in Replicas:
 
 =============================================================================
 \* Modification History
-\* Last modified Tue Jan 30 13:29:02 EST 2024 by santamariashithil
+\* Last modified Tue Jan 30 15:06:19 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil
