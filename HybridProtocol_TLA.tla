@@ -189,7 +189,7 @@ FindingWaitingInst(finalDeps) ==
     IN
         allWaitingInst
 
-IsAllCommitted == \A replica \in Replicas :
+IsAllCommitted == \A replica \in Replicas : (* check whether all the commands are committed across all the replicas *)
                            LET recs ==  {rec.inst: rec \in cmdLog[replica]} IN
                                 /\ \A rec \in recs: rec.status = "causally-committed" \/ rec.status = "strongly-committed" \/ rec.status = "executed" \/ rec.status = "discarded"
 
@@ -1404,16 +1404,16 @@ Stability == (* For any replica, the set of committed commands at any time is a 
                         /\ rec2.status \in {"causally-committed", "strongly-committed", "executed", "discarded"}))
 
 
-ExecutionConsistency ==  \A replica1 \in Replicas:(* All the operations should be executed in the same order in all the replicas *)
+ExecutionConsistency ==  \A replica1 \in Replicas:(* All the operations should be executed in the same order in all the replicas *) (* As checking against all replicas and all instacnes, will take a longer time to execute. Can be optimized a bit to execute faster *)
                             \A rec1 \in cmdLog[replica1]:
                                 /\ rec1.status \in {"causally-committed", "strongly-committed", "executed", "discarded"}
-                                /\ LET scc_set1 == FinalSCC(replica1,rec1.inst) IN 
+                                /\ LET scc_set1 == FinalSCC(replica1,rec1.inst) IN (* picked a specific inntance for a specific replica and calculated and ordered it's scc *)
                                     /\ \A replica2 \in (Replicas \ replica1): 
                                         /\ \A rec2 \in cmdLog[replica2]: 
                                             /\ rec2.inst = rec1.inst
                                             /\ rec2.status \in  {"causally-committed", "strongly-committed", "executed", "discarded"}
-                                            /\ LET scc_set2 == FinalSCC(replica2,rec2.inst) IN
-                                                /\ scc_set1 = scc_set2
+                                            /\ LET scc_set2 == FinalSCC(replica2,rec2.inst) IN (* picked the same instance as rec1.inst for all other replicas. Calculated and ordered the scc. *)
+                                                /\ scc_set1 = scc_set2 (*finally checking whether the scc order for a specific instance over all the replicas are same or not *)
         
 (*IsAllInstancesCommittedSame == LET pc == IsAllCommitted IN (* checking whether all instances across all the replicas committed the same commands *)
                                 pc = TRUE => IsSameCommitted (* here we have to check whether all instances have the same command *) *)
@@ -1435,5 +1435,5 @@ Termination == <>((\A r \in Replicas:
 
 =============================================================================
 \* Modification History
-\* Last modified Mon Jan 29 18:05:14 EST 2024 by santamariashithil
+\* Last modified Mon Jan 29 18:13:10 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil
