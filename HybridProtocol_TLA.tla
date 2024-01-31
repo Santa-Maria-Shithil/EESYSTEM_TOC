@@ -15,7 +15,7 @@ Max(S) == IF S = {} THEN 0 ELSE CHOOSE i \in S : \A j \in S : j <= i
 (*       Consistency_level: the set of consistency level of all commands         *)
 (*********************************************************************************)
 
-CONSTANTS Commands, Replicas, MaxBallot, Consistency_level, Ctx_id
+CONSTANTS Commands, Replicas, MaxBallot, Consistency_level, Ctx_id, Keys
 
  
  TwoElementSubsetsR(r) == {s \in SUBSET (Replicas \ {r}) : Cardinality(s) = 2}
@@ -192,9 +192,16 @@ FindingWaitingInst(finalDeps) ==
 IsAllCommitted == \A replica \in Replicas : (* check whether all the commands are committed across all the replicas *)
                            LET recs ==  {rec.inst: rec \in cmdLog[replica]} IN
                                 /\ \A rec \in recs: rec.status = "causally-committed" \/ rec.status = "strongly-committed" \/ rec.status = "executed" \/ rec.status = "discarded"
+
+
+IsAllExecutedOrDiscarded == \A replica \in Replicas : (* check whether all the commands are executed or discarded across all the replicas *)
+                           LET recs ==  {rec.inst: rec \in cmdLog[replica]} IN
+                                /\ \A rec \in recs:   rec.status = "executed" \/ rec.status = "discarded"
+
 MaxSeq(Replica) == LET recs == {rec: rec \in cmdLog[Replica] } IN
                         CHOOSE rec \in recs : \A otherrecs \in recs:
                             rec.seq >= otherrecs.seq 
+                            
 
 SameCtxScc(ordered_scc, ctx_id, replica) == (* return instances from the same context *)(* {<<"a", 0>>, <<"a", 1>>} *)
     LET 
@@ -1532,15 +1539,19 @@ GetFromCausality == (* whether the get from cauality is maintaining or not *)
                    sequence number of all dependent write. That means, commands came after the read will be executed after the dependet write commands.
                    
                 *)
+
+(* TrainsitiveCausality *)
+
+GlobalOrderingOfWrite == LET pc == IsAllExecutedOrDiscarded IN (* checking whether all instances across all the replicas are executed or discarded *)
+                                pc = TRUE => IsSameCommitted               
+                
+(*GlobalOrderingOfRead == (* once a strong read, read any write (strong/weak), all later strong read must observe that write *) *)
                                         
+(* RealTimeOrderingOfStrong *)
 
 (***************************************************************************)
 (* Liveness Property                                                       *)
 (***************************************************************************)
-
-(*Convergence == LET pc == IsAllCommitted IN (* checking whether all instances across all the replicas committed the same commands *)
-                                pc = TRUE => IsSameCommitted (* here we have to check whether all instances have the same command *) *)
-
 
 
 (***************************************************************************)
@@ -1556,5 +1567,5 @@ Termination == <>((\A r \in Replicas:
 
 =============================================================================
 \* Modification History
-\* Last modified Wed Jan 31 08:54:38 EST 2024 by santamariashithil
+\* Last modified Wed Jan 31 09:38:57 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil
