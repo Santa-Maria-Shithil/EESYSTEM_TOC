@@ -213,9 +213,10 @@ StartPhase1Causal(C, cleader, Q, inst, ballot, oldMsg, oldClk,cl,ctx) ==
            C.op.type = "r" => will add this dependency only if the command to commit is a read command *)
            inst2 == {rec.inst: rec \in recs2}
            deps2 == {inst2} (* get from dependency *)
-           deps == deps1 \cup deps2 (* taking union of same session dependency and get from dependency to calculate the transitive dependency *)
-       
-            newDeps == {rec.inst: rec \in cmdLog[cleader]} 
+           (*deps == deps1 \cup deps2*) (* taking union of same session dependency and get from dependency to calculate the transitive dependency *)
+           (* no need to calculate the transitive dependency. It will be calculated during the graph formation in the execution phase *) 
+            
+            newDeps == deps1 \cup deps2
             newSeq == 1 + Max({t.seq: t \in cmdLog[cleader]} \cup {oldClk}) 
             oldRecs == {rec \in cmdLog[cleader] : rec.inst = inst}
             waitingRecs== {rec \in cmdLog[cleader]: rec.state = "waiting"} 
@@ -284,7 +285,23 @@ StartPhase1Causal(C, cleader, Q, inst, ballot, oldMsg, oldClk,cl,ctx) ==
                                               
                                               
 StartPhase1Strong(C, cleader, Q, inst, ballot, oldMsg, oldClk,cl,ctx) ==
-    LET newDeps == {rec.inst: rec \in cmdLog[cleader]} 
+    LET recs1 == {rec \in cmdLog[cleader]: rec.ctxid = ctx}
+           deps1 == {rec.inst: rec \in recs1} (* same session dependency *)
+           maxRec == MaxSeq(cleader) (* selecting the rec with the highest sequence number in this specific replica *)
+           recs2 == {rec \in cmdLog[cleader]: rec.state = "executed" /\ rec.cmd.op.type = "w" /\ rec.cmd.op.key = C.op.key  /\ rec.seq = maxRec.seq /\ C.op.type = "r"} 
+           (* rec.state = "executed" /\ rec.cmd.op.type = "w" => latest executed write 
+           rec.cmd.op.key = C.op.key  => key of the command to commit and the dependecy is the same.
+           rec.seq = maxRec.seq => select the rec with the maximum seq that means the latest write operation
+           C.op.type = "r" => will add this dependency only if the command to commit is a read command *)
+           inst2 == {rec.inst: rec \in recs2}
+           deps2 == {inst2} (* get from dependency *)
+           (*deps == deps1 \cup deps2*) (* taking union of same session dependency and get from dependency to calculate the transitive dependency *)
+           (* no need to calculate the transitive dependency. It will be calculated during the graph formation in the execution phase *) 
+           recs3 == {rec \in cmdLog[cleader]: rec.cmd.op.key = C.op.key}
+           inst3 == {rec.inst: rec \in recs3}
+           deps3 == {inst3} (* command interference *)
+           
+           newDeps == deps1 \cup deps2 \cup deps3
             newSeq == 1 + Max({t.seq: t \in cmdLog[cleader]} \cup {oldClk}) 
             oldRecs == {rec \in cmdLog[cleader] : rec.inst = inst} 
             waitingRecs== {rec \in cmdLog[cleader]: rec.state = "waiting"} 
@@ -1463,5 +1480,5 @@ Termination == <>((\A r \in Replicas:
 
 =============================================================================
 \* Modification History
-\* Last modified Tue Jan 30 15:06:19 EST 2024 by santamariashithil
+\* Last modified Wed Jan 31 06:12:18 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil
