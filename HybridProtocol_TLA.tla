@@ -1543,7 +1543,8 @@ GetFromCausality == (* whether the get from cauality is maintaining or not *)
 (* TrainsitiveCausality *)
 
 GlobalOrderingOfWrite == LET pc == IsAllExecutedOrDiscarded IN (* checking whether all instances across all the replicas are executed or discarded *)
-                                pc = TRUE => IsSameCommitted               
+                                pc = TRUE => \A key in \Keys: 
+                                            LET all_latest_write == LatestWriteofSpecificKey(key, Replicas) IN              
                 
 (*GlobalOrderingOfRead == (* once a strong read, read any write (strong/weak), all later strong read must observe that write *) *)
                                         
@@ -1567,5 +1568,5 @@ Termination == <>((\A r \in Replicas:
 
 =============================================================================
 \* Modification History
-\* Last modified Wed Jan 31 09:38:57 EST 2024 by santamariashithil
+\* Last modified Wed Jan 31 09:50:46 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil

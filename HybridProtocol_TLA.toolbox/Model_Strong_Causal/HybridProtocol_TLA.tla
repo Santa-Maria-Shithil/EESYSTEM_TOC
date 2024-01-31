@@ -15,7 +15,7 @@ Max(S) == IF S = {} THEN 0 ELSE CHOOSE i \in S : \A j \in S : j <= i
 (*       Consistency_level: the set of consistency level of all commands         *)
 (*********************************************************************************)
 
-CONSTANTS Commands, Replicas, MaxBallot, Consistency_level, Ctx_id
+CONSTANTS Commands, Replicas, MaxBallot, Consistency_level, Ctx_id, Keys
 
  
  TwoElementSubsetsR(r) == {s \in SUBSET (Replicas \ {r}) : Cardinality(s) = 2}
@@ -189,16 +189,84 @@ FindingWaitingInst(finalDeps) ==
     IN
         allWaitingInst
 
-IsAllCommitted == \A replica \in Replicas :
+IsAllCommitted == \A replica \in Replicas : (* check whether all the commands are committed across all the replicas *)
                            LET recs ==  {rec.inst: rec \in cmdLog[replica]} IN
                                 /\ \A rec \in recs: rec.status = "causally-committed" \/ rec.status = "strongly-committed" \/ rec.status = "executed" \/ rec.status = "discarded"
 
+
+IsAllExecutedOrDiscarded == \A replica \in Replicas : (* check whether all the commands are executed or discarded across all the replicas *)
+                           LET recs ==  {rec.inst: rec \in cmdLog[replica]} IN
+                                /\ \A rec \in recs:   rec.status = "executed" \/ rec.status = "discarded"
+
+MaxSeq(Replica) == LET recs == {rec: rec \in cmdLog[Replica] } IN
+                        CHOOSE rec \in recs : \A otherrecs \in recs:
+                            rec.seq >= otherrecs.seq 
+                            
+
+SameCtxScc(ordered_scc, ctx_id, replica) == (* return instances from the same context *)(* {<<"a", 0>>, <<"a", 1>>} *)
+    LET 
+        RECURSIVE ctxScc(_, _, _, _)
+        ctxScc(scc, ctx, r, passed_scc) ==
+            IF scc = <<>> THEN
+                passed_scc
+            ELSE
+                LET  
+                    
+                    node == Head(scc)
+                    recs == {rec \in cmdLog[r]: rec.ctxid = ctx_id /\ rec.inst = node /\ rec.inst[1] = r} 
+                    inst == {rec.inst: rec \in recs} IN
+                    IF inst = {} THEN
+                    ctxScc(SubSeq(scc, 2, Len(scc)), ctx, r, passed_scc)  
+                    ELSE
+                    LET i1 == CHOOSE i \in inst: TRUE IN
+                    ctxScc(SubSeq(scc, 2, Len(scc)), ctx, r, passed_scc \cup {i1})                  
+    IN
+        ctxScc(ordered_scc, ctx_id, replica,  {})            
+
+MinInst(allInstances) ==
+    CHOOSE inst \in allInstances : \A otherInst \in allInstances : 
+        inst[2] <= otherInst[2]
+
+OrderingBasedOnInstanceNumber(scc) ==  (*ordering based on instance number (ascending)*) (* {<<"a", 0>>, <<"a", 1>>} *)
+     LET
+        RECURSIVE minCover(_, _)
+        minCover(SeqSet, Cover) ==
+            IF SeqSet = {}
+            THEN Cover
+            ELSE
+                LET inst == MinInst(SeqSet) IN
+                        minCover(SeqSet \ {inst}, Cover \cup {inst})
+     IN
+       minCover(scc, {}) 
+
+ MaxWriteSeq(Replica,deps) == LET recs == {rec: rec \in cmdLog[Replica] } IN (*returns the maximum sequence number among all the write operations *)
+                        CHOOSE rec \in recs : \A otherrecs \in recs:
+                            /\ rec.seq >= otherrecs.seq 
+                            /\ rec.inst \in deps
+                            
+                            
+MinSequenceRecs(recs) == CHOOSE rec \in recs : \A otherrecs \in recs: (* returns the rec with the minimum sequence number *)
+                            /\ rec.seq < otherrecs.seq 
+                            
 (***************************************************************************)
 (* Actions                                                                 *)
 (***************************************************************************)
 
 StartPhase1Causal(C, cleader, Q, inst, ballot, oldMsg, oldClk,cl,ctx) ==
-        LET newDeps == {rec.inst: rec \in cmdLog[cleader]} 
+        LET recs1 == {rec \in cmdLog[cleader]: rec.ctxid = ctx}
+           deps1 == {rec.inst: rec \in recs1} (* same session dependency *)
+           maxRec == MaxSeq(cleader) (* selecting the rec with the highest sequence number in this specific replica *)
+           recs2 == {rec \in cmdLog[cleader]: rec.state = "executed" /\ rec.cmd.op.type = "w" /\ rec.cmd.op.key = C.op.key  /\ rec.seq = maxRec.seq /\ C.op.type = "r"} 
+           (* rec.state = "executed" /\ rec.cmd.op.type = "w" => latest executed write 
+           rec.cmd.op.key = C.op.key  => key of the command to commit and the dependecy is the same.
+           rec.seq = maxRec.seq => select the rec with the maximum seq that means the latest write operation
+           C.op.type = "r" => will add this dependency only if the command to commit is a read command *)
+           inst2 == {rec.inst: rec \in recs2}
+           deps2 == {inst2} (* get from dependency *)
+           (*deps == deps1 \cup deps2*) (* taking union of same session dependency and get from dependency to calculate the transitive dependency *)
+           (* no need to calculate the transitive dependency. It will be calculated during the graph formation in the execution phase *) 
+            
+            newDeps == deps1 \cup deps2
             newSeq == 1 + Max({t.seq: t \in cmdLog[cleader]} \cup {oldClk}) 
             oldRecs == {rec \in cmdLog[cleader] : rec.inst = inst}
             waitingRecs== {rec \in cmdLog[cleader]: rec.state = "waiting"} 
@@ -267,7 +335,23 @@ StartPhase1Causal(C, cleader, Q, inst, ballot, oldMsg, oldClk,cl,ctx) ==
                                               
                                               
 StartPhase1Strong(C, cleader, Q, inst, ballot, oldMsg, oldClk,cl,ctx) ==
-    LET newDeps == {rec.inst: rec \in cmdLog[cleader]} 
+    LET recs1 == {rec \in cmdLog[cleader]: rec.ctxid = ctx}
+           deps1 == {rec.inst: rec \in recs1} (* same session dependency *)
+           maxRec == MaxSeq(cleader) (* selecting the rec with the highest sequence number in this specific replica *)
+           recs2 == {rec \in cmdLog[cleader]: rec.state = "executed" /\ rec.cmd.op.type = "w" /\ rec.cmd.op.key = C.op.key  /\ rec.seq = maxRec.seq /\ C.op.type = "r"} 
+           (* rec.state = "executed" /\ rec.cmd.op.type = "w" => latest executed write 
+           rec.cmd.op.key = C.op.key  => key of the command to commit and the dependecy is the same.
+           rec.seq = maxRec.seq => select the rec with the maximum seq that means the latest write operation
+           C.op.type = "r" => will add this dependency only if the command to commit is a read command *)
+           inst2 == {rec.inst: rec \in recs2}
+           deps2 == {inst2} (* get from dependency *)
+           (*deps == deps1 \cup deps2*) (* taking union of same session dependency and get from dependency to calculate the transitive dependency *)
+           (* no need to calculate the transitive dependency. It will be calculated during the graph formation in the execution phase *) 
+           recs3 == {rec \in cmdLog[cleader]: rec.cmd.op.key = C.op.key}
+           inst3 == {rec.inst: rec \in recs3}
+           deps3 == {inst3} (* command interference *)
+           
+           newDeps == deps1 \cup deps2 \cup deps3
             newSeq == 1 + Max({t.seq: t \in cmdLog[cleader]} \cup {oldClk}) 
             oldRecs == {rec \in cmdLog[cleader] : rec.inst = inst} 
             waitingRecs== {rec \in cmdLog[cleader]: rec.state = "waiting"} 
@@ -1224,7 +1308,7 @@ MinSeq(allInstances) ==
     CHOOSE inst \in allInstances : \A otherInst \in allInstances : 
         ChoosingSetElement("a", <<inst[1],inst[2]>>) <= ChoosingSetElement("a",<<otherInst[1],otherInst[2]>>)(*--replace replica value--*)
 
-OrderingInstancesFirstLevel(scc) ==  (*ordering based on sequence number (ascending)*)
+OrderingInstancesFirstLevel(scc) ==  (*ordering based on sequence number (ascending)*) (* it returns a sequence of instances *)
      LET
         RECURSIVE minCover(_, _)
         minCover(SeqSet, Cover) ==
@@ -1286,7 +1370,7 @@ ExecuteCommand(replica, i) ==
                            
                            ELSE 
                             LET 
-                                recs == {rec3 \in cmdLog[replica]: rec3.state = "executed" /\ rec3.cmd.op.key = rec2.cmd.op.key} (* finding the instant that has the same key as the instant that we are going to execute *)
+                                recs == {rec3 \in cmdLog[replica]: rec3.state = "executed" /\ rec3.cmd.op.key = rec2.cmd.op.key /\ rec3.cmd.op.type = rec2.cmd.op.key} (* finding the instance that has the same key as the instance that we are going to execute *)
                                 seq == {rec4.seq: rec4 \in recs} (* finding the seq number of the last write *) IN
                                     IF rec2.seq > seq THEN
                                         /\cmdLog' = [cmdLog EXCEPT ![instant[1]] = (@ \ instant[2]) \cup
@@ -1384,9 +1468,11 @@ Nontriviality ==  (* Checking whether any command committed by any replica has b
     \A i \in Instances :
         (\A C \in committed[i] : C[1] \in proposed \/ C[1] = none)
         
+        
 Consistency == (* Two replicas can never have different commands committed for the same instance. *)
     \A i \in Instances :
         (Cardinality(committed[i]) <= 1)
+        
         
 Stability == (* For any replica, the set of committed commands at any time is a subset of the committed commands at any later time. *)
     \A replica \in Replicas :
@@ -1402,16 +1488,71 @@ Stability == (* For any replica, the set of committed commands at any time is a 
                         /\ rec2.status \in {"causally-committed", "strongly-committed", "executed", "discarded"}))
 
 
-(*Consistency == (* Two replicas can never have different commands committed for the same instance. *)
-    \A i \in Instances :
-        [](Cardinality(committed[i]) <= 1)*)
+ExecutionConsistency ==  \A replica1 \in Replicas:(* All the operations should be executed in the same order in all the replicas *) (* As checking against all replicas and all instacnes, will take a longer time to execute. Can be optimized a bit to execute faster *)
+                            \A rec1 \in cmdLog[replica1]:
+                                /\ rec1.status \in {"causally-committed", "strongly-committed", "executed", "discarded"}
+                                /\ LET scc_set1 == FinalSCC(replica1,rec1.inst) IN (* picked a specific inntance for a specific replica and calculated and ordered it's scc *)
+                                    /\ \A scc1 \in scc_set1: 
+                                        /\LET ordered_scc1 == OrderingInstancesFirstLevel(scc1) IN
+                                            /\ \A replica2 \in (Replicas \ replica1): 
+                                                /\ \A rec2 \in cmdLog[replica2]: 
+                                                    /\ rec2.inst = rec1.inst
+                                                    /\ rec2.status \in  {"causally-committed", "strongly-committed", "executed", "discarded"}
+                                                    /\ LET scc_set2 == FinalSCC(replica2,rec2.inst) IN (* picked the same instance as rec1.inst for all other replicas. Calculated and ordered the scc. *)
+                                                        /\ \E scc2 \in scc_set2:
+                                                            /\ LET ordered_scc2 == OrderingInstancesFirstLevel(scc1) IN
+                                                                /\ ordered_scc1 = ordered_scc2 (*finally checking whether the scc order for a specific instance over all the replicas are same or not *)
         
-(*IsAllInstancesCommittedSame == LET pc == IsAllCommitted IN (* checking whether all instances across all the replicas committed the same commands *)
-                                pc = TRUE => IsSameCommitted (* here we have to check whether all instances have the same command *) *)
+
+SameSessionCausality ==  (* whether the same session causal order is maintaining or not *)
+                \A replica1 \in Replicas: 
+                            \A rec1 \in cmdLog[replica1]:
+                                /\ rec1.status \in {"causally-committed", "strongly-committed", "executed", "discarded"}
+                                /\ LET scc_set1 == FinalSCC(replica1,rec1.inst) IN (* picked a specific inntance for a specific replica and calculated and ordered it's scc *)
+                                    /\ \A scc1 \in scc_set1: 
+                                        /\LET ordered_scc1 == OrderingInstancesFirstLevel(scc1) IN 
+                                            /\ \A ctx \in Ctx_id: 
+                                                /\ LET same_ctx_scc == SameCtxScc(ordered_scc1, ctx, replica1)  (* Finding the instances from the same context id *)
+                                                       ordered_same_ctx_scc == OrderingBasedOnInstanceNumber(same_ctx_scc) IN (* ordering (ascending) the instances based on the instance number. 
+                                                        My assumption is that the command came earlier from a context will assign lower instance number than the command came
+                                                        from the same context at a later time *)
+                                                       /\ same_ctx_scc = ordered_same_ctx_scc 
+                                                       
+                                            
+GetFromCausality == (* whether the get from cauality is maintaining or not *)        
+                \A replica1 \in Replicas: 
+                            \A rec1 \in cmdLog[replica1]:
+                                /\ rec1.status \in {"causally-committed", "strongly-committed", "executed", "discarded"}
+                                /\ rec1.cmd.op.type = "r"
+                                /\ LET max_write_instance == MaxWriteSeq(replica1,rec1.deps) (* finding the instance with max sequence of all dependent write of a specific read command*)
+                                    max_sequence == max_write_instance.seq (* max sequence *)
+                                    recs2 == {rec \in cmdLog[replica1]: rec.inst[2] > rec1.inst[2]} (* finding all instances that came to the same replica after the read command *)
+                                    min_sequence_recs == MinSequenceRecs(recs2) (* finding the instance with the min sequence that came to the same replica after the read command *)
+                                    min_sequence == min_sequence_recs .seq (* min sequence *) IN
+                                        /\ min_sequence > max_sequence
+                (* (GetFromCausality): I am doing the following for every read command:
+                   1) finding all write operantions that are on the dependency list of the read command
+                   2) finding the max seq among all the write command of step1
+                   3) finding the commands that came to the same replica (as read command) after the read command
+                   4) finding the min sequence among all the commands of setp3
+                   5) if min sequence is greater than max sequence that means the sequence number of all the commands come after the read command is greater than the
+                   sequence number of all dependent write. That means, commands came after the read will be executed after the dependet write commands.
+                   
+                *)
+
+(* TrainsitiveCausality *)
+
+GlobalOrderingOfWrite == LET pc == IsAllExecutedOrDiscarded IN (* checking whether all instances across all the replicas are executed or discarded *)
+                                pc = TRUE => TRUE              
+                
+(*GlobalOrderingOfRead == (* once a strong read, read any write (strong/weak), all later strong read must observe that write *) *)
+                                        
+(* RealTimeOrderingOfStrong *)
 
 (***************************************************************************)
 (* Liveness Property                                                       *)
 (***************************************************************************)
+
 
 (***************************************************************************)
 (* Termination Property                                                    *)
@@ -1426,5 +1567,5 @@ Termination == <>((\A r \in Replicas:
 
 =============================================================================
 \* Modification History
-\* Last modified Mon Jan 29 15:37:54 EST 2024 by santamariashithil
+\* Last modified Wed Jan 31 09:40:34 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil

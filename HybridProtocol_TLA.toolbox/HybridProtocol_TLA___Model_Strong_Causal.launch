@@ -21,7 +21,7 @@
     <stringAttribute key="modelBehaviorNext" value=""/>
     <stringAttribute key="modelBehaviorSpec" value="Spec"/>
     <intAttribute key="modelBehaviorSpecType" value="1"/>
-    <stringAttribute key="modelBehaviorVars" value=""/>
+    <stringAttribute key="modelBehaviorVars" value="sentMsg, executed, crtInst, clk, ballots, cmdLog, leaderOfInst, committed, proposed, preparing"/>
     <stringAttribute key="modelComments" value=""/>
     <booleanAttribute key="modelCorrectnessCheckDeadlock" value="true"/>
     <listAttribute key="modelCorrectnessInvariants">
@@ -36,8 +36,9 @@
         <listEntry value="MaxBallot;;10;0;0"/>
         <listEntry value="Replicas;;{1,2,3,4,5};0;0"/>
         <listEntry value="Consistency_level;;{&quot;strong&quot;,&quot;causal&quot;};0;0"/>
-        <listEntry value="Ctx_id;;{1};0;0"/>
+        <listEntry value="Ctx_id;;{1,2};0;0"/>
         <listEntry value="Commands;;{ [op |-&gt; {[key |-&gt; &quot;x&quot;, type |-&gt; &quot;w&quot;]}], [op |-&gt; {[key |-&gt; &quot;y&quot;, type |-&gt; &quot;r&quot;]}]};0;0"/>
+        <listEntry value="Keys;;{&quot;x&quot;, &quot;y&quot;};0;0"/>
     </listAttribute>
     <listAttribute key="modelParameterDefinitions">
         <listEntry value="none;;none;1;0"/>
