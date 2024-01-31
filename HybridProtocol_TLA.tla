@@ -196,8 +196,51 @@ MaxSeq(Replica) == LET recs == {rec: rec \in cmdLog[Replica] } IN
                         CHOOSE rec \in recs : \A otherrecs \in recs:
                             rec.seq >= otherrecs.seq 
 
+SameCtxScc(ordered_scc, ctx_id, replica) == (* return instances from the same context *)(* {<<"a", 0>>, <<"a", 1>>} *)
+    LET 
+        RECURSIVE ctxScc(_, _, _, _)
+        ctxScc(scc, ctx, r, passed_scc) ==
+            IF scc = <<>> THEN
+                passed_scc
+            ELSE
+                LET  
+                    
+                    node == Head(scc)
+                    recs == {rec \in cmdLog[r]: rec.ctxid = ctx_id /\ rec.inst = node /\ rec.inst[1] = r} 
+                    inst == {rec.inst: rec \in recs} IN
+                    IF inst = {} THEN
+                    ctxScc(SubSeq(scc, 2, Len(scc)), ctx, r, passed_scc)  
+                    ELSE
+                    LET i1 == CHOOSE i \in inst: TRUE IN
+                    ctxScc(SubSeq(scc, 2, Len(scc)), ctx, r, passed_scc \cup {i1})                  
+    IN
+        ctxScc(ordered_scc, ctx_id, replica,  {})            
 
+MinInst(allInstances) ==
+    CHOOSE inst \in allInstances : \A otherInst \in allInstances : 
+        inst[2] <= otherInst[2]
 
+OrderingBasedOnInstanceNumber(scc) ==  (*ordering based on instance number (ascending)*) (* {<<"a", 0>>, <<"a", 1>>} *)
+     LET
+        RECURSIVE minCover(_, _)
+        minCover(SeqSet, Cover) ==
+            IF SeqSet = {}
+            THEN Cover
+            ELSE
+                LET inst == MinInst(SeqSet) IN
+                        minCover(SeqSet \ {inst}, Cover \cup {inst})
+     IN
+       minCover(scc, {}) 
+
+ MaxWriteSeq(Replica,deps) == LET recs == {rec: rec \in cmdLog[Replica] } IN (*returns the maximum sequence number among all the write operations *)
+                        CHOOSE rec \in recs : \A otherrecs \in recs:
+                            /\ rec.seq >= otherrecs.seq 
+                            /\ rec.inst \in deps
+                            
+                            
+MinSequenceRecs(recs) == CHOOSE rec \in recs : \A otherrecs \in recs: (* returns the rec with the minimum sequence number *)
+                            /\ rec.seq < otherrecs.seq 
+                            
 (***************************************************************************)
 (* Actions                                                                 *)
 (***************************************************************************)
@@ -1258,7 +1301,7 @@ MinSeq(allInstances) ==
     CHOOSE inst \in allInstances : \A otherInst \in allInstances : 
         ChoosingSetElement("a", <<inst[1],inst[2]>>) <= ChoosingSetElement("a",<<otherInst[1],otherInst[2]>>)(*--replace replica value--*)
 
-OrderingInstancesFirstLevel(scc) ==  (*ordering based on sequence number (ascending)*)
+OrderingInstancesFirstLevel(scc) ==  (*ordering based on sequence number (ascending)*) (* it returns a sequence of instances *)
      LET
         RECURSIVE minCover(_, _)
         minCover(SeqSet, Cover) ==
@@ -1454,9 +1497,42 @@ ExecutionConsistency ==  \A replica1 \in Replicas:(* All the operations should b
                                                                 /\ ordered_scc1 = ordered_scc2 (*finally checking whether the scc order for a specific instance over all the replicas are same or not *)
         
 
-(*CausalOrdering == (* Checking whether causal ordering is violating or not *)*)
-                
-                
+SameSessionCausality ==  (* whether the same session causal order is maintaining or not *)
+                \A replica1 \in Replicas: 
+                            \A rec1 \in cmdLog[replica1]:
+                                /\ rec1.status \in {"causally-committed", "strongly-committed", "executed", "discarded"}
+                                /\ LET scc_set1 == FinalSCC(replica1,rec1.inst) IN (* picked a specific inntance for a specific replica and calculated and ordered it's scc *)
+                                    /\ \A scc1 \in scc_set1: 
+                                        /\LET ordered_scc1 == OrderingInstancesFirstLevel(scc1) IN 
+                                            /\ \A ctx \in Ctx_id: 
+                                                /\ LET same_ctx_scc == SameCtxScc(ordered_scc1, ctx, replica1)  (* Finding the instances from the same context id *)
+                                                       ordered_same_ctx_scc == OrderingBasedOnInstanceNumber(same_ctx_scc) IN (* ordering (ascending) the instances based on the instance number. 
+                                                        My assumption is that the command came earlier from a context will assign lower instance number than the command came
+                                                        from the same context at a later time *)
+                                                       /\ same_ctx_scc = ordered_same_ctx_scc 
+                                                       
+                                            
+GetFromCausality == (* whether the get from cauality is maintaining or not *)        
+                \A replica1 \in Replicas: 
+                            \A rec1 \in cmdLog[replica1]:
+                                /\ rec1.status \in {"causally-committed", "strongly-committed", "executed", "discarded"}
+                                /\ rec1.cmd.op.type = "r"
+                                /\ LET max_write_instance == MaxWriteSeq(replica1,rec1.deps) (* finding the instance with max sequence of all dependent write of a specific read command*)
+                                    max_sequence == max_write_instance.seq (* max sequence *)
+                                    recs2 == {rec \in cmdLog[replica1]: rec.inst[2] > rec1.inst[2]} (* finding all instances that came to the same replica after the read command *)
+                                    min_sequence_recs == MinSequenceRecs(recs2) (* finding the instance with the min sequence that came to the same replica after the read command *)
+                                    min_sequence == min_sequence_recs .seq (* min sequence *) IN
+                                        /\ min_sequence > max_sequence
+                (* (GetFromCausality): I am doing the following for every read command:
+                   1) finding all write operantions that are on the dependency list of the read command
+                   2) finding the max seq among all the write command of step1
+                   3) finding the commands that came to the same replica (as read command) after the read command
+                   4) finding the min sequence among all the commands of setp3
+                   5) if min sequence is greater than max sequence that means the sequence number of all the commands come after the read command is greater than the
+                   sequence number of all dependent write. That means, commands came after the read will be executed after the dependet write commands.
+                   
+                *)
+                                        
 
 (***************************************************************************)
 (* Liveness Property                                                       *)
@@ -1480,5 +1556,5 @@ Termination == <>((\A r \in Replicas:
 
 =============================================================================
 \* Modification History
-\* Last modified Wed Jan 31 06:12:18 EST 2024 by santamariashithil
+\* Last modified Wed Jan 31 08:54:38 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil
