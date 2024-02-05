@@ -134,7 +134,7 @@ TypeOK ==
                                        consistency: Consistency_level \cup {none},
                                        ctxid: Ctx_id \cup {none},
                                        execution_order: Nat, (* This is the global order of execution in a specific replica. Ordering will start from 1. O means not executed yet and no specific execution order. *)
-                                       execution_order_list: SUBSET Instances]]
+                                       execution_order_list: SUBSET {Nat \X Instances}]]
     /\ proposed \in SUBSET Commands
     /\ executed \in [Replicas -> SUBSET (Nat \X Commands)]
     /\ sentMsg \in SUBSET Message
@@ -247,15 +247,6 @@ OrderingBasedOnInstanceNumber(scc) ==  (*ordering based on instance number (asce
      IN
        minCover(scc, {},0) 
        
-        
-       
-       
-       
-       
-       
-       
-       
-
  MaxWriteSeq(Replica,deps) == LET recs == {rec: rec \in cmdLog[Replica] } IN (*returns the maximum sequence number among all the write operations *)
                         CHOOSE rec \in recs : \A otherrecs \in recs:
                             /\ rec.seq >= otherrecs.seq 
@@ -269,6 +260,29 @@ MinSequenceRecs(recs) == CHOOSE rec \in recs : \A otherrecs \in recs: (* returns
 FindMaxExecutionOrder(replica) == LET allrecs == {rec: rec \in cmdLog[replica]} IN (* return the instance with the highest execution_order *)
                                         CHOOSE rec \in allrecs : \A otherrec \in allrecs : 
                                              rec.execution_order >= otherrec.execution_order
+                                             
+                                             
+                                             
+LatestWrite(key, replica) ==  LET recs1 == {rec: rec \in cmdLog[replica]}
+                                  recs2 == {rec \in recs1: rec.cmd.op.key = key /\ rec.cmd.op.type = "w"} IN
+                                   CHOOSE rec \in recs2 : \A otherrecs \in recs2:
+                                    /\ rec.execution_order >= otherrecs.execution_order
+                                    
+                                                                        
+LatestWriteofSpecificKey(key)  ==  (* finidng the latest write of a specific key across all the replicas *)
+    LET 
+        RECURSIVE latestWrite(_, _, _)
+        latestWrite(k, r, lw) == 
+            IF r = {}
+            THEN lw
+            ELSE
+                LET replica == CHOOSE x \in r: TRUE
+                lw2 == LatestWrite(k, replica)
+                IN
+                latestWrite(k, r \ {replica}, lw \cup {lw2})
+                
+    IN
+        latestWrite(key, Replicas, {})
                             
 (***************************************************************************)
 (* Actions                                                                 *)
@@ -1644,12 +1658,17 @@ GetFromCausality == (* whether the get from cauality is maintaining or not *)
 
 (* TrainsitiveCausality *)
 
-GlobalOrderingOfWrite == (* checking whether the system is convergin or not? *)
+GlobalOrderingOfWrite == (* checking whether the system is converging or not? *)
         LET pc == IsAllExecutedOrDiscarded IN (* checking whether all instances across all the replicas are executed or discarded *)
-                                pc = TRUE => \A key in \Keys: 
-                                            LET all_latest_write == LatestWriteofSpecificKey(key, Replicas) IN              
-                
-(*GlobalOrderingOfRead == (* once a strong read, read any write (strong/weak), all later strong read must observe that write *) *)
+                                pc = TRUE => \A key \in Keys: 
+                                                LET all_latest_write == LatestWriteofSpecificKey(key) IN 
+                                                \A recs \in all_latest_write : \A otherrecs \in all_latest_write :
+                                                 /\ recs.inst = otherrecs.inst
+                                            
+                                            
+                  
+                                                                       
+GlobalOrderingOfRead == (* once a strong read, read any write (strong/weak), all later strong read must observe that write *) 
                                         
 (* RealTimeOrderingOfStrong *)
 
@@ -1671,5 +1690,5 @@ Termination == <>((\A r \in Replicas:
 
 =============================================================================
 \* Modification History
-\* Last modified Wed Jan 31 20:26:25 EST 2024 by santamariashithil
+\* Last modified Sun Feb 04 21:50:26 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil
