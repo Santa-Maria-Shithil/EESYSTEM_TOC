@@ -134,6 +134,7 @@ TypeOK ==
                                        consistency: Consistency_level \cup {none},
                                        ctxid: Ctx_id \cup {none},
                                        execution_order: Nat, (* This is the global order of execution in a specific replica. Ordering will start from 1. O means not executed yet and no specific execution order. *)
+                                       commit_order : Nat,
                                        execution_order_list: SUBSET {Nat \X Instances}]]
     /\ proposed \in SUBSET Commands
     /\ executed \in [Replicas -> SUBSET (Nat \X Commands)]
@@ -317,6 +318,32 @@ IsMajorityCommitted(inst) == (* finding in how many replicas the instance is com
                     majorityCommitted(i, r \ {replica}, flist \cup inst2)
     IN 
         majorityCommitted(inst, Replicas, {})
+        
+        
+        
+MaxCommitNumber(replica) ==  LET recs == {rec: rec \in cmdLog[replica] } IN
+                        CHOOSE rec \in recs : \A otherrecs \in recs:
+                            /\ rec.commit_order >= otherrecs.commit_order
+                            /\ rec.status \in {"strongly-committed", "executed", "discarded"}
+                            /\ otherrecs.status \in {"strongly-committed", "executed", "discarded"}
+        
+        
+MaxCommitOrder ==  (* finding the max commit order among all the replicas *)
+     LET 
+        RECURSIVE maxCommit(_, _)
+        maxCommit(r, max) ==
+            IF r = {}
+            THEN max
+            ELSE
+                LET
+                    replica == CHOOSE x \in r: TRUE
+                    max2 == MaxCommitNumber(replica) IN
+                    IF max2.commit_order >= max THEN
+                    maxCommit(r \ {replica}, max2.commit_order)
+                    ELSE
+                    maxCommit(r \ {replica}, max.commit_order)
+    IN 
+        maxCommit(Replicas, 1) (* initial commit number is 1 *)
                             
 (***************************************************************************)
 (* Actions                                                                 *)
@@ -336,6 +363,8 @@ StartPhase1Causal(C, cleader, Q, inst, ballot, oldMsg, oldClk,cl,ctx) ==
            (*deps == deps1 \cup deps2*) (* taking union of same session dependency and get from dependency to calculate the transitive dependency *)
            (* no need to calculate the transitive dependency. It will be calculated during the graph formation in the execution phase *) 
             
+       
+            
             newDeps == deps1 \cup deps2
             newSeq == 1 + Max({t.seq: t \in cmdLog[cleader]} \cup {oldClk}) 
             oldRecs == {rec \in cmdLog[cleader] : rec.inst = inst}
@@ -353,7 +382,8 @@ StartPhase1Causal(C, cleader, Q, inst, ballot, oldMsg, oldClk,cl,ctx) ==
                                           consistency |-> cl,
                                           ctxid |-> ctx,
                                           execution_order |-> 0,
-                                          execution_order_list |-> {} ]}]
+                                          execution_order_list |-> {},
+                                          commit_order |-> 0 ]}]   (* incase of causal command, the commit order will be always 0 and will not be tracked *)
                 /\ leaderOfInst' = [leaderOfInst EXCEPT ![cleader] = @ \cup {inst}]
                 /\ sentMsg' = (sentMsg \ oldMsg) \cup 
                                         [type  : {"commit"},
@@ -366,7 +396,8 @@ StartPhase1Causal(C, cleader, Q, inst, ballot, oldMsg, oldClk,cl,ctx) ==
                                           seq   : {newSeq},
                                           consistency : {cl},
                                           ctxid : {ctx},
-                                          clk : {oldClk}]
+                                          clk : {oldClk},
+                                          commit_order : {0}]
 
            ELSE
                  /\ cmdLog' = [cmdLog EXCEPT ![cleader] = (@ \ oldRecs) \cup 
@@ -380,7 +411,8 @@ StartPhase1Causal(C, cleader, Q, inst, ballot, oldMsg, oldClk,cl,ctx) ==
                                           consistency |-> cl,
                                           ctxid |-> ctx,
                                           execution_order |-> 0,
-                                          execution_order_list |-> {}   ]}]
+                                          execution_order_list |-> {},
+                                          commit_order |-> 0   ]}]
                 /\ LET newcmdstate == checkWaiting(cleader) IN
                      /\ cmdLog' = [cmdLog EXCEPT ![cleader] = (@ \ oldRecs) \cup 
                         {[inst   |-> inst,
@@ -391,7 +423,10 @@ StartPhase1Causal(C, cleader, Q, inst, ballot, oldMsg, oldClk,cl,ctx) ==
                           deps   |-> newDeps,
                           seq    |-> newSeq,
                           consistency |-> cl,
-                          ctxid |-> ctx ]}]
+                          ctxid |-> ctx,
+                          execution_order |-> 0,
+                          execution_order_list |-> {},
+                          commit_order |-> 0 ]}]
                     /\ leaderOfInst' = [leaderOfInst EXCEPT ![cleader] = @ \cup {inst}]
                     /\ sentMsg' = (sentMsg \ oldMsg) \cup 
                                             [type  : {"commit"},
@@ -404,7 +439,8 @@ StartPhase1Causal(C, cleader, Q, inst, ballot, oldMsg, oldClk,cl,ctx) ==
                                               seq   : {newSeq},
                                               consistency : {cl},
                                               ctxid : {ctx},
-                                              clk : {oldClk}]
+                                              clk : {oldClk},
+                                              commit_order : {0}]
                                               
                                               
                                               
@@ -426,6 +462,13 @@ StartPhase1Strong(C, cleader, Q, inst, ballot, oldMsg, oldClk,cl,ctx) ==
            deps3 == {inst3} (* command interference *)
            
            newDeps == deps1 \cup deps2 \cup deps3
+           
+                
+            maxCommit == MaxCommitOrder (* finding the max commit order among all the strong committed instances across the replicas *)
+            
+           
+           
+           
             newSeq == 1 + Max({t.seq: t \in cmdLog[cleader]} \cup {oldClk}) 
             oldRecs == {rec \in cmdLog[cleader] : rec.inst = inst} 
             waitingRecs== {rec \in cmdLog[cleader]: rec.state = "waiting"} 
@@ -442,7 +485,8 @@ StartPhase1Strong(C, cleader, Q, inst, ballot, oldMsg, oldClk,cl,ctx) ==
                                           consistency |-> cl,
                                           ctxid |-> ctx,
                                           execution_order |-> 0,
-                                          execution_order_list |-> {}]}]
+                                          execution_order_list |-> {},
+                                          commit_order |-> maxCommit+1 ]}]
                 /\ leaderOfInst' = [leaderOfInst EXCEPT ![cleader] = @ \cup {inst}]
                 /\ sentMsg' = (sentMsg \ oldMsg) \cup 
                                         [type  : {"pre-accept"},
@@ -455,7 +499,8 @@ StartPhase1Strong(C, cleader, Q, inst, ballot, oldMsg, oldClk,cl,ctx) ==
                                           seq   : {newSeq},
                                           consistency : {cl},
                                           ctxid : {ctx},
-                                          clk : {oldClk}]
+                                          clk : {oldClk},
+                                          commit_order : {maxCommit+1}]
            ELSE
                  /\ cmdLog' = [cmdLog EXCEPT ![cleader] = (@ \ oldRecs) \cup 
                                         {[inst   |-> inst,
@@ -468,7 +513,8 @@ StartPhase1Strong(C, cleader, Q, inst, ballot, oldMsg, oldClk,cl,ctx) ==
                                           consistency |-> cl,
                                           ctxid |-> ctx,
                                           execution_order |-> 0,
-                                          execution_order_list |-> {}]}]
+                                          execution_order_list |-> {},
+                                          commit_order |-> maxCommit+1]}]
                 /\ LET newcmdstate == checkWaiting(cleader) IN
                      /\ cmdLog' = [cmdLog EXCEPT ![cleader] = (@ \ oldRecs) \cup 
                         {[inst   |-> inst,
@@ -481,7 +527,8 @@ StartPhase1Strong(C, cleader, Q, inst, ballot, oldMsg, oldClk,cl,ctx) ==
                           consistency |-> cl,
                           ctxid |-> ctx,
                            execution_order |-> 0,
-                          execution_order_list |-> {}]}]
+                          execution_order_list |-> {},
+                          commit_order |-> maxCommit+1]}]
                     /\ leaderOfInst' = [leaderOfInst EXCEPT ![cleader] = @ \cup {inst}]
                     /\ sentMsg' = (sentMsg \ oldMsg) \cup 
                                             [type  : {"pre-accept"},
@@ -494,7 +541,8 @@ StartPhase1Strong(C, cleader, Q, inst, ballot, oldMsg, oldClk,cl,ctx) ==
                                               seq   : {newSeq},
                                               consistency : {cl},
                                               ctxid : {ctx},
-                                              clk : {oldClk}]
+                                              clk : {oldClk},
+                                              commit_order : {maxCommit+1}]
 
 
 StartPhase1(C, cleader, Q, inst, ballot, oldMsg, oldClk,cl,ctx) ==
@@ -547,7 +595,8 @@ Phase1Reply(replica) ==
                                               consistency |-> msg.consistency,
                                               ctxid |-> msg.ctxid,
                                               execution_order |-> 0,
-                                              execution_order_list |-> {}  ]}]
+                                              execution_order_list |-> {},
+                                              commit_order |-> msg.commit_order]}]
                         /\ sentMsg' = (sentMsg \ {msg}) \cup
                                             {[type  |-> "pre-accept-reply",
                                               src   |-> replica,
@@ -559,7 +608,8 @@ Phase1Reply(replica) ==
                                               committed|-> instCom,
                                               consistency |-> msg.consistency,
                                               ctxid |-> msg.ctxid,
-                                              clk |-> newClk]}
+                                              clk |-> newClk,
+                                              commit_order |-> msg.commit_order]}
                         /\ clk' = [clk EXCEPT ![replica] = newClk]
                         /\ UNCHANGED << proposed, crtInst, executed, leaderOfInst,
                                         committed, ballots, preparing >>
@@ -575,7 +625,8 @@ Phase1Reply(replica) ==
                                               consistency |-> msg.consistency,
                                               ctxid |-> msg.ctxid,
                                               execution_order |-> 0,
-                                              execution_order_list |-> {}  ]}]
+                                              execution_order_list |-> {},
+                                              commit_order |-> msg.commit_order  ]}]
                         /\ LET newcmdstate == checkWaiting(replica) IN
                             /\ cmdLog' = [cmdLog EXCEPT ![replica] = (@ \ oldRec) \cup
                                             {[inst   |-> msg.inst,
@@ -588,7 +639,8 @@ Phase1Reply(replica) ==
                                               consistency |-> msg.consistency,
                                               ctxid |-> msg.ctxid,
                                               execution_order |-> 0,
-                                              execution_order_list |-> {}]}]
+                                              execution_order_list |-> {},
+                                              commit_order |-> msg.commit_order]}]
                              /\ sentMsg' = (sentMsg \ {msg}) \cup
                                             {[type  |-> "pre-accept-reply",
                                               src   |-> replica,
@@ -600,7 +652,8 @@ Phase1Reply(replica) ==
                                               committed|-> instCom,
                                               consistency |-> msg.consistency,
                                               ctxid |-> msg.ctxid,
-                                              clk |-> newClk]}
+                                              clk |-> newClk,
+                                              commit_order |-> msg.commit_order]}
                              /\ clk' = [clk EXCEPT ![replica] = newClk]
                              /\ UNCHANGED << proposed, crtInst, executed, leaderOfInst,
                                         committed, ballots, preparing >>
@@ -642,7 +695,8 @@ Phase1Fast(cleader, i, Q) ==
                                           consistency |-> record.consistency,
                                           ctxid |-> record.ctxid,
                                           execution_order |-> 0,
-                                          execution_order_list |-> {} ]}]
+                                          execution_order_list |-> {},
+                                          commit_order |-> r.commit_order ]}]
                 /\ LET newClk == [clk EXCEPT ![cleader] = @+1] IN
                             sentMsg' = (sentMsg \ replies) \cup
                             {[type  |-> "commit",
@@ -653,7 +707,8 @@ Phase1Fast(cleader, i, Q) ==
                             seq     |-> r.seq,
                             consistency |-> r.consistency,
                             ctxid |-> r.ctxid,
-                            clk |-> newClk[cleader]]}
+                            clk |-> newClk[cleader],
+                            commit_order |-> r.commit_order]}
                 /\ leaderOfInst' = [leaderOfInst EXCEPT ![cleader] = @ \ {i}]
                 /\ committed' = [committed EXCEPT ![i] = 
                                             @ \cup {<<record.cmd, r.deps, r.seq>>}]
@@ -692,7 +747,8 @@ Phase1Slow(cleader, i, Q) ==
                                                       consistency |-> record.consistency, 
                                                       ctxid |-> record.ctxid,
                                                       execution_order |-> 0,
-                                                      execution_order_list |-> {}  ]}]
+                                                      execution_order_list |-> {},
+                                                      commit_order |-> record.commit_order]}]
                             /\ LET newClk == [clk EXCEPT ![cleader] = @+1] IN \E SQ \in SlowQuorums(cleader):
                                (sentMsg' = (sentMsg \ replies) \cup
                                         [type : {"accept"},
@@ -705,7 +761,8 @@ Phase1Slow(cleader, i, Q) ==
                                         seq : {finalSeq},
                                         consistency : {record.consistency},
                                         ctxid : {record.ctxid},
-                                        clk : {newClk[cleader]}])
+                                        clk : {newClk[cleader]},
+                                        commit_order : {record.commit_order}])
                             /\ clk' = [clk EXCEPT ![cleader] = @+1]
                             /\ UNCHANGED << proposed, executed, crtInst, leaderOfInst,
                                             committed, ballots, preparing >>
@@ -721,7 +778,8 @@ Phase1Slow(cleader, i, Q) ==
                                                       consistency |-> record.consistency, 
                                                       ctxid |-> record.ctxid,
                                                       execution_order |-> 0,
-                                                      execution_order_list |-> {}  ]}]
+                                                      execution_order_list |-> {},
+                                                      commit_order |-> record.commit_order  ]}]
                             /\ LET newcmdstate == checkWaiting(cleader) IN
                                 /\ cmdLog' = [cmdLog EXCEPT ![cleader] = (@ \ {record}) \cup 
                                                     {[inst   |-> i,
@@ -734,7 +792,8 @@ Phase1Slow(cleader, i, Q) ==
                                                       consistency |-> record.consistency, 
                                                       ctxid |-> record.ctxid,
                                                       execution_order |-> 0,
-                                                      execution_order_list |-> {}  ]}]
+                                                      execution_order_list |-> {},
+                                                      commit_order |-> record.commit_order  ]}]
                                 /\ LET newClk == [clk EXCEPT ![cleader] = @+1] IN \E SQ \in SlowQuorums(cleader):
                                    (sentMsg' = (sentMsg \ replies) \cup
                                             [type : {"accept"},
@@ -747,7 +806,8 @@ Phase1Slow(cleader, i, Q) ==
                                             seq : {finalSeq},
                                             consistency : {record.consistency},
                                             ctxid : {record.ctxid},
-                                            clk : {newClk[cleader]}])
+                                            clk : {newClk[cleader]},
+                                            commit_order : {record.commit_order}])
                                 /\ clk' = [clk EXCEPT ![cleader] = @+1]
                                 /\ UNCHANGED << proposed, executed, crtInst, leaderOfInst,
                                                 committed, ballots, preparing >>
@@ -775,7 +835,8 @@ Phase1Slow(cleader, i, Q) ==
                               consistency |-> msg.consistency, 
                               ctxid |-> msg.ctxid,
                               execution_order |-> 0,
-                              execution_order_list |-> {} ]}]
+                              execution_order_list |-> {},
+                              commit_order |-> msg.commit_order ]}]
         /\ LET newClk == [clk EXCEPT ![replica] = @+1] IN
             sentMsg' = (sentMsg \ {msg}) \cup
                                 {[type  |-> "accept-reply",
@@ -785,7 +846,8 @@ Phase1Slow(cleader, i, Q) ==
                                   ballot|-> msg.ballot,
                                   consistency |-> msg.consistency,
                                   ctxid |-> msg.ctxid,
-                                  clk |-> newClk[replica]]}
+                                  clk |-> newClk[replica],
+                                  commit_order |-> msg.commit_order]}
         /\ clk' = [clk EXCEPT ![replica] = @+1]
         /\ UNCHANGED << proposed, crtInst, executed, leaderOfInst,
                         committed, ballots, preparing >>   
@@ -803,7 +865,8 @@ Phase1Slow(cleader, i, Q) ==
                               consistency |-> msg.consistency, 
                               ctxid |-> msg.ctxid,
                               execution_order |-> 0,
-                              execution_order_list |-> {} ]}]
+                              execution_order_list |-> {},
+                              commit_order |-> msg.commit_order ]}]
            /\ LET newcmdstate == checkWaiting(replica) IN   
              /\ cmdLog' = [cmdLog EXCEPT ![replica] = (@ \ oldRec) \cup
                             {[inst   |-> msg.inst,
@@ -826,7 +889,8 @@ Phase1Slow(cleader, i, Q) ==
                                       ballot|-> msg.ballot,
                                       consistency |-> msg.consistency,
                                       ctxid |-> msg.ctxid,
-                                      clk |-> newClk[replica]]}
+                                      clk |-> newClk[replica],
+                                      commit_order |-> msg.commit_order]}
               /\ clk' = [clk EXCEPT ![replica] = @+1]
               /\ UNCHANGED << proposed, crtInst, executed, leaderOfInst,
                             committed, ballots, preparing >>                                          
@@ -859,7 +923,8 @@ Phase1Slow(cleader, i, Q) ==
                                       consistency |-> record.consistency,
                                       ctxid |-> record.ctxid,
                                       execution_order |-> 0,
-                                      execution_order_list |-> {} ]}]
+                                      execution_order_list |-> {},
+                                      commit_order |-> record.commit_order ]}]
             /\ LET newClk == [clk EXCEPT ![cleader] = @+1] IN
                sentMsg' = (sentMsg \ replies) \cup
                         {[type  |-> "commit",
@@ -870,7 +935,8 @@ Phase1Slow(cleader, i, Q) ==
                         seq     |-> record.seq,
                         consistency |-> record.consistency,
                         ctxid |-> record.ctxid,
-                        clk |-> newClk[cleader]]}
+                        clk |-> newClk[cleader],
+                        commit_order |-> record.commit_order]}
             /\ committed' = [committed EXCEPT ![i] = @ \cup 
                                {<<record.cmd, record.deps, record.seq>>}]
             /\ leaderOfInst' = [leaderOfInst EXCEPT ![cleader] = @ \ {i}]
@@ -900,7 +966,8 @@ CommitCausal(replica, cmsg) ==
                                               consistency |-> cmsg.consistency,
                                               ctxid |-> cmsg.ctxid,
                                               execution_order |-> 0,
-                                              execution_order_list |-> {}  ]}]
+                                              execution_order_list |-> {},
+                                              commit_order |-> cmsg.commit_order  ]}]
                 /\ committed' = [committed EXCEPT ![cmsg.inst] = @ \cup 
                                        {<<cmsg.cmd, cmsg.deps, cmsg.seq>>}]
                 /\ clk' = [clk EXCEPT ![replica] = newClk]
@@ -920,7 +987,8 @@ CommitCausal(replica, cmsg) ==
                                               consistency |-> cmsg.consistency,
                                               ctxid |-> cmsg.ctxid,
                                               execution_order |-> 0,
-                                              execution_order_list |-> {}  ]}]
+                                              execution_order_list |-> {},
+                                              commit_order |-> cmsg.commit_order  ]}]
                 /\ LET newcmdstate == checkWaiting(replica) IN
                     /\ cmdLog' = [cmdLog EXCEPT ![replica] = (@ \ oldRec) \cup 
                                                 {[inst     |-> cmsg.inst,
@@ -933,7 +1001,8 @@ CommitCausal(replica, cmsg) ==
                                                   consistency |-> cmsg.consistency,
                                                   ctxid |-> cmsg.ctxid,
                                                   execution_order |-> 0,
-                                                  execution_order_list |-> {}  ]}]
+                                                  execution_order_list |-> {},
+                                                  commit_order |-> cmsg.commit_order  ]}]
                     /\ committed' = [committed EXCEPT ![cmsg.inst] = @ \cup 
                                            {<<cmsg.cmd, cmsg.deps, cmsg.seq>>}]
                     /\ clk' = [clk EXCEPT ![replica] = newClk]
@@ -962,7 +1031,8 @@ CommitStrong(replica, cmsg) ==
                                               consistency |-> cmsg.consistency,
                                               ctxid |-> cmsg.ctxid,
                                               execution_order |-> 0,
-                                              execution_order_list |-> {}  ]}]
+                                              execution_order_list |-> {},
+                                              commit_order |-> cmsg.commit_order  ]}]
                 /\ committed' = [committed EXCEPT ![cmsg.inst] = @ \cup 
                                        {<<cmsg.cmd, cmsg.deps, cmsg.seq>>}]
                 /\ clk' = [clk EXCEPT ![replica] = newClk]
@@ -982,7 +1052,8 @@ CommitStrong(replica, cmsg) ==
                                               consistency |-> cmsg.consistency,
                                               ctxid |-> cmsg.ctxid,
                                               execution_order |-> 0 ,
-                                              execution_order_list |-> {} ]}]
+                                              execution_order_list |-> {},
+                                              commit_order |-> cmsg.commit_order ]}]
                 /\ LET newcmdstate == checkWaiting(replica) IN
                     /\ cmdLog' = [cmdLog EXCEPT ![replica] = (@ \ oldRec) \cup 
                                                 {[inst     |-> cmsg.inst,
@@ -995,7 +1066,8 @@ CommitStrong(replica, cmsg) ==
                                                   consistency |-> cmsg.consistency,
                                                   ctxid |-> cmsg.ctxid,
                                                   execution_order |-> 0,
-                                                  execution_order_list |-> {}]}]
+                                                  execution_order_list |-> {},
+                                                  commit_order |-> cmsg.commit_order]}]
                     /\ committed' = [committed EXCEPT ![cmsg.inst] = @ \cup 
                                            {<<cmsg.cmd, cmsg.deps, cmsg.seq>>}]
                     /\ clk' = [clk EXCEPT ![replica] = newClk]
@@ -1053,7 +1125,8 @@ SendPrepare(replica, i, Q) ==
                               deps  |-> rec.deps,
                               seq   |-> rec.seq,
                               consistency |-> rec.consistency,
-                              ctxid |-> rec.ctxid]}
+                              ctxid |-> rec.ctxid,
+                              commit_order |-> rec.commit_order]}
                  /\ cmdLog' = [cmdLog EXCEPT ![replica] = (@ \ {rec}) \cup
                             {[inst  |-> rec.inst,
                               status|-> rec.status,
@@ -1065,7 +1138,8 @@ SendPrepare(replica, i, Q) ==
                               consistency |-> rec.consistency,
                               ctxid |-> rec.ctxid,
                               execution_order |-> 0,
-                              execution_order_list |-> {} ]}]
+                              execution_order_list |-> {},
+                              commit_order |-> rec.commit_order ]}]
                  /\ IF rec.inst \in leaderOfInst[replica] THEN
                         /\ leaderOfInst' = [leaderOfInst EXCEPT ![replica] = 
                                                                 @ \ {rec.inst}]
@@ -1504,7 +1578,8 @@ ExecuteCommand(replica, i) ==
                                                       consistency |-> rec2.consistency,
                                                       ctxid |-> rec2.ctxid,
                                                       execution_order |-> (max_execution_order+1),
-                                                      execution_order_list |-> instant]}]
+                                                      execution_order_list |-> instant,
+                                                      commit_order |-> rec2.commit_order]}]
                                     /\UNCHANGED <<proposed, executed, sentMsg, crtInst, leaderOfInst,
                                             committed, ballots, preparing, clk>>
                                    
@@ -1524,7 +1599,8 @@ ExecuteCommand(replica, i) ==
                                                       consistency |-> rec2.consistency,
                                                       ctxid |-> rec2.ctxid,
                                                       execution_order |-> (max_execution_order+1),
-                                                      execution_order_list |-> instant  ]}]
+                                                      execution_order_list |-> instant,
+                                                      commit_order |-> rec2.commit_order  ]}]
                                                /\UNCHANGED <<proposed, executed, sentMsg, crtInst, leaderOfInst,
                                                  committed, ballots, preparing, clk>>
                                             ELSE
@@ -1539,7 +1615,8 @@ ExecuteCommand(replica, i) ==
                                                       consistency |-> rec2.consistency,
                                                       ctxid |-> rec2.ctxid,
                                                       execution_order |-> (max_execution_order+1),
-                                                      execution_order_list |-> instant  ]}]
+                                                      execution_order_list |-> instant,
+                                                      commit_order |-> rec2.commit_order  ]}]
                                                /\UNCHANGED <<proposed, executed, sentMsg, crtInst, leaderOfInst,
                                                  committed, ballots, preparing, clk>>
      (* instant == { <<1, <<"a", 0>>>>,
@@ -1563,9 +1640,10 @@ CommandLeaderAction ==
             \/ (\E Q \in FastQuorums(cleader) : Phase1Fast(cleader, inst, Q))
             \/ (\E Q \in SlowQuorums(cleader) : Phase1Slow(cleader, inst, Q))
             \/ (\E Q \in SlowQuorums(cleader) : Phase2Finalize(cleader, inst, Q))
-            \/ (\E Q \in SlowQuorums(cleader) : FinalizeTryPreAccept(cleader, inst, Q)))
-    \/ \E replica \in Replicas: 
-            \E inst \in cmdLog[replica]: ExecuteCommand(replica, inst)
+            (* \/ (\E Q \in SlowQuorums(cleader) : FinalizeTryPreAccept(cleader, inst, Q))) *)
+            )
+    \/ (\E replica \in Replicas: 
+            \E inst \in cmdLog[replica]: ExecuteCommand(replica, inst))
     
     
   
@@ -1577,14 +1655,14 @@ ReplicaAction ==
         (\/ Phase1Reply(replica)
          \/ \E cmsg \in sentMsg : (cmsg.type = "commit" /\ Commit(replica, cmsg))
          \/ Phase2Reply(replica)
-         \/ \E i \in Instances : 
+         (*\/ \E i \in Instances : 
             /\ crtInst[i[1]] > i[2] (* This condition states that the instance has *) 
                                     (* been started by its original owner          *)
             /\ \E Q \in SlowQuorums(replica) : SendPrepare(replica, i, Q)
          \/ ReplyPrepare(replica)
          \/ \E i \in preparing[replica] :
             \E Q \in SlowQuorums(replica) : PrepareFinalize(replica, i, Q)
-         \/ ReplyTryPreaccept(replica)
+         \/ ReplyTryPreaccept(replica)*)
          \/ \E inst \in cmdLog[replica]: ExecuteCommand(replica, inst)
          )
 
@@ -1721,7 +1799,14 @@ GlobalOrderingOfRead == (* once a strong read, read any write (strong/weak), all
                 *)         
                                     
                                         
-(* RealTimeOrderingOfStrong *)
+RealTimeOrderingOfStrong  == (* If two interfering strong commands γ and δ are serialized by clients (i.e., δ is pro-
+posed only after γ is committed by any replica), then every replica will execute γ before δ.*) (* this holds only for strong commands *)
+    \A replica \in Replicas:
+        \A rec1, rec2 \in cmdLog[replica]:
+            /\ rec1.consistency \in {"strong"}
+            /\ rec2.consistency \in {"strong"}
+            /\ rec1.commit_order > rec2.commit_order => rec1.execution_order > rec2.execution_order
+    
 
 (***************************************************************************)
 (* Liveness Property                                                       *)
@@ -1741,5 +1826,5 @@ Termination == <>((\A r \in Replicas:
 
 =============================================================================
 \* Modification History
-\* Last modified Mon Feb 05 00:09:36 EST 2024 by santamariashithil
+\* Last modified Mon Feb 05 03:20:04 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil
