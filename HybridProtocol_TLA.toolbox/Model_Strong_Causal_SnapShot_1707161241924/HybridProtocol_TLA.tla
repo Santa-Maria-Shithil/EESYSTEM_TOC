@@ -136,7 +136,7 @@ TypeOK ==
                                        execution_order: Nat, (* This is the global order of execution in a specific replica. Ordering will start from 1. O means not executed yet and no specific execution order. *)
                                        commit_order : Nat,
                                        execution_order_list: SUBSET {Nat \X Instances}]]
-    (*/\ proposed \in SUBSET Commands
+    /\ proposed \in SUBSET Commands
     /\ executed \in [Replicas -> SUBSET (Nat \X Commands)]
     /\ sentMsg \in SUBSET Message
     /\ crtInst \in [Replicas -> Nat]
@@ -146,7 +146,7 @@ TypeOK ==
                                            Nat)]
     /\ ballots \in Nat
     /\ preparing \in [Replicas -> SUBSET Instances]
-    /\ clk \in [Replicas -> Nat]*)
+    /\ clk \in [Replicas -> Nat]
     (*/\ scc \in [Commands -> SUBSET Instances]*)
    
     
@@ -1823,5 +1823,5 @@ Termination == <>((\A r \in Replicas:
 
 =============================================================================
 \* Modification History
-\* Last modified Mon Feb 05 14:32:32 EST 2024 by santamariashithil
+\* Last modified Mon Feb 05 13:53:11 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil

@@ -55,6 +55,7 @@ const CHECKPOINT_PERIOD = 10000
 
 var cpMarker []state.Command
 var cpcounter = 0
+var clk = 0
 
 type Replica struct {
 	*genericsmr.Replica
@@ -1076,7 +1077,7 @@ func (r *Replica) handlePropose(propose *genericsmr.Propose) {
 
 func (r *Replica) startPhase1(replica int32, instance int32, ballot int32, proposals []*genericsmr.Propose, cmds []state.Command, batchSize int) {
 	//init command attributes
-
+	clk++
 	seq := int32(0)
 	deps := make([]int32, r.N)
 	for q := 0; q < r.N; q++ {

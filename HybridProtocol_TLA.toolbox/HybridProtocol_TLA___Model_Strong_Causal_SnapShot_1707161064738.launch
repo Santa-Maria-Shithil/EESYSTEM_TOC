@@ -2,7 +2,7 @@
 <launchConfiguration type="org.lamport.tla.toolbox.tool.tlc.modelCheck">
     <stringAttribute key="TLCCmdLineParameters" value=""/>
     <intAttribute key="collectCoverage" value="0"/>
-    <stringAttribute key="configurationName" value="Model_Strong_Causal"/>
+    <stringAttribute key="configurationName" value="Model_Strong_Causal_SnapShot_1707161064738"/>
     <booleanAttribute key="deferLiveness" value="false"/>
     <intAttribute key="dfidDepth" value="100"/>
     <booleanAttribute key="dfidMode" value="false"/>
@@ -12,7 +12,7 @@
     <stringAttribute key="distributedTLC" value="off"/>
     <stringAttribute key="distributedTLCVMArgs" value=""/>
     <intAttribute key="fpBits" value="1"/>
-    <intAttribute key="fpIndex" value="66"/>
+    <intAttribute key="fpIndex" value="88"/>
     <booleanAttribute key="fpIndexRandom" value="true"/>
     <intAttribute key="maxHeapSize" value="25"/>
     <intAttribute key="maxSetSize" value="1000000"/>
@@ -25,16 +25,16 @@
     <stringAttribute key="modelComments" value=""/>
     <booleanAttribute key="modelCorrectnessCheckDeadlock" value="true"/>
     <listAttribute key="modelCorrectnessInvariants">
-        <listEntry value="0TypeOK"/>
+        <listEntry value="1TypeOK"/>
     </listAttribute>
     <listAttribute key="modelCorrectnessProperties">
         <listEntry value="0Termination"/>
     </listAttribute>
     <intAttribute key="modelEditorOpenTabs" value="8"/>
-    <stringAttribute key="modelExpressionEval" value="Instances"/>
+    <stringAttribute key="modelExpressionEval" value=""/>
     <listAttribute key="modelParameterConstants">
         <listEntry value="MaxBallot;;10;0;0"/>
-        <listEntry value="Replicas;;{1,2,3,4,5};0;0"/>
+        <listEntry value="Replicas;;{1,2,3};0;0"/>
         <listEntry value="Consistency_level;;{&quot;strong&quot;,&quot;causal&quot;};0;0"/>
         <listEntry value="Ctx_id;;{1,2};0;0"/>
         <listEntry value="Commands;;{ [op |-&gt; [key |-&gt; &quot;x&quot;, type |-&gt; &quot;w&quot;]], [op |-&gt; [key |-&gt; &quot;y&quot;, type |-&gt; &quot;r&quot;]], [op |-&gt; [key |-&gt; &quot;x&quot;, type |-&gt; &quot;r&quot;]], [op |-&gt; [key |-&gt; &quot;y&quot;, type |-&gt; &quot;w&quot;]], [op |-&gt; [key |-&gt; &quot;w&quot;, type |-&gt; &quot;w&quot;]], [op |-&gt; [key |-&gt; &quot;z&quot;, type |-&gt; &quot;r&quot;]]};0;0"/>
