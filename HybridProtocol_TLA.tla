@@ -283,6 +283,40 @@ LatestWriteofSpecificKey(key)  ==  (* finidng the latest write of a specific key
                 
     IN
         latestWrite(key, Replicas, {})
+        
+        
+ DependentWriteInstances(deps_list, replica) == (* finding only dependent write commands *) (* return {<<"a", 1>>, <<"b", 0>>} *)
+    LET 
+        RECURSIVE depWriteInstance(_,_,_)
+            depWriteInstance(dlist, r, fdlist) ==
+                IF dlist = {}
+                THEN fdlist
+                ELSE
+                    LET
+                        dep == CHOOSE x \in dlist: TRUE
+                        rec1 == {rec: rec \in cmdLog[r]}
+                        rec2 == {rec \in rec1:  rec.inst = dep /\ rec.cmd.op.type = "w"} 
+                        inst == {rec.inst: rec \in rec2} IN
+                        depWriteInstance(dlist \ {dep}, r, fdlist \cup inst)           
+    IN
+        depWriteInstance(deps_list, replica, {})
+        
+        
+IsMajorityCommitted(inst) == (* finding in how many replicas the instance is committed *)
+    LET 
+        RECURSIVE majorityCommitted(_, _, _)
+        majorityCommitted(i, r, flist) ==
+            IF r = {}
+            THEN flist
+            ELSE
+                LET
+                    replica == CHOOSE x \in r: TRUE
+                    rec1 == {rec: rec \in cmdLog[replica]}
+                    rec2 == {rec \in rec1: rec.inst = i /\ rec.status \in {"causally-committed", "strongly-committed", "executed", "discarded"}}
+                    inst2 == {rec.inst: rec \in rec2} IN
+                    majorityCommitted(i, r \ {replica}, flist \cup inst2)
+    IN 
+        majorityCommitted(inst, Replicas, {})
                             
 (***************************************************************************)
 (* Actions                                                                 *)
@@ -1661,14 +1695,31 @@ GetFromCausality == (* whether the get from cauality is maintaining or not *)
 GlobalOrderingOfWrite == (* checking whether the system is converging or not? *)
         LET pc == IsAllExecutedOrDiscarded IN (* checking whether all instances across all the replicas are executed or discarded *)
                                 pc = TRUE => \A key \in Keys: 
-                                                LET all_latest_write == LatestWriteofSpecificKey(key) IN 
+                                                LET all_latest_write == LatestWriteofSpecificKey(key) IN (* retrieving latest write of a specific key across all the replicas *)
                                                 \A recs \in all_latest_write : \A otherrecs \in all_latest_write :
-                                                 /\ recs.inst = otherrecs.inst
+                                                 /\ recs.inst = otherrecs.inst (* comparing whether all latest write for a specific key , across all the replicas are same or not *)
                                             
                                             
                   
                                                                        
 GlobalOrderingOfRead == (* once a strong read, read any write (strong/weak), all later strong read must observe that write *) 
+                        (* I am checking majority committed or not. My assumption is that, is a commit is majority committed then it will be observed by all later strong commands *)
+                        \A replica \in Replicas:
+                            \A rec \in cmdLog[replica]:
+                                /\ rec.cmd.op.type = "r" 
+                                /\ rec.status \in {"strongly-committed", "executed"} (* as the command is read command, hence checking only for "strongly-committed" or executed "*)
+                                /\ LET deps_list == rec.deps 
+                                    dep_write_instances ==  DependentWriteInstances(deps_list, replica)  (* retrieving the dependent write commnads for a specific strong read command *)
+                                    IN
+                                    /\ \A inst \in dep_write_instances : LET commitList == IsMajorityCommitted(inst) IN (* retrieving the replicas where the instance is committed or executed or discarded *)
+                                        /\ Cardinality(commitList) = (Cardinality(Replicas) \div 2) + 1
+                                        
+                (* (GlobalOrderingOfRead): I am doing the following for every strong read command:
+                   1) finding the dependent instances of the strong read command
+                   2) selecting the write commands from the dependent instance list
+                   3) chekcing whether each of the instances of step2 is majority committed or not 
+                *)         
+                                    
                                         
 (* RealTimeOrderingOfStrong *)
 
@@ -1690,5 +1741,5 @@ Termination == <>((\A r \in Replicas:
 
 =============================================================================
 \* Modification History
-\* Last modified Sun Feb 04 21:50:26 EST 2024 by santamariashithil
+\* Last modified Mon Feb 05 00:09:36 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil
