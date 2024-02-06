@@ -2,7 +2,7 @@
 <launchConfiguration type="org.lamport.tla.toolbox.tool.tlc.modelCheck">
     <stringAttribute key="TLCCmdLineParameters" value=""/>
     <intAttribute key="collectCoverage" value="0"/>
-    <stringAttribute key="configurationName" value="Model_Strong_Causal"/>
+    <stringAttribute key="configurationName" value="Model_Strong_Causal_SnapShot_1707253877639"/>
     <booleanAttribute key="deferLiveness" value="false"/>
     <intAttribute key="dfidDepth" value="100"/>
     <booleanAttribute key="dfidMode" value="false"/>
@@ -12,7 +12,7 @@
     <stringAttribute key="distributedTLC" value="off"/>
     <stringAttribute key="distributedTLCVMArgs" value=""/>
     <intAttribute key="fpBits" value="1"/>
-    <intAttribute key="fpIndex" value="35"/>
+    <intAttribute key="fpIndex" value="38"/>
     <booleanAttribute key="fpIndexRandom" value="true"/>
     <intAttribute key="maxHeapSize" value="25"/>
     <intAttribute key="maxSetSize" value="1000000"/>
@@ -32,8 +32,8 @@
         <listEntry value="1SameSessionCausality"/>
         <listEntry value="1GetFromCausality"/>
         <listEntry value="1GlobalOrderingOfWrite"/>
-        <listEntry value="1GlobalOrderingOfRead"/>
-        <listEntry value="1RealTimeOrderingOfStrong"/>
+        <listEntry value="0GlobalOrderingOfRead"/>
+        <listEntry value="0RealTimeOrderingOfStrong"/>
     </listAttribute>
     <listAttribute key="modelCorrectnessProperties">
         <listEntry value="0Termination"/>

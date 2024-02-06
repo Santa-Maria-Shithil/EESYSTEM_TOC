@@ -2,7 +2,7 @@
 TLC2 Version 2.16 of 31 December 2020 (rev: cdddf55)
 @!@!@ENDMSG 2262 @!@!@
 @!@!@STARTMSG 2187:0 @!@!@
-Running breadth-first search Model-Checking with fp 35 and seed -4481995029806326679 with 4 workers on 8 cores with 1214MB heap and 2730MB offheap memory [pid: 1226] (Mac OS X 10.16 x86_64, AdoptOpenJDK 14.0.1 x86_64, OffHeapDiskFPSet, DiskStateQueue).
+Running breadth-first search Model-Checking with fp 46 and seed -6643857550336994167 with 4 workers on 8 cores with 1214MB heap and 2730MB offheap memory [pid: 1189] (Mac OS X 10.16 x86_64, AdoptOpenJDK 14.0.1 x86_64, OffHeapDiskFPSet, DiskStateQueue).
 @!@!@ENDMSG 2187 @!@!@
 @!@!@STARTMSG 2220:0 @!@!@
 Starting SANY...
@@ -23,7 +23,7 @@ Semantic processing of module MC
 SANY finished.
 @!@!@ENDMSG 2219 @!@!@
 @!@!@STARTMSG 2185:0 @!@!@
-Starting... (2024-02-06 16:23:57)
+Starting... (2024-02-06 16:12:16)
 @!@!@ENDMSG 2185 @!@!@
 << "$!@$!@$!@$!@$!",
    { <<1, 1>>,
@@ -60,8 +60,14 @@ Starting... (2024-02-06 16:23:57)
 Computing initial states...
 @!@!@ENDMSG 2189 @!@!@
 @!@!@STARTMSG 2190:0 @!@!@
-Finished computing initial states: 1 distinct state generated at 2024-02-06 16:23:58.
+Finished computing initial states: 1 distinct state generated at 2024-02-06 16:12:17.
 @!@!@ENDMSG 2190 @!@!@
 @!@!@STARTMSG 2200:0 @!@!@
-Progress(5) at 2024-02-06 16:24:01: 10,834 states generated (10,834 s/min), 10,671 distinct states found (10,671 ds/min), 10,690 states left on queue.
+Progress(5) at 2024-02-06 16:12:20: 8,124 states generated (8,124 s/min), 8,022 distinct states found (8,022 ds/min), 8,039 states left on queue.
+@!@!@ENDMSG 2200 @!@!@
+@!@!@STARTMSG 2200:0 @!@!@
+Progress(5) at 2024-02-06 16:13:20: 515,410 states generated (507,286 s/min), 448,326 distinct states found (440,304 ds/min), 447,291 states left on queue.
+@!@!@ENDMSG 2200 @!@!@
+@!@!@STARTMSG 2200:0 @!@!@
+Progress(5) at 2024-02-06 16:14:20: 1,358,727 states generated (843,317 s/min), 859,588 distinct states found (411,262 ds/min), 856,876 states left on queue.
 @!@!@ENDMSG 2200 @!@!@

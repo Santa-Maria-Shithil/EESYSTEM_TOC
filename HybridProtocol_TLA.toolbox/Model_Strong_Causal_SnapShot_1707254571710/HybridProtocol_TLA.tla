@@ -1831,9 +1831,9 @@ RealTimeOrderingOfStrong  == (* If two interfering strong commands γ and δ are
 posed only after γ is committed by any replica), then every replica will execute γ before δ.*) (* this holds only for strong commands *)
     \A replica \in Replicas:
         \A rec1, rec2 \in cmdLog[replica]:
-            (/\ rec1.consistency \in {"strong"}
-            /\ rec2.consistency \in {"strong"}) =>
-                (/\ rec1.commit_order > rec2.commit_order => rec1.execution_order > rec2.execution_order)
+            /\ rec1.consistency \in {"strong"}
+            /\ rec2.consistency \in {"strong"}
+            /\ rec1.commit_order > rec2.commit_order => rec1.execution_order > rec2.execution_order
     
 
 (***************************************************************************)
@@ -1854,5 +1854,5 @@ Termination == <>((\A r \in Replicas:
 
 =============================================================================
 \* Modification History
-\* Last modified Tue Feb 06 16:23:50 EST 2024 by santamariashithil
+\* Last modified Tue Feb 06 16:20:46 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil

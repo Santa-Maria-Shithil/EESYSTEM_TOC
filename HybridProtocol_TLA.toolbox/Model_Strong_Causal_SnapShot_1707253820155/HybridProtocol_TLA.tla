@@ -213,7 +213,7 @@ IsAllCommitted == \A replica \in Replicas : (* check whether all the commands ar
 
 
 IsAllExecutedOrDiscarded == \A replica \in Replicas : (* check whether all the commands are executed or discarded across all the replicas *)
-                           LET recs ==  {rec: rec \in cmdLog[replica]} IN
+                           LET recs ==  {rec.inst: rec \in cmdLog[replica]} IN
                                 /\ \A rec \in recs:   rec.status \in {"executed"} \/ rec.status \in {"discarded"}
 
 MaxSeq(Replica) == LET recs == {rec: rec \in cmdLog[Replica] } IN
@@ -1796,12 +1796,12 @@ GetFromCausality == (* whether the get from cauality is maintaining or not *)
 (* TrainsitiveCausality *)
 
 GlobalOrderingOfWrite == (* checking whether the system is converging or not? *)
-        LET pc == IsAllExecutedOrDiscarded IN  (* checking whether all instances across all the replicas are executed or discarded *)
-                                pc = TRUE => \A key \in Keys: 
+        LET pc == IsAllExecutedOrDiscarded IN (* checking whether all instances across all the replicas are executed or discarded *)
+                                pc = TRUE (*=> \A key \in Keys: 
                                                 LET all_latest_write == LatestWriteofSpecificKey(key) IN (* retrieving latest write of a specific key across all the replicas *)
                                                 \A recs \in all_latest_write : \A otherrecs \in all_latest_write :
                                                  /\ recs.inst = otherrecs.inst (* comparing whether all latest write for a specific key , across all the replicas are same or not *)
-                                            
+                                            *)
                                             
                   
                                                                        
@@ -1809,16 +1809,13 @@ GlobalOrderingOfRead == (* once a strong read, read any write (strong/weak), all
                         (* I am checking majority committed or not. My assumption is that, is a commit is majority committed then it will be observed by all later strong commands *)
                         \A replica \in Replicas:
                             \A rec \in cmdLog[replica]:
-                               (/\ rec.cmd.op.type = "r"
-                               /\ rec.consistency = "strong"
-                               /\ rec.status \in {"strongly-committed", "executed"})  => (* as the command is read command, hence checking only for "strongly-committed" or executed "*)
-                            
-                                { 
-                                 /\ LET deps_list == rec.deps 
+                                /\ rec.cmd.op.type = "r" 
+                                /\ rec.status \in {"strongly-committed", "executed"} (* as the command is read command, hence checking only for "strongly-committed" or executed "*)
+                                /\ LET deps_list == rec.deps 
                                     dep_write_instances ==  DependentWriteInstances(deps_list, replica)  (* retrieving the dependent write commnads for a specific strong read command *)
                                     IN
                                     /\ \A inst \in dep_write_instances : LET commitList == IsMajorityCommitted(inst) IN (* retrieving the replicas where the instance is committed or executed or discarded *)
-                                        /\ Cardinality(commitList) = (Cardinality(Replicas) \div 2) + 1}
+                                        /\ Cardinality(commitList) = (Cardinality(Replicas) \div 2) + 1
                                         
                 (* (GlobalOrderingOfRead): I am doing the following for every strong read command:
                    1) finding the dependent instances of the strong read command
@@ -1831,9 +1828,9 @@ RealTimeOrderingOfStrong  == (* If two interfering strong commands γ and δ are
 posed only after γ is committed by any replica), then every replica will execute γ before δ.*) (* this holds only for strong commands *)
     \A replica \in Replicas:
         \A rec1, rec2 \in cmdLog[replica]:
-            (/\ rec1.consistency \in {"strong"}
-            /\ rec2.consistency \in {"strong"}) =>
-                (/\ rec1.commit_order > rec2.commit_order => rec1.execution_order > rec2.execution_order)
+            /\ rec1.consistency \in {"strong"}
+            /\ rec2.consistency \in {"strong"}
+            /\ rec1.commit_order > rec2.commit_order => rec1.execution_order > rec2.execution_order
     
 
 (***************************************************************************)
@@ -1854,5 +1851,5 @@ Termination == <>((\A r \in Replicas:
 
 =============================================================================
 \* Modification History
-\* Last modified Tue Feb 06 16:23:50 EST 2024 by santamariashithil
+\* Last modified Tue Feb 06 16:10:08 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil

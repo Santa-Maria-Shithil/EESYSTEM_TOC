@@ -49,6 +49,23 @@ ASSUME \A r \in Replicas:
 
 none == CHOOSE c : c \notin Commands
 
+(***************************************************************************)
+(* Special empty instance                                                  *)
+(***************************************************************************)
+
+emptyInstance == [inst   |-> <<0,0>>,
+                  status |-> "none",
+                  state |-> "none",
+                  ballot |-> <<0,0>>,
+                  cmd    |-> {},
+                  deps   |-> {},
+                  seq    |-> 0,
+                  consistency |-> "none",
+                  ctxid |-> 0,
+                  execution_order |-> 0,
+                  execution_order_list |-> {},
+                  commit_order |-> 0 ]
+
 
 (***************************************************************************)
 (* The instance space                                                      *)
@@ -196,8 +213,8 @@ IsAllCommitted == \A replica \in Replicas : (* check whether all the commands ar
 
 
 IsAllExecutedOrDiscarded == \A replica \in Replicas : (* check whether all the commands are executed or discarded across all the replicas *)
-                           LET recs ==  {rec.inst: rec \in cmdLog[replica]} IN
-                                /\ \A rec \in recs:   rec.status = "executed" \/ rec.status = "discarded"
+                           LET recs ==  {rec: rec \in cmdLog[replica]} IN
+                                /\ \A rec \in recs:   rec.status \in {"executed"} \/ rec.status \in {"discarded"}
 
 MaxSeq(Replica) == LET recs == {rec: rec \in cmdLog[Replica] } IN
                         CHOOSE rec \in recs : \A otherrecs \in recs:
@@ -249,14 +266,17 @@ OrderingBasedOnInstanceNumber(scc) ==  (*ordering based on instance number (asce
      IN
        minCover(scc, {},0) 
        
-MaxWriteInstance(Replica,deps) == LET recs == {rec: rec \in cmdLog[Replica] } IN (*returns the maximum sequence number among all the write operations *)
-                        CHOOSE rec \in recs : \A otherrecs \in recs:
-                            /\ rec.execution_order >= otherrecs.execution_order
-                            /\ rec.inst \in deps
+MaxWriteInstance(Replica,deps) == LET recs == {rec \in cmdLog[Replica]: rec.inst \in deps } IN (*returns the maximum sequence number among all the write operations *)
+                            IF recs = {} THEN emptyInstance
+                            ELSE
+                                CHOOSE rec \in recs : \A otherrecs \in recs:
+                                    /\ rec.execution_order >= otherrecs.execution_order
+                                    
                             
                             
-MinExecutionOrderRecs(recs) == CHOOSE rec \in recs : \A otherrecs \in recs: (* returns the rec with the minimum sequence number *)
-                            /\ rec.execution_order < otherrecs.execution_order
+MinExecutionOrderRecs(recs) == 
+                            CHOOSE rec \in recs : \A otherrecs \in recs: (* returns the rec with the minimum sequence number *)
+                            /\ rec.execution_order <= otherrecs.execution_order
                             
                             
 FindMaxExecutionOrder(replica) == LET allrecs == {rec: rec \in cmdLog[replica]} IN (* return the instance with the highest execution_order *)
@@ -267,6 +287,8 @@ FindMaxExecutionOrder(replica) == LET allrecs == {rec: rec \in cmdLog[replica]} 
                                              
 LatestWrite(key, replica) ==  LET recs1 == {rec: rec \in cmdLog[replica]}
                                   recs2 == {rec \in recs1: rec.cmd.op.key = key /\ rec.cmd.op.type = "w"} IN
+                                  IF recs2 = {} THEN emptyInstance
+                                  ELSE
                                    CHOOSE rec \in recs2 : \A otherrecs \in recs2:
                                     /\ rec.execution_order >= otherrecs.execution_order
                                     
@@ -281,6 +303,9 @@ LatestWriteofSpecificKey(key)  ==  (* finidng the latest write of a specific key
                 LET replica == CHOOSE x \in r: TRUE
                 lw2 == LatestWrite(k, replica)
                 IN
+                IF lw2.status = "none" THEN
+                latestWrite(k, r \ {replica}, lw)
+                ELSE
                 latestWrite(k, r \ {replica}, lw \cup {lw2})
                 
     IN
@@ -323,10 +348,10 @@ IsMajorityCommitted(inst) == (* finding in how many replicas the instance is com
         
         
 MaxCommitNumber(replica) ==  LET recs == {rec \in cmdLog[replica]: rec.status \in {"strongly-committed", "executed", "discarded"} } IN
-                             IF recs = {} THEN {}
-                             ELSE
-                                CHOOSE rec \in recs : \A otherrecs \in recs:
-                                /\ rec.commit_order >= otherrecs.commit_order
+                                IF recs = {} THEN emptyInstance
+                                ELSE 
+                                    CHOOSE rec \in recs : \A otherrecs \in recs:
+                                    /\ rec.commit_order >= otherrecs.commit_order
                           
         
         
@@ -340,7 +365,7 @@ MaxCommitOrder ==  (* finding the max commit order among all the replicas *)
                 LET
                     replica == CHOOSE x \in r: TRUE
                     max2 == MaxCommitNumber(replica) IN
-                    IF max2 # {} /\ max2.commit_order >= max THEN
+                    IF max2.status # "none" /\ max2.commit_order >= max THEN
                     maxCommit(r \ {replica}, max2.commit_order)
                     ELSE
                     maxCommit(r \ {replica}, max)
@@ -362,7 +387,6 @@ StartPhase1Causal(C, cleader, Q, inst, ballot, oldMsg, oldClk,cl,ctx) ==
            rec.seq = maxRec.seq => select the rec with the maximum seq that means the latest write operation
            C.op.type = "r" => will add this dependency only if the command to commit is a read command *)
            deps2 == {rec.inst: rec \in recs2} (* get from dependency *)
-           
            (*deps == deps1 \cup deps2*) (* taking union of same session dependency and get from dependency to calculate the transitive dependency *)
            (* no need to calculate the transitive dependency. It will be calculated during the graph formation in the execution phase *) 
             
@@ -1732,14 +1756,14 @@ Stability == (* For any replica, the set of committed commands at any time is a 
 SameSessionCausality ==  (* whether the same session causal order is maintaining or not *)
                 \A replica1 \in Replicas: 
                             \A rec1 \in cmdLog[replica1]:
-                                /\ rec1.status \in {"causally-committed", "strongly-committed", "executed", "discarded"}
-                                /\ LET execution_order == rec1.execution_order_list IN (* pick execution order list for a specific instance *)
+                                /\ rec1.status \in {"causally-committed", "strongly-committed", "executed", "discarded"} =>
+                                    (/\ LET execution_order == rec1.execution_order_list IN (* pick execution order list for a specific instance *)
                                             /\ \A ctx \in Ctx_id: 
                                                 /\ LET same_ctx_execution_order == SameCtxScc(execution_order, ctx, replica1)  (* Finding the instances from the same context id *)
                                                        ordered_same_ctx_execution_order == OrderingBasedOnInstanceNumber(same_ctx_execution_order) IN (* ordering (ascending) the instances based on the instance number. 
                                                         My assumption is that the command came earlier from a context will assign lower instance number than the command came
                                                         from the same context at a later time *)
-                                                       /\ same_ctx_execution_order = ordered_same_ctx_execution_order
+                                                       /\ same_ctx_execution_order = ordered_same_ctx_execution_order)
                                                        
                                                        
                                                        
@@ -1749,14 +1773,19 @@ SameSessionCausality ==  (* whether the same session causal order is maintaining
 GetFromCausality == (* whether the get from cauality is maintaining or not *)        
                 \A replica1 \in Replicas: 
                             \A rec1 \in cmdLog[replica1]:
-                                /\ rec1.status \in {"causally-committed", "strongly-committed", "executed", "discarded"}
-                                /\ rec1.cmd.op.type = "r"
-                                /\ LET max_write_instance == MaxWriteInstance(replica1,rec1.deps) (* finding the instance with max sequence of all dependent write of a specific read command*)
-                                    max_execution_order == max_write_instance.execution_order (* max execution order *)
-                                    recs2 == {rec \in cmdLog[replica1]: rec.inst[2] > rec1.inst[2]} (* finding all instances that came to the same replica after the read command *)
-                                    min_execution_order_recs == MinExecutionOrderRecs(recs2) (* finding the instance with the min sequence that came to the same replica after the read command *)
-                                    min_execution_order == min_execution_order_recs.execution_order (* min sequence *) IN
-                                        /\ min_execution_order  > max_execution_order 
+                                /\ rec1.status \in {"executed", "discarded"} => 
+                                    (/\ rec1.cmd.op.type = "r"
+                                    /\ LET max_write_instance == MaxWriteInstance(replica1,rec1.deps) (* finding the instance with max sequence of all dependent write of a specific read command*)
+                                        max_execution_order == max_write_instance.execution_order (* max execution order *)
+                                        recs2 == {rec \in cmdLog[replica1]: rec.inst[2] > rec1.inst[2]} (* finding all instances that came to the same replica after the read command *)
+                                        IN
+                                            IF recs2 = {} THEN TRUE
+                                            ELSE 
+                                                LET
+                                                min_execution_order_recs == MinExecutionOrderRecs(recs2)
+                                                min_execution_order == min_execution_order_recs.execution_order  (* finding the instance with the min execution order that came to the same replica after the read command *)
+                                                IN                                      
+                                                  /\ min_execution_order  > max_execution_order) 
                 (* (GetFromCausality): I am doing the following for every read command:
                    1) finding all write operantions that are on the dependency list of the read command
                    2) finding the max execution order among all the write command of step1
@@ -1767,7 +1796,7 @@ GetFromCausality == (* whether the get from cauality is maintaining or not *)
 (* TrainsitiveCausality *)
 
 GlobalOrderingOfWrite == (* checking whether the system is converging or not? *)
-        LET pc == IsAllExecutedOrDiscarded IN (* checking whether all instances across all the replicas are executed or discarded *)
+        LET pc == IsAllExecutedOrDiscarded IN  (* checking whether all instances across all the replicas are executed or discarded *)
                                 pc = TRUE => \A key \in Keys: 
                                                 LET all_latest_write == LatestWriteofSpecificKey(key) IN (* retrieving latest write of a specific key across all the replicas *)
                                                 \A recs \in all_latest_write : \A otherrecs \in all_latest_write :
@@ -1780,13 +1809,16 @@ GlobalOrderingOfRead == (* once a strong read, read any write (strong/weak), all
                         (* I am checking majority committed or not. My assumption is that, is a commit is majority committed then it will be observed by all later strong commands *)
                         \A replica \in Replicas:
                             \A rec \in cmdLog[replica]:
-                                /\ rec.cmd.op.type = "r" 
-                                /\ rec.status \in {"strongly-committed", "executed"} (* as the command is read command, hence checking only for "strongly-committed" or executed "*)
-                                /\ LET deps_list == rec.deps 
+                               (/\ rec.cmd.op.type = "r"
+                               /\ rec.consistency = "strong"
+                               /\ rec.status \in {"strongly-committed", "executed"})  => (* as the command is read command, hence checking only for "strongly-committed" or executed "*)
+                            
+                                { 
+                                 /\ LET deps_list == rec.deps 
                                     dep_write_instances ==  DependentWriteInstances(deps_list, replica)  (* retrieving the dependent write commnads for a specific strong read command *)
                                     IN
                                     /\ \A inst \in dep_write_instances : LET commitList == IsMajorityCommitted(inst) IN (* retrieving the replicas where the instance is committed or executed or discarded *)
-                                        /\ Cardinality(commitList) = (Cardinality(Replicas) \div 2) + 1
+                                        /\ Cardinality(commitList) = (Cardinality(Replicas) \div 2) + 1}
                                         
                 (* (GlobalOrderingOfRead): I am doing the following for every strong read command:
                    1) finding the dependent instances of the strong read command
@@ -1799,9 +1831,9 @@ RealTimeOrderingOfStrong  == (* If two interfering strong commands γ and δ are
 posed only after γ is committed by any replica), then every replica will execute γ before δ.*) (* this holds only for strong commands *)
     \A replica \in Replicas:
         \A rec1, rec2 \in cmdLog[replica]:
-            /\ rec1.consistency \in {"strong"}
-            /\ rec2.consistency \in {"strong"}
-            /\ rec1.commit_order > rec2.commit_order => rec1.execution_order > rec2.execution_order
+            (/\ rec1.consistency \in {"strong"}
+            /\ rec2.consistency \in {"strong"}) =>
+                (/\ rec1.commit_order > rec2.commit_order => rec1.execution_order > rec2.execution_order)
     
 
 (***************************************************************************)
@@ -1822,5 +1854,5 @@ Termination == <>((\A r \in Replicas:
 
 =============================================================================
 \* Modification History
-\* Last modified Tue Feb 06 01:05:52 EST 2024 by santamariashithil
+\* Last modified Tue Feb 06 16:23:50 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil
