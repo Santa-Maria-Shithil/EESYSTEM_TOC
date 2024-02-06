@@ -71,20 +71,20 @@ State == {"ready", "waiting", "done"}
 Message ==
         [type: {"pre-accept"}, src: Replicas, dst: Replicas,
         inst: Instances, ballot: Nat \X Replicas,
-        cmd: Commands \cup {none}, deps: SUBSET Instances, seq: Nat,   consistency: Consistency_level, ctxid: Ctx_id,clk: Nat]
+        cmd: Commands \cup {none}, deps: SUBSET Instances, seq: Nat,   consistency: Consistency_level, ctxid: Nat,clk: Nat, commit_order: Nat]
   \cup  [type: {"accept"}, src: Replicas, dst: Replicas,
         inst: Instances, ballot: Nat \X Replicas,
-        cmd: Commands \cup {none}, deps: SUBSET Instances, seq: Nat, consistency: Consistency_level, ctxid: Ctx_id, clk: Nat]
-  \cup  [type: {"commit"},
+        cmd: Commands \cup {none}, deps: SUBSET Instances, seq: Nat, consistency: Consistency_level, ctxid:  Nat, clk: Nat, commit_order: Nat]
+  \cup  [type: {"commit"}, src: Replicas, dst: Replicas,
         inst: Instances, ballot: Nat \X Replicas,
-        cmd: Commands \cup {none}, deps: SUBSET Instances, seq: Nat, consistency: Consistency_level, ctxid: Ctx_id, clk: Nat]
+        cmd: Commands \cup {none}, deps: SUBSET Instances, seq: Nat, consistency: Consistency_level, ctxid:  Nat, clk: Nat, commit_order: Nat]
   \cup  [type: {"prepare"}, src: Replicas, dst: Replicas,
         inst: Instances, ballot: Nat \X Replicas]
   \cup  [type: {"pre-accept-reply"}, src: Replicas, dst: Replicas,
         inst: Instances, ballot: Nat \X Replicas,
-        deps: SUBSET Instances, seq: Nat, committed: SUBSET Instances, consistency: Consistency_level, ctxid: Ctx_id, clk: Nat]
+        deps: SUBSET Instances, seq: Nat, committed: SUBSET Instances, consistency: Consistency_level, ctxid:  Nat, clk: Nat, commit_order: Nat]
   \cup  [type: {"accept-reply"}, src: Replicas, dst: Replicas,
-        inst: Instances, ballot: Nat \X Replicas]
+        inst: Instances, ballot: Nat \X Replicas,cmd: Commands \cup {none}, deps: SUBSET Instances, seq: Nat,consistency: Consistency_level, ctxid:  Nat,clk: Nat, commit_order: Nat ]
   \cup  [type: {"prepare-reply"}, src: Replicas, dst: Replicas,
         inst: Instances, ballot: Nat \X Replicas, prev_ballot: Nat \X Replicas,
         status: Status,
@@ -96,7 +96,9 @@ Message ==
         inst: Instances, ballot: Nat \X Replicas, status: Status \cup {"OK"}]
         
         
- 
+ (* [type: {"accept"}, src: Replicas, dst: Replicas,
+        inst: Instances, ballot: Nat \X Replicas,
+        cmd: Commands \cup {none}, deps: SUBSET Instances, seq: Nat, consistency: Consistency_level, ctxid:  Nat, clk: Nat, commit_order: Nat] *)
 
 (*******************************************************************************)
 (* Variables:                                                                  *)
@@ -136,7 +138,7 @@ TypeOK ==
                                        execution_order: Nat, (* This is the global order of execution in a specific replica. Ordering will start from 1. O means not executed yet and no specific execution order. *)
                                        commit_order : Nat,
                                        execution_order_list: SUBSET {Nat \X Instances}]]
-    (*/\ proposed \in SUBSET Commands
+    /\ proposed \in SUBSET Commands
     /\ executed \in [Replicas -> SUBSET (Nat \X Commands)]
     /\ sentMsg \in SUBSET Message
     /\ crtInst \in [Replicas -> Nat]
@@ -146,8 +148,7 @@ TypeOK ==
                                            Nat)]
     /\ ballots \in Nat
     /\ preparing \in [Replicas -> SUBSET Instances]
-    /\ clk \in [Replicas -> Nat]*)
-    (*/\ scc \in [Commands -> SUBSET Instances]*)
+    /\ clk \in [Replicas -> Nat]
    
     
 vars == << cmdLog, proposed, executed, sentMsg, crtInst, leaderOfInst, 
@@ -248,7 +249,7 @@ OrderingBasedOnInstanceNumber(scc) ==  (*ordering based on instance number (asce
      IN
        minCover(scc, {},0) 
        
- MaxWriteInstance(Replica,deps) == LET recs == {rec: rec \in cmdLog[Replica] } IN (*returns the maximum sequence number among all the write operations *)
+MaxWriteInstance(Replica,deps) == LET recs == {rec: rec \in cmdLog[Replica] } IN (*returns the maximum sequence number among all the write operations *)
                         CHOOSE rec \in recs : \A otherrecs \in recs:
                             /\ rec.execution_order >= otherrecs.execution_order
                             /\ rec.inst \in deps
@@ -321,11 +322,12 @@ IsMajorityCommitted(inst) == (* finding in how many replicas the instance is com
         
         
         
-MaxCommitNumber(replica) ==  LET recs == {rec: rec \in cmdLog[replica] } IN
-                        CHOOSE rec \in recs : \A otherrecs \in recs:
-                            /\ rec.commit_order >= otherrecs.commit_order
-                            /\ rec.status \in {"strongly-committed", "executed", "discarded"}
-                            /\ otherrecs.status \in {"strongly-committed", "executed", "discarded"}
+MaxCommitNumber(replica) ==  LET recs == {rec \in cmdLog[replica]: rec.status \in {"strongly-committed", "executed", "discarded"} } IN
+                             IF recs = {} THEN {}
+                             ELSE
+                                CHOOSE rec \in recs : \A otherrecs \in recs:
+                                /\ rec.commit_order >= otherrecs.commit_order
+                          
         
         
 MaxCommitOrder ==  (* finding the max commit order among all the replicas *)
@@ -338,12 +340,12 @@ MaxCommitOrder ==  (* finding the max commit order among all the replicas *)
                 LET
                     replica == CHOOSE x \in r: TRUE
                     max2 == MaxCommitNumber(replica) IN
-                    IF max2.commit_order >= max THEN
+                    IF max2 # {} /\ max2.commit_order >= max THEN
                     maxCommit(r \ {replica}, max2.commit_order)
                     ELSE
-                    maxCommit(r \ {replica}, max.commit_order)
+                    maxCommit(r \ {replica}, max)
     IN 
-        maxCommit(Replicas, 1) (* initial commit number is 1 *)
+        maxCommit(Replicas, 1) (* initial commit order number is 1 *)
                             
 (***************************************************************************)
 (* Actions                                                                 *)
@@ -351,15 +353,16 @@ MaxCommitOrder ==  (* finding the max commit order among all the replicas *)
 
 StartPhase1Causal(C, cleader, Q, inst, ballot, oldMsg, oldClk,cl,ctx) ==
         LET recs1 == {rec \in cmdLog[cleader]: rec.ctxid = ctx}
-           deps1 == {rec.inst: rec \in recs1} (* same session dependency *)
+           deps1 == {rec2.inst: rec2 \in recs1} (* same session dependency *)
+           
            maxRec == MaxSeq(cleader) (* selecting the rec with the highest sequence number in this specific replica *)
            recs2 == {rec \in cmdLog[cleader]: rec.state = "executed" /\ rec.cmd.op.type = "w" /\ rec.cmd.op.key = C.op.key  /\ rec.seq = maxRec.seq /\ C.op.type = "r"} 
            (* rec.state = "executed" /\ rec.cmd.op.type = "w" => latest executed write 
            rec.cmd.op.key = C.op.key  => key of the command to commit and the dependecy is the same.
            rec.seq = maxRec.seq => select the rec with the maximum seq that means the latest write operation
            C.op.type = "r" => will add this dependency only if the command to commit is a read command *)
-           inst2 == {rec.inst: rec \in recs2}
-           deps2 == {inst2} (* get from dependency *)
+           deps2 == {rec.inst: rec \in recs2} (* get from dependency *)
+           
            (*deps == deps1 \cup deps2*) (* taking union of same session dependency and get from dependency to calculate the transitive dependency *)
            (* no need to calculate the transitive dependency. It will be calculated during the graph formation in the execution phase *) 
             
@@ -453,18 +456,14 @@ StartPhase1Strong(C, cleader, Q, inst, ballot, oldMsg, oldClk,cl,ctx) ==
            rec.cmd.op.key = C.op.key  => key of the command to commit and the dependecy is the same.
            rec.seq = maxRec.seq => select the rec with the maximum seq that means the latest write operation
            C.op.type = "r" => will add this dependency only if the command to commit is a read command *)
-           inst2 == {rec.inst: rec \in recs2}
-           deps2 == {inst2} (* get from dependency *)
+           deps2 == {rec.inst: rec \in recs2} (* get from dependency *)
+           
            (*deps == deps1 \cup deps2*) (* taking union of same session dependency and get from dependency to calculate the transitive dependency *)
            (* no need to calculate the transitive dependency. It will be calculated during the graph formation in the execution phase *) 
            recs3 == {rec \in cmdLog[cleader]: rec.cmd.op.key = C.op.key}
-           inst3 == {rec.inst: rec \in recs3}
-           deps3 == {inst3} (* command interference *)
-           
-           newDeps == deps1 \cup deps2 \cup deps3
-           
-                
-            maxCommit == MaxCommitOrder (* finding the max commit order among all the strong committed instances across the replicas *)
+           deps3 == {rec.inst: rec \in recs3} (* command interference *)
+           newDeps == deps1 \cup deps2 \cup deps3 
+           maxCommit == MaxCommitOrder (* finding the max commit order among all the strong committed instances across the replicas *)
             
            
            
@@ -1823,5 +1822,5 @@ Termination == <>((\A r \in Replicas:
 
 =============================================================================
 \* Modification History
-\* Last modified Mon Feb 05 14:32:32 EST 2024 by santamariashithil
+\* Last modified Tue Feb 06 01:05:52 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil

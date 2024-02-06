@@ -146,9 +146,10 @@ TypeOK ==
     /\ committed \in [Instances -> SUBSET ((Commands \cup {none}) \X
                                            (SUBSET Instances) \X 
                                            Nat)]
-    /\ ballots \in Nat
+    (*/\ ballots \in Nat
     /\ preparing \in [Replicas -> SUBSET Instances]
-    /\ clk \in [Replicas -> Nat]
+    /\ clk \in [Replicas -> Nat]*)
+    (*/\ scc \in [Commands -> SUBSET Instances]*)
    
     
 vars == << cmdLog, proposed, executed, sentMsg, crtInst, leaderOfInst, 
@@ -1822,5 +1823,5 @@ Termination == <>((\A r \in Replicas:
 
 =============================================================================
 \* Modification History
-\* Last modified Tue Feb 06 01:05:52 EST 2024 by santamariashithil
+\* Last modified Tue Feb 06 01:01:59 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil

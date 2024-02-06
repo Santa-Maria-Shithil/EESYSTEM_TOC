@@ -72,13 +72,14 @@ Message ==
         [type: {"pre-accept"}, src: Replicas, dst: Replicas,
         inst: Instances, ballot: Nat \X Replicas,
         cmd: Commands \cup {none}, deps: SUBSET Instances, seq: Nat,   consistency: Consistency_level, ctxid: Nat,clk: Nat, commit_order: Nat]
-  \cup  [type: {"accept"}, src: Replicas, dst: Replicas,
+  (* \cup  [type: {"accept"}, src: Replicas, dst: Replicas,
         inst: Instances, ballot: Nat \X Replicas,
         cmd: Commands \cup {none}, deps: SUBSET Instances, seq: Nat, consistency: Consistency_level, ctxid:  Nat, clk: Nat, commit_order: Nat]
-  \cup  [type: {"commit"}, src: Replicas, dst: Replicas,
+  *)
+  \cup  [type: {"commit"},
         inst: Instances, ballot: Nat \X Replicas,
         cmd: Commands \cup {none}, deps: SUBSET Instances, seq: Nat, consistency: Consistency_level, ctxid:  Nat, clk: Nat, commit_order: Nat]
-  \cup  [type: {"prepare"}, src: Replicas, dst: Replicas,
+  (*\cup  [type: {"prepare"}, src: Replicas, dst: Replicas,
         inst: Instances, ballot: Nat \X Replicas]
   \cup  [type: {"pre-accept-reply"}, src: Replicas, dst: Replicas,
         inst: Instances, ballot: Nat \X Replicas,
@@ -93,12 +94,10 @@ Message ==
         inst: Instances, ballot: Nat \X Replicas,
         cmd: Commands \cup {none}, deps: SUBSET Instances, seq: Nat]
   \cup  [type: {"try-pre-accept-reply"}, src: Replicas, dst: Replicas,
-        inst: Instances, ballot: Nat \X Replicas, status: Status \cup {"OK"}]
+        inst: Instances, ballot: Nat \X Replicas, status: Status \cup {"OK"}]*)
         
         
- (* [type: {"accept"}, src: Replicas, dst: Replicas,
-        inst: Instances, ballot: Nat \X Replicas,
-        cmd: Commands \cup {none}, deps: SUBSET Instances, seq: Nat, consistency: Consistency_level, ctxid:  Nat, clk: Nat, commit_order: Nat] *)
+ 
 
 (*******************************************************************************)
 (* Variables:                                                                  *)
@@ -141,14 +140,15 @@ TypeOK ==
     /\ proposed \in SUBSET Commands
     /\ executed \in [Replicas -> SUBSET (Nat \X Commands)]
     /\ sentMsg \in SUBSET Message
-    /\ crtInst \in [Replicas -> Nat]
+    (*/\ crtInst \in [Replicas -> Nat]
     /\ leaderOfInst \in [Replicas -> SUBSET Instances]
     /\ committed \in [Instances -> SUBSET ((Commands \cup {none}) \X
                                            (SUBSET Instances) \X 
                                            Nat)]
     /\ ballots \in Nat
     /\ preparing \in [Replicas -> SUBSET Instances]
-    /\ clk \in [Replicas -> Nat]
+    /\ clk \in [Replicas -> Nat]*)
+    (*/\ scc \in [Commands -> SUBSET Instances]*)
    
     
 vars == << cmdLog, proposed, executed, sentMsg, crtInst, leaderOfInst, 
@@ -1822,5 +1822,5 @@ Termination == <>((\A r \in Replicas:
 
 =============================================================================
 \* Modification History
-\* Last modified Tue Feb 06 01:05:52 EST 2024 by santamariashithil
+\* Last modified Tue Feb 06 00:53:08 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil
