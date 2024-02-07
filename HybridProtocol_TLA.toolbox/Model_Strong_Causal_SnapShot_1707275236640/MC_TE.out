@@ -1,0 +1,67 @@
+@!@!@STARTMSG 2262:0 @!@!@
+TLC2 Version 2.16 of 31 December 2020 (rev: cdddf55)
+@!@!@ENDMSG 2262 @!@!@
+@!@!@STARTMSG 2187:0 @!@!@
+Running breadth-first search Model-Checking with fp 77 and seed -1275280405630949298 with 4 workers on 8 cores with 1214MB heap and 2730MB offheap memory [pid: 3644] (Mac OS X 10.16 x86_64, AdoptOpenJDK 14.0.1 x86_64, OffHeapDiskFPSet, DiskStateQueue).
+@!@!@ENDMSG 2187 @!@!@
+@!@!@STARTMSG 2220:0 @!@!@
+Starting SANY...
+@!@!@ENDMSG 2220 @!@!@
+Parsing file /Volumes/StudyMaterials/Project/EESYSTEM_TOC/HybridProtocol_TLA.toolbox/Model_Strong_Causal/MC.tla
+Parsing file /Volumes/StudyMaterials/Project/EESYSTEM_TOC/HybridProtocol_TLA.toolbox/Model_Strong_Causal/HybridProtocol_TLA.tla
+Parsing file /Applications/TLA+ Toolbox.app/Contents/Eclipse/plugins/org.lamport.tlatools_1.0.0.202012311918/tla2sany/StandardModules/TLC.tla
+Parsing file /Applications/TLA+ Toolbox.app/Contents/Eclipse/plugins/org.lamport.tlatools_1.0.0.202012311918/tla2sany/StandardModules/Naturals.tla
+Parsing file /Applications/TLA+ Toolbox.app/Contents/Eclipse/plugins/org.lamport.tlatools_1.0.0.202012311918/tla2sany/StandardModules/FiniteSets.tla
+Parsing file /Applications/TLA+ Toolbox.app/Contents/Eclipse/plugins/org.lamport.tlatools_1.0.0.202012311918/tla2sany/StandardModules/Sequences.tla
+Semantic processing of module Naturals
+Semantic processing of module Sequences
+Semantic processing of module FiniteSets
+Semantic processing of module HybridProtocol_TLA
+Semantic processing of module TLC
+Semantic processing of module MC
+@!@!@STARTMSG 2219:0 @!@!@
+SANY finished.
+@!@!@ENDMSG 2219 @!@!@
+@!@!@STARTMSG 2185:0 @!@!@
+Starting... (2024-02-06 22:07:08)
+@!@!@ENDMSG 2185 @!@!@
+<< "$!@$!@$!@$!@$!",
+   { <<1, 1>>,
+     <<1, 2>>,
+     <<1, 3>>,
+     <<1, 4>>,
+     <<1, 5>>,
+     <<1, 6>>,
+     <<2, 1>>,
+     <<2, 2>>,
+     <<2, 3>>,
+     <<2, 4>>,
+     <<2, 5>>,
+     <<2, 6>>,
+     <<3, 1>>,
+     <<3, 2>>,
+     <<3, 3>>,
+     <<3, 4>>,
+     <<3, 5>>,
+     <<3, 6>>,
+     <<4, 1>>,
+     <<4, 2>>,
+     <<4, 3>>,
+     <<4, 4>>,
+     <<4, 5>>,
+     <<4, 6>>,
+     <<5, 1>>,
+     <<5, 2>>,
+     <<5, 3>>,
+     <<5, 4>>,
+     <<5, 5>>,
+     <<5, 6>> } >>
+@!@!@STARTMSG 2189:0 @!@!@
+Computing initial states...
+@!@!@ENDMSG 2189 @!@!@
+@!@!@STARTMSG 2190:0 @!@!@
+Finished computing initial states: 1 distinct state generated at 2024-02-06 22:07:09.
+@!@!@ENDMSG 2190 @!@!@
+@!@!@STARTMSG 2200:0 @!@!@
+Progress(4) at 2024-02-06 22:07:12: 10,757 states generated (10,757 s/min), 10,613 distinct states found (10,613 ds/min), 10,626 states left on queue.
+@!@!@ENDMSG 2200 @!@!@

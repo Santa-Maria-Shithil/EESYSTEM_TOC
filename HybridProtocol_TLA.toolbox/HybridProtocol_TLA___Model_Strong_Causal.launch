@@ -12,7 +12,7 @@
     <stringAttribute key="distributedTLC" value="off"/>
     <stringAttribute key="distributedTLCVMArgs" value=""/>
     <intAttribute key="fpBits" value="1"/>
-    <intAttribute key="fpIndex" value="35"/>
+    <intAttribute key="fpIndex" value="77"/>
     <booleanAttribute key="fpIndexRandom" value="true"/>
     <intAttribute key="maxHeapSize" value="25"/>
     <intAttribute key="maxSetSize" value="1000000"/>
@@ -45,8 +45,8 @@
         <listEntry value="Replicas;;{1,2,3,4,5};0;0"/>
         <listEntry value="Consistency_level;;{&quot;strong&quot;,&quot;causal&quot;};0;0"/>
         <listEntry value="Ctx_id;;{1,2};0;0"/>
-        <listEntry value="Commands;;{ [op |-&gt; [key |-&gt; &quot;x&quot;, type |-&gt; &quot;w&quot;]], [op |-&gt; [key |-&gt; &quot;y&quot;, type |-&gt; &quot;r&quot;]], [op |-&gt; [key |-&gt; &quot;x&quot;, type |-&gt; &quot;r&quot;]], [op |-&gt; [key |-&gt; &quot;y&quot;, type |-&gt; &quot;w&quot;]], [op |-&gt; [key |-&gt; &quot;w&quot;, type |-&gt; &quot;w&quot;]], [op |-&gt; [key |-&gt; &quot;z&quot;, type |-&gt; &quot;r&quot;]]};0;0"/>
         <listEntry value="Keys;;{&quot;w&quot;, &quot;x&quot;, &quot;y&quot;, &quot;z&quot;};0;0"/>
+        <listEntry value="Commands;; { [op |-&gt; [key |-&gt; &quot;x&quot;, type |-&gt; &quot;w&quot;]], [op |-&gt; [key |-&gt; &quot;y&quot;, type |-&gt; &quot;r&quot;]], [op |-&gt; [key |-&gt; &quot;x&quot;, type |-&gt; &quot;r&quot;]], [op |-&gt; [key |-&gt; &quot;y&quot;, type |-&gt; &quot;w&quot;]], [op |-&gt; [key |-&gt; &quot;w&quot;, type |-&gt; &quot;w&quot;]], [op |-&gt; [key |-&gt; &quot;z&quot;, type |-&gt; &quot;r&quot;]]};0;0"/>
     </listAttribute>
     <listAttribute key="modelParameterDefinitions">
         <listEntry value="none;;none;1;0"/>

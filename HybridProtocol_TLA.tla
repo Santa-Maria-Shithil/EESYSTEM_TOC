@@ -15,7 +15,8 @@ Max(S) == IF S = {} THEN 0 ELSE CHOOSE i \in S : \A j \in S : j <= i
 (*       Consistency_level: the set of consistency level of all commands         *)
 (*********************************************************************************)
 
-CONSTANTS Commands, Replicas, MaxBallot, Consistency_level, Ctx_id, Keys
+CONSTANTS Commands,  Replicas, MaxBallot, Consistency_level, Ctx_id, Keys
+
 
  
  TwoElementSubsetsR(r) == {s \in SUBSET (Replicas \ {r}) : Cardinality(s) = 2}
@@ -185,7 +186,8 @@ Init ==
   /\ committed = [i \in Instances |-> {}]
   /\ ballots = 1
   /\ preparing = [r \in Replicas |-> {}]
-  /\ clk = [r \in Replicas |-> 1]
+  /\ clk = [r \in Replicas |-> 0]
+  
   (*/\ scc = [c \in Commands |-> {}]*)
 
 
@@ -1854,5 +1856,5 @@ Termination == <>((\A r \in Replicas:
 
 =============================================================================
 \* Modification History
-\* Last modified Tue Feb 06 16:23:50 EST 2024 by santamariashithil
+\* Last modified Tue Feb 06 22:08:20 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil
