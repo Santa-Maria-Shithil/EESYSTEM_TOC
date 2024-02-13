@@ -17,12 +17,13 @@ Max(S) == IF S = {} THEN 0 ELSE CHOOSE i \in S : \A j \in S : j <= i
 
 CONSTANTS Commands,  Replicas, MaxBallot, Consistency_level, Ctx_id, Keys
 
+Comm == { [op |-> [key |-> "x", type |-> "w"]], [op |-> [key |-> "y", type |-> "r"]], [op |-> [key |-> "x", type |-> "r"]], [op |-> [key |-> "y", type |-> "w"]], [op |-> [key |-> "w", type |-> "w"]], [op |-> [key |-> "z", type |-> "r"]]}
  
  TwoElementSubsetsR(r) == {s \in SUBSET (Replicas \ {r}) : Cardinality(s) = 2}
  SlowQuorums(r) == {{r} \cup s : s \in TwoElementSubsetsR(r)}
  FastQuorums(r) == {{r} \cup s : s \in TwoElementSubsetsR(r)}
 
-ASSUME IsFiniteSet(Replicas)
+(*ASSUME IsFiniteSet(Replicas)
 
 (***************************************************************************)
 (* Quorum conditions:                                                      *)
@@ -40,7 +41,7 @@ ASSUME \A r \in Replicas:
   /\ \A FQ \in FastQuorums(r):
     /\ r \in FQ
     /\ Cardinality(FQ) = (Cardinality(Replicas) \div 2) + 
-                         ((Cardinality(Replicas) \div 2) + 1) \div 2
+                         ((Cardinality(Replicas) \div 2) + 1) \div 2*)
     
     
 (***************************************************************************)
@@ -1855,5 +1856,5 @@ Termination == <>((\A r \in Replicas:
 
 =============================================================================
 \* Modification History
-\* Last modified Tue Feb 06 22:06:53 EST 2024 by santamariashithil
+\* Last modified Tue Feb 13 14:54:05 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil
