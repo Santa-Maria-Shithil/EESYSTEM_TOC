@@ -12,7 +12,7 @@
     <stringAttribute key="distributedTLC" value="off"/>
     <stringAttribute key="distributedTLCVMArgs" value=""/>
     <intAttribute key="fpBits" value="1"/>
-    <intAttribute key="fpIndex" value="93"/>
+    <intAttribute key="fpIndex" value="67"/>
     <booleanAttribute key="fpIndexRandom" value="true"/>
     <intAttribute key="maxHeapSize" value="25"/>
     <intAttribute key="maxSetSize" value="1000000"/>
@@ -42,7 +42,7 @@
     <stringAttribute key="modelExpressionEval" value=""/>
     <listAttribute key="modelParameterConstants">
         <listEntry value="MaxBallot;;10;0;0"/>
-        <listEntry value="Replicas;;{1,2,3};0;0"/>
+        <listEntry value="Replicas;;{1,2,3,4,5};0;0"/>
         <listEntry value="Consistency_level;;{&quot;strong&quot;,&quot;causal&quot;};0;0"/>
         <listEntry value="Ctx_id;;{1,2};0;0"/>
         <listEntry value="Keys;;{&quot;w&quot;, &quot;x&quot;, &quot;y&quot;, &quot;z&quot;};0;0"/>
