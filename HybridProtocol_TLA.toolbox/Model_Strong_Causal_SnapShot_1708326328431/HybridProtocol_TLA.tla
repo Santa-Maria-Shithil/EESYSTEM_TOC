@@ -589,8 +589,8 @@ Phase1Reply(replica) ==
         /\ LET oldRec == {rec \in cmdLog[replica]: rec.inst = msg.inst} IN
             /\ (\A rec \in oldRec : 
                 (rec.ballot = msg.ballot \/ rec.ballot[1] < msg.ballot[1]))
-            /\ LET (*recs1 == {rec \in cmdLog[replica]: rec.ctxid = msg.ctx}
-                   deps1 == {rec.inst: rec \in recs1}*) (* same session dependency *)
+            /\ LET recs1 == {rec \in cmdLog[replica]: rec.ctxid = msg.ctx}
+                   deps1 == {rec.inst: rec \in recs1} (* same session dependency *)
                    maxRec == MaxSeq(replica) (* selecting the rec with the highest sequence number in this specific replica *)
                    recs2 == {rec \in cmdLog[replica]: rec.state = "executed" /\ rec.cmd.op.type = "w" /\ rec.cmd.op.key = msg.cmd.op.key  /\ rec.seq = maxRec.seq /\ msg.cmd.op.type = "r"} 
                    (* rec.state = "executed" /\ rec.cmd.op.type = "w" => latest executed write 
@@ -604,7 +604,7 @@ Phase1Reply(replica) ==
                    recs3 == {rec \in cmdLog[replica]: rec.cmd.op.key = msg.cmd.op.key}
                    deps3 == {rec.inst: rec \in recs3} (* command interference *)
             
-                   newDeps == msg.deps \cup deps2 \cup deps3
+                   newDeps == msg.deps \cup deps1 \cup deps2 \cup deps3
                            
                    newClk == 1 + Max({clk[replica]} \cup {msg.seq})
                    newSeq == Max({newClk, 
@@ -1949,5 +1949,5 @@ Termination == <>((\A r \in Replicas:
 
 =============================================================================
 \* Modification History
-\* Last modified Mon Feb 19 02:06:34 EST 2024 by santamariashithil
+\* Last modified Mon Feb 19 02:04:57 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil

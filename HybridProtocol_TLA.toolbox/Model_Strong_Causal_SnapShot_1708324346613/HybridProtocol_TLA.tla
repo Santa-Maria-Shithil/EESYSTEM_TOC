@@ -422,7 +422,7 @@ StartPhase1Causal(C, cleader, Q, inst, ballot, oldMsg, oldClk,cl,ctx) ==
            ELSE
                  /\ cmdLog' = [cmdLog EXCEPT ![cleader] = (@ \ oldRecs) \cup 
                                         {[inst   |-> inst,
-                                          status |-> "causally-committed",
+                                          status |-> "accepted",
                                           state |-> "waiting",
                                           ballot |-> ballot,
                                           cmd    |-> C,
@@ -589,8 +589,8 @@ Phase1Reply(replica) ==
         /\ LET oldRec == {rec \in cmdLog[replica]: rec.inst = msg.inst} IN
             /\ (\A rec \in oldRec : 
                 (rec.ballot = msg.ballot \/ rec.ballot[1] < msg.ballot[1]))
-            /\ LET (*recs1 == {rec \in cmdLog[replica]: rec.ctxid = msg.ctx}
-                   deps1 == {rec.inst: rec \in recs1}*) (* same session dependency *)
+            /\ LET recs1 == {rec \in cmdLog[replica]: rec.ctxid = msg.ctx}
+                   deps1 == {rec.inst: rec \in recs1} (* same session dependency *)
                    maxRec == MaxSeq(replica) (* selecting the rec with the highest sequence number in this specific replica *)
                    recs2 == {rec \in cmdLog[replica]: rec.state = "executed" /\ rec.cmd.op.type = "w" /\ rec.cmd.op.key = msg.cmd.op.key  /\ rec.seq = maxRec.seq /\ msg.cmd.op.type = "r"} 
                    (* rec.state = "executed" /\ rec.cmd.op.type = "w" => latest executed write 
@@ -604,13 +604,13 @@ Phase1Reply(replica) ==
                    recs3 == {rec \in cmdLog[replica]: rec.cmd.op.key = msg.cmd.op.key}
                    deps3 == {rec.inst: rec \in recs3} (* command interference *)
             
-                   newDeps == msg.deps \cup deps2 \cup deps3
-                           
+                   newDeps == msg.deps \cup 
+                            ({t.inst: t \in cmdLog[replica]} \ {msg.inst})
                    newClk == 1 + Max({clk[replica]} \cup {msg.seq})
                    newSeq == Max({newClk, 
                                   1 + Max({t.seq: t \in cmdLog[replica]})})
                    instCom == {t.inst: t \in {tt \in cmdLog[replica] :
-                              tt.status \in {"causally-committed", "strongly-committed", "executed", "discarded"}}}
+                              tt.status \in {"causally-committed", "strongly-committed", "executed"}}}
                    
                     waitingRecs == {rec \in cmdLog[replica]: rec.state = "waiting"} 
                     waitingInst == {rec.inst: rec \in waitingRecs} IN
@@ -709,94 +709,44 @@ Phase1Fast(cleader, i, Q) ==
             /\ (\A r1, r2 \in replies:
                 /\ r1.deps = r2.deps
                 /\ r1.seq = r2.seq)
-            /\ LET r == CHOOSE r \in replies : TRUE
-                   waitingRecs == {rec \in cmdLog[cleader]: rec.state = "waiting"} 
-                   waitingInst == {rec.inst: rec \in waitingRecs} IN
-                        (*/\ LET localCom == {t.inst: 
-                                    t \in {tt \in cmdLog[cleader] : 
-                                         tt.status \in {"causally-committed", "strongly-committed", "executed", "discarded"}}}
-                               extCom == UNION {msg.committed: msg \in replies} IN
-                               (r.deps \subseteq (localCom \cup extCom))    *)
-                        
-                        IF Cardinality(waitingInst) = 0 THEN
-                        /\ cmdLog' = [cmdLog EXCEPT ![cleader] = (@ \ {record}) \cup 
-                                                {[inst   |-> i,
-                                                  status |-> "strongly-committed",
-                                                  state |-> "done",
-                                                  ballot |-> record.ballot,
-                                                  cmd    |-> record.cmd,
-                                                  deps   |-> r.deps,
-                                                  seq    |-> r.seq,
-                                                  consistency |-> record.consistency,
-                                                  ctxid |-> record.ctxid,
-                                                  execution_order |-> 0,
-                                                  execution_order_list |-> {},
-                                                  commit_order |-> r.commit_order ]}]
-                        /\ LET newClk == [clk EXCEPT ![cleader] = @+1] IN
-                                    sentMsg' = (sentMsg \ replies) \cup
-                                    {[type  |-> "commit",
-                                    inst    |-> i,
-                                    ballot  |-> record.ballot,
-                                    cmd     |-> record.cmd,
-                                    deps    |-> r.deps,
-                                    seq     |-> r.seq,
-                                    consistency |-> r.consistency,
-                                    ctxid |-> r.ctxid,
-                                    clk |-> newClk[cleader],
-                                    commit_order |-> r.commit_order]}
-                        /\ leaderOfInst' = [leaderOfInst EXCEPT ![cleader] = @ \ {i}]
-                        /\ committed' = [committed EXCEPT ![i] = 
-                                                    @ \cup {<<record.cmd, r.deps, r.seq>>}]
-                        /\ clk' = [clk EXCEPT ![cleader] = @+1]
-                        /\ UNCHANGED << proposed, executed, crtInst, ballots, preparing >> 
-                        
-                     ELSE  
-                        /\ cmdLog' = [cmdLog EXCEPT ![cleader] = (@ \ {record}) \cup 
-                                                {[inst   |-> i,
-                                                  status |-> "strongly-committed",
-                                                  state |-> "waiting",
-                                                  ballot |-> record.ballot,
-                                                  cmd    |-> record.cmd,
-                                                  deps   |-> r.deps,
-                                                  seq    |-> r.seq,
-                                                  consistency |-> record.consistency,
-                                                  ctxid |-> record.ctxid,
-                                                  execution_order |-> 0,
-                                                  execution_order_list |-> {},
-                                                  commit_order |-> r.commit_order ]}]
+            /\ LET r == CHOOSE r \in replies : TRUE IN
+                /\ LET localCom == {t.inst: 
+                            t \in {tt \in cmdLog[cleader] : 
+                                 tt.status \in {"strongly-committed", "executed"}}}
+                       extCom == UNION {msg.committed: msg \in replies} IN
+                       (r.deps \subseteq (localCom \cup extCom))    
+                /\ cmdLog' = [cmdLog EXCEPT ![cleader] = (@ \ {record}) \cup 
+                                        {[inst   |-> i,
+                                          status |-> "strongly-committed",
+                                          state |-> "done",
+                                          ballot |-> record.ballot,
+                                          cmd    |-> record.cmd,
+                                          deps   |-> r.deps,
+                                          seq    |-> r.seq,
+                                          consistency |-> record.consistency,
+                                          ctxid |-> record.ctxid,
+                                          execution_order |-> 0,
+                                          execution_order_list |-> {},
+                                          commit_order |-> r.commit_order ]}]
+                /\ LET newClk == [clk EXCEPT ![cleader] = @+1] IN
+                            sentMsg' = (sentMsg \ replies) \cup
+                            {[type  |-> "commit",
+                            inst    |-> i,
+                            ballot  |-> record.ballot,
+                            cmd     |-> record.cmd,
+                            deps    |-> r.deps,
+                            seq     |-> r.seq,
+                            consistency |-> r.consistency,
+                            ctxid |-> r.ctxid,
+                            clk |-> newClk[cleader],
+                            commit_order |-> r.commit_order]}
+                /\ leaderOfInst' = [leaderOfInst EXCEPT ![cleader] = @ \ {i}]
+                /\ committed' = [committed EXCEPT ![i] = 
+                                            @ \cup {<<record.cmd, r.deps, r.seq>>}]
+                /\ clk' = [clk EXCEPT ![cleader] = @+1]
+                /\ UNCHANGED << proposed, executed, crtInst, ballots, preparing >>   
    
-                        /\ LET newcmdstate == checkWaiting(cleader) IN   
-                        
-                            /\ cmdLog' = [cmdLog EXCEPT ![cleader] = (@ \ {record}) \cup 
-                                                    {[inst   |-> i,
-                                                      status |-> "strongly-committed",
-                                                      state |-> "done",
-                                                      ballot |-> record.ballot,
-                                                      cmd    |-> record.cmd,
-                                                      deps   |-> r.deps,
-                                                      seq    |-> r.seq,
-                                                      consistency |-> record.consistency,
-                                                      ctxid |-> record.ctxid,
-                                                      execution_order |-> 0,
-                                                      execution_order_list |-> {},
-                                                      commit_order |-> r.commit_order ]}]
-                            /\ LET newClk == [clk EXCEPT ![cleader] = @+1] IN
-                                        sentMsg' = (sentMsg \ replies) \cup
-                                        {[type  |-> "commit",
-                                        inst    |-> i,
-                                        ballot  |-> record.ballot,
-                                        cmd     |-> record.cmd,
-                                        deps    |-> r.deps,
-                                        seq     |-> r.seq,
-                                        consistency |-> r.consistency,
-                                        ctxid |-> r.ctxid,
-                                        clk |-> newClk[cleader],
-                                        commit_order |-> r.commit_order]}
-                            /\ leaderOfInst' = [leaderOfInst EXCEPT ![cleader] = @ \ {i}]
-                            /\ committed' = [committed EXCEPT ![i] = 
-                                                        @ \cup {<<record.cmd, r.deps, r.seq>>}]
-                            /\ clk' = [clk EXCEPT ![cleader] = @+1]
-                            /\ UNCHANGED << proposed, executed, crtInst, ballots, preparing >> 
+   
    
                                
 Phase1Slow(cleader, i, Q) ==
@@ -1034,7 +984,7 @@ CommitCausal(replica, cmsg) ==
             waitingRecs == {rec \in cmdLog[replica]: rec.state = "waiting"} 
             waitingInst == {rec.inst: rec \in waitingRecs} IN
             IF Cardinality(waitingInst) = 0 THEN
-                /\ \A rec \in oldRec : (rec.status \notin {"causally-committed", "executed", "discarded"} /\ 
+                /\ \A rec \in oldRec : (rec.status \notin {"causally-committed", "executed"} /\ 
                                         rec.ballot[1] <= cmsg.ballot[1])
                 /\ cmdLog' = [cmdLog EXCEPT ![replica] = (@ \ oldRec) \cup 
                                             {[inst     |-> cmsg.inst,
@@ -1055,7 +1005,7 @@ CommitCausal(replica, cmsg) ==
                 /\ UNCHANGED << proposed, executed, crtInst, leaderOfInst,
                                 sentMsg, ballots, preparing>>      
             ELSE
-                /\ \A rec \in oldRec : (rec.status \notin {"causally-committed", "executed", "discarded"} /\ 
+                /\ \A rec \in oldRec : (rec.status \notin {"causally-committed", "executed"} /\ 
                                         rec.ballot[1] <= cmsg.ballot[1])
                 /\ cmdLog' = [cmdLog EXCEPT ![replica] = (@ \ oldRec) \cup 
                                             {[inst     |-> cmsg.inst,
@@ -1099,7 +1049,7 @@ CommitStrong(replica, cmsg) ==
             waitingRecs == {rec \in cmdLog[replica]: rec.state = "waiting"} 
             waitingInst == {rec.inst: rec \in waitingRecs} IN
             IF Cardinality(waitingInst) = 0 THEN
-                /\ \A rec \in oldRec : (rec.status \notin {"strongly-committed", "executed", "discarded"} /\ 
+                /\ \A rec \in oldRec : (rec.status \notin {"strongly-committed", "executed"} /\ 
                                         rec.ballot[1] <= cmsg.ballot[1])
                 /\ cmdLog' = [cmdLog EXCEPT ![replica] = (@ \ oldRec) \cup 
                                             {[inst     |-> cmsg.inst,
@@ -1120,7 +1070,7 @@ CommitStrong(replica, cmsg) ==
                 /\ UNCHANGED << proposed, executed, crtInst, leaderOfInst,
                                 sentMsg, ballots, preparing>>      
             ELSE
-                /\ \A rec \in oldRec : (rec.status \notin {"strongly-committed", "executed", "discarded"} /\ 
+                /\ \A rec \in oldRec : (rec.status \notin {"strongly-committed", "executed"} /\ 
                                         rec.ballot[1] <= cmsg.ballot[1])
                 /\ cmdLog' = [cmdLog EXCEPT ![replica] = (@ \ oldRec) \cup 
                                             {[inst     |-> cmsg.inst,
@@ -1949,5 +1899,5 @@ Termination == <>((\A r \in Replicas:
 
 =============================================================================
 \* Modification History
-\* Last modified Mon Feb 19 02:06:34 EST 2024 by santamariashithil
+\* Last modified Mon Feb 19 01:31:29 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil
