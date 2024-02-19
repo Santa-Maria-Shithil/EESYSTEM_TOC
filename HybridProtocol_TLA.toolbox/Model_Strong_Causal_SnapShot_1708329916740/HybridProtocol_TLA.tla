@@ -93,7 +93,7 @@ Message ==
   \cup  [type: {"accept"}, src: Replicas, dst: Replicas,
         inst: Instances, ballot: Nat \X Replicas,
         cmd: Commands \cup {none}, deps: SUBSET Instances, seq: Nat, consistency: Consistency_level, ctxid:  Nat, clk: Nat, commit_order: Nat]
-  \cup  [type: {"commit"}, 
+  \cup  [type: {"commit"}, src: Replicas, dst: Replicas,
         inst: Instances, ballot: Nat \X Replicas,
         cmd: Commands \cup {none}, deps: SUBSET Instances, seq: Nat, consistency: Consistency_level, ctxid:  Nat, clk: Nat, commit_order: Nat]
   \cup  [type: {"prepare"}, src: Replicas, dst: Replicas,
@@ -1271,9 +1271,8 @@ PrepareFinalize(replica, i, Q) ==
                         /\ (com.status \in {"causally-committed", "strongly-committed", "executed", "discarded"})
                         /\ preparing' = [preparing EXCEPT ![replica] = @ \ {i}]
                         /\ clk' = newClk
-                        (*/\ sentMsg' = sentMsg \ replies*)
                         /\ sentMsg' = (sentMsg \ replies) \cup
-                                [type  : {"commit"},
+                                {[type  : {"commit"},
                                 inst    : {i},
                                 ballot  : {rec.ballot},
                                 cmd     : {com.cmd},
@@ -1282,7 +1281,7 @@ PrepareFinalize(replica, i, Q) ==
                                 consistency : {com.consistency},
                                 ctxid : {com.ctxid},
                                 clk : newClk[replica],
-                                commit_order : {com.commit_order}]
+                                commit_order : {com.commit_order}]}
                         /\ UNCHANGED << cmdLog, proposed, executed, crtInst, leaderOfInst,
                                         committed, ballots>>
                         
@@ -1771,7 +1770,8 @@ CommandLeaderAction ==
             \/ (\E Q \in FastQuorums(cleader) : Phase1Fast(cleader, inst, Q))
             \/ (\E Q \in SlowQuorums(cleader) : Phase1Slow(cleader, inst, Q))
             \/ (\E Q \in SlowQuorums(cleader) : Phase2Finalize(cleader, inst, Q))
-            \/ (\E Q \in SlowQuorums(cleader) : FinalizeTryPreAccept(cleader, inst, Q))) 
+            (* \/ (\E Q \in SlowQuorums(cleader) : FinalizeTryPreAccept(cleader, inst, Q))) *)
+            )
     \/ (\E replica \in Replicas: 
             \E inst \in cmdLog[replica]: ExecuteCommand(replica, inst))
     
@@ -1785,14 +1785,14 @@ ReplicaAction ==
         (\/ Phase1Reply(replica)
          \/ \E cmsg \in sentMsg : (cmsg.type = "commit" /\ Commit(replica, cmsg))
          \/ Phase2Reply(replica)
-         \/ \E i \in Instances : 
+         (*\/ \E i \in Instances : 
             /\ crtInst[i[1]] > i[2] (* This condition states that the instance has *) 
                                     (* been started by its original owner          *)
             /\ \E Q \in SlowQuorums(replica) : SendPrepare(replica, i, Q)
          \/ ReplyPrepare(replica)
          \/ \E i \in preparing[replica] :
             \E Q \in SlowQuorums(replica) : PrepareFinalize(replica, i, Q)
-         \/ ReplyTryPreaccept(replica)
+         \/ ReplyTryPreaccept(replica)*)
          \/ \E inst \in cmdLog[replica]: ExecuteCommand(replica, inst)
          )
 
@@ -1960,5 +1960,5 @@ Termination == <>((\A r \in Replicas:
 
 =============================================================================
 \* Modification History
-\* Last modified Mon Feb 19 03:23:10 EST 2024 by santamariashithil
+\* Last modified Mon Feb 19 03:03:17 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil

@@ -93,7 +93,7 @@ Message ==
   \cup  [type: {"accept"}, src: Replicas, dst: Replicas,
         inst: Instances, ballot: Nat \X Replicas,
         cmd: Commands \cup {none}, deps: SUBSET Instances, seq: Nat, consistency: Consistency_level, ctxid:  Nat, clk: Nat, commit_order: Nat]
-  \cup  [type: {"commit"}, 
+  \cup  [type: {"commit"}, src: Replicas, dst: Replicas,
         inst: Instances, ballot: Nat \X Replicas,
         cmd: Commands \cup {none}, deps: SUBSET Instances, seq: Nat, consistency: Consistency_level, ctxid:  Nat, clk: Nat, commit_order: Nat]
   \cup  [type: {"prepare"}, src: Replicas, dst: Replicas,
@@ -1271,8 +1271,8 @@ PrepareFinalize(replica, i, Q) ==
                         /\ (com.status \in {"causally-committed", "strongly-committed", "executed", "discarded"})
                         /\ preparing' = [preparing EXCEPT ![replica] = @ \ {i}]
                         /\ clk' = newClk
-                        (*/\ sentMsg' = sentMsg \ replies*)
-                        /\ sentMsg' = (sentMsg \ replies) \cup
+                        /\ sentMsg' = sentMsg \ replies
+                        (*/\ sentMsg' = (sentMsg \ replies) \cup
                                 [type  : {"commit"},
                                 inst    : {i},
                                 ballot  : {rec.ballot},
@@ -1282,7 +1282,7 @@ PrepareFinalize(replica, i, Q) ==
                                 consistency : {com.consistency},
                                 ctxid : {com.ctxid},
                                 clk : newClk[replica],
-                                commit_order : {com.commit_order}]
+                                commit_order : {com.commit_order}]*)
                         /\ UNCHANGED << cmdLog, proposed, executed, crtInst, leaderOfInst,
                                         committed, ballots>>
                         
@@ -1960,5 +1960,5 @@ Termination == <>((\A r \in Replicas:
 
 =============================================================================
 \* Modification History
-\* Last modified Mon Feb 19 03:23:10 EST 2024 by santamariashithil
+\* Last modified Mon Feb 19 03:17:00 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil

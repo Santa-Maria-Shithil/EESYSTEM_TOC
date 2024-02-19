@@ -93,7 +93,7 @@ Message ==
   \cup  [type: {"accept"}, src: Replicas, dst: Replicas,
         inst: Instances, ballot: Nat \X Replicas,
         cmd: Commands \cup {none}, deps: SUBSET Instances, seq: Nat, consistency: Consistency_level, ctxid:  Nat, clk: Nat, commit_order: Nat]
-  \cup  [type: {"commit"}, src: Replicas, dst: Replicas,
+  \cup  [type: {"commit"}, 
         inst: Instances, ballot: Nat \X Replicas,
         cmd: Commands \cup {none}, deps: SUBSET Instances, seq: Nat, consistency: Consistency_level, ctxid:  Nat, clk: Nat, commit_order: Nat]
   \cup  [type: {"prepare"}, src: Replicas, dst: Replicas,
@@ -407,8 +407,6 @@ StartPhase1Causal(C, cleader, Q, inst, ballot, oldMsg, oldClk,cl,ctx) ==
                 /\ leaderOfInst' = [leaderOfInst EXCEPT ![cleader] = @ \cup {inst}]
                 /\ sentMsg' = (sentMsg \ oldMsg) \cup 
                                         [type  : {"commit"},
-                                          src   : {cleader},
-                                          dst   : Q \ {cleader},
                                           inst  : {inst},
                                           ballot: {ballot},
                                           cmd   : {C},
@@ -450,8 +448,6 @@ StartPhase1Causal(C, cleader, Q, inst, ballot, oldMsg, oldClk,cl,ctx) ==
                     /\ leaderOfInst' = [leaderOfInst EXCEPT ![cleader] = @ \cup {inst}]
                     /\ sentMsg' = (sentMsg \ oldMsg) \cup 
                                             [type  : {"commit"},
-                                              src   : {cleader},
-                                              dst   : Q \ {cleader},
                                               inst  : {inst},
                                               ballot: {ballot},
                                               cmd   : {C},
@@ -1174,7 +1170,7 @@ SendPrepare(replica, i, Q) ==
     /\ ballots <= MaxBallot
     /\ ~(\E rec \in cmdLog[replica] :
                         /\ rec.inst = i
-                        /\ rec.status \in {"causally-committed", "strongly-committed", "executed"})
+                        /\ rec.status \in {"causally-committed", "strongly-committed", "executed", "discarded"})
     /\ sentMsg' = sentMsg \cup
                     [type   : {"prepare"},
                      src    : {replica},
@@ -1263,8 +1259,7 @@ PrepareFinalize(replica, i, Q) ==
     /\ i \in preparing[replica]
     /\ \E rec \in cmdLog[replica] :
        /\ rec.inst = i
-       /\ rec.status \notin {"causally-committed", "strongly-committed", "executed"}
-       
+       /\ rec.status \notin {"causally-committed", "strongly-committed", "executed", "discarded"}
        /\ LET replies == {msg \in sentMsg : 
                         /\ msg.inst = i
                         /\ msg.type = "prepare-reply"
@@ -1273,13 +1268,25 @@ PrepareFinalize(replica, i, Q) ==
             newClk == [clk EXCEPT ![replica] = @ + 1] IN
             /\ (\A rep \in Q : \E msg \in replies : msg.src = rep)
             /\  \/ \E com \in replies :
-                        /\ (com.status \in {"causally-committed", "strongly-committed", "executed"})
+                        /\ (com.status \in {"causally-committed", "strongly-committed", "executed", "discarded"})
                         /\ preparing' = [preparing EXCEPT ![replica] = @ \ {i}]
                         /\ clk' = newClk
-                        /\ sentMsg' = sentMsg \ replies
+                        (*/\ sentMsg' = sentMsg \ replies*)
+                        /\ sentMsg' = (sentMsg \ replies) \cup
+                                [type  : {"commit"},
+                                inst    : {i},
+                                ballot  : {rec.ballot},
+                                cmd     : {com.cmd},
+                                deps    : {com.deps},
+                                seq     : {com.seq},
+                                consistency : {com.consistency},
+                                ctxid : {com.ctxid},
+                                clk : newClk[replica],
+                                commit_order : {com.commit_order}]
                         /\ UNCHANGED << cmdLog, proposed, executed, crtInst, leaderOfInst,
                                         committed, ballots>>
-                \/ /\ ~(\E msg \in replies : msg.status \in {"causally-committed", "strongly-committed", "executed"})
+                        
+                \/ /\ ~(\E msg \in replies : msg.status \in {"causally-committed", "strongly-committed", "executed", "discarded"})
                    /\ \E acc \in replies :
                         /\ acc.status = "accepted"
                         /\ (\A msg \in (replies \ {acc}) : 
@@ -1313,7 +1320,7 @@ PrepareFinalize(replica, i, Q) ==
                          /\ leaderOfInst' = [leaderOfInst EXCEPT ![replica] = @ \cup {i}]
                          /\ UNCHANGED << proposed, executed, crtInst, committed, ballots>>
                 \/ /\ ~(\E msg \in replies : 
-                        msg.status \in {"accepted", "causally-committed", "strongly-committed", "executed"})
+                        msg.status \in {"accepted", "causally-committed", "strongly-committed", "executed", "discarded"})
                    /\ LET preaccepts == {msg \in replies : msg.status = "pre-accepted"} IN
                        (\/  /\ \A p1, p2 \in preaccepts :
                                     p1.cmd = p2.cmd /\ p1.deps = p2.deps /\ p1.seq = p2.seq
@@ -1392,7 +1399,7 @@ ReplyTryPreaccept(replica) ==
         /\ LET oldRec == {rec \in cmdLog[replica] : rec.inst = tpa.inst}
            newClk == [clk EXCEPT ![replica] = @ + 1] IN
             /\ \A rec \in oldRec : rec.ballot[1] <= tpa.ballot[1] /\ 
-                                   rec.status \notin {"accepted",  "causally-committed", "strongly-committed", "executed"}
+                                   rec.status \notin {"accepted",  "causally-committed", "strongly-committed", "executed", "discarded"}
             /\ \/ (\E rec \in cmdLog[replica] \ oldRec:
                         /\ tpa.inst \notin rec.deps
                         /\ \/ rec.inst \notin tpa.deps
@@ -1476,7 +1483,7 @@ FinalizeTryPreAccept(cleader, i, Q) ==
                               execution_order_list |-> {} ]}]
                   /\ UNCHANGED << proposed, executed, committed, crtInst, ballots,
                                   leaderOfInst, preparing >>
-               \/ /\ \E tpr \in tprs: tpr.status \in {"accepted", "causally-committed", "strongly-committed", "executed"}
+               \/ /\ \E tpr \in tprs: tpr.status \in {"accepted", "causally-committed", "strongly-committed", "executed", "discarded"}
                   /\ StartPhase1(rec.cmd, cleader, Q, i, rec.ballot, tprs, newClk[cleader], rec.consistency, rec.ctxid)
                   /\ UNCHANGED << proposed, executed, committed, crtInst, ballots,
                                   leaderOfInst, preparing >>
@@ -1488,7 +1495,7 @@ FinalizeTryPreAccept(cleader, i, Q) ==
                                   ballots, preparing >> 
                                   
 (***************************************************************************)
-(* Command Execution Actions                                               *)
+(* Command Execution Handler Functions                                     *)
 (***************************************************************************)
 
 BoundedSeq(S, n) == UNION {[1..i -> S] : i \in 0..n}  (* this is generating all possible paths among 
@@ -1674,6 +1681,11 @@ OrderingInstancesSecondLevel(scc) ==
                         
 
 
+(***************************************************************************)
+(* Command Execution Actions                                               *)
+(***************************************************************************)
+
+
 ExecuteCommand(replica, i) == 
      \E rec \in cmdLog[replica]:
         /\ rec.inst = i
@@ -1759,8 +1771,7 @@ CommandLeaderAction ==
             \/ (\E Q \in FastQuorums(cleader) : Phase1Fast(cleader, inst, Q))
             \/ (\E Q \in SlowQuorums(cleader) : Phase1Slow(cleader, inst, Q))
             \/ (\E Q \in SlowQuorums(cleader) : Phase2Finalize(cleader, inst, Q))
-            (* \/ (\E Q \in SlowQuorums(cleader) : FinalizeTryPreAccept(cleader, inst, Q))) *)
-            )
+            \/ (\E Q \in SlowQuorums(cleader) : FinalizeTryPreAccept(cleader, inst, Q))) 
     \/ (\E replica \in Replicas: 
             \E inst \in cmdLog[replica]: ExecuteCommand(replica, inst))
     
@@ -1774,14 +1785,14 @@ ReplicaAction ==
         (\/ Phase1Reply(replica)
          \/ \E cmsg \in sentMsg : (cmsg.type = "commit" /\ Commit(replica, cmsg))
          \/ Phase2Reply(replica)
-         (*\/ \E i \in Instances : 
+         \/ \E i \in Instances : 
             /\ crtInst[i[1]] > i[2] (* This condition states that the instance has *) 
                                     (* been started by its original owner          *)
             /\ \E Q \in SlowQuorums(replica) : SendPrepare(replica, i, Q)
          \/ ReplyPrepare(replica)
          \/ \E i \in preparing[replica] :
             \E Q \in SlowQuorums(replica) : PrepareFinalize(replica, i, Q)
-         \/ ReplyTryPreaccept(replica)*)
+         \/ ReplyTryPreaccept(replica)
          \/ \E inst \in cmdLog[replica]: ExecuteCommand(replica, inst)
          )
 
@@ -1949,5 +1960,5 @@ Termination == <>((\A r \in Replicas:
 
 =============================================================================
 \* Modification History
-\* Last modified Mon Feb 19 02:06:34 EST 2024 by santamariashithil
+\* Last modified Mon Feb 19 03:23:10 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil
