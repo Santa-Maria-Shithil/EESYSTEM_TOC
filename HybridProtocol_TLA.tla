@@ -1556,27 +1556,66 @@ OrderingInstancesFirstLevel(scc) ==  (*ordering based on sequence number (ascend
        minCover(scc, {}, 0)
     
 
-(*OrderingInstancesSecondLevel(scc) ==  (*ordering the instances among themeselves from the same replica according to the instance number (ascending)*) 
+  
+SetToSeq(s) == 
     LET
-        orderedSccNodes == OrderingInstancesFirstLevel(scc)
-        RECURSIVE secondLevelOrdering(_,_)
-        secondLevelOrdering(sccSet, index) == 
-            IF index = Len(orderedSccNodes)
-            THEN sccSet
-            ELSE 
-                LET 
-                    itemToSwap == sccSet[index] IN
-                    (*IF itemToSwap[1] = item[i][1] /\ itemToSwap[2] >= item[i][2] 
-                    THEN sccSet[index] == item[i]
-                        sccSet[i] == itemToSwap
-                    ELSE
-                        sccSet[index] == sccSet[index]
-                        sccSet[i] == sccSet[i]*)
-                    sccSet[i] == itemToSwap : i \in index..Len(sccSet)
-                    
-                                  
+        RECURSIVE settoseq(_, _)
+        settoseq(set, newseq) ==
+            IF set = {}
+            THEN newseq
+            ELSE
+                LET seq == CHOOSE x \in set: TRUE
+              
+                IN  
+                
+                settoseq(set \ {seq}, Append(newseq,seq[2]))
     IN
-        secondLevelOrdering(orderedSccNodes,1)*)
+        settoseq(s,<<>>)
+        
+        
+
+        
+MinInstancePosition(item, seq) == 
+    LET 
+        RECURSIVE mininstanceposition(_, _, _, _)
+        mininstanceposition(min, s, pos, ptr) ==
+            IF ptr = Len(s)+1 
+            THEN pos
+            ELSE
+                IF min[1] = s[ptr][1] /\ min[2] >= s[ptr][2]
+                THEN  
+                    LET min1 == s[ptr] 
+                    IN mininstanceposition(min1, s, ptr, ptr+1)
+                ELSE 
+                    mininstanceposition(min, s, pos, ptr+1)
+                    
+    IN 
+    mininstanceposition(item, seq, 1, 1)
+    
+swapSeq(seq, pos, newValue) == [i \in DOMAIN seq |-> IF i = pos THEN newValue ELSE seq[i]]
+
+ 
+Delete(seq, pos) == [i \in 1..Len(seq)-1 |-> IF i < pos THEN seq[i] ELSE seq[i + 1]]
+   
+SortSeq2(seq) ==
+    LET
+        RECURSIVE sortseq2(_, _)
+        sortseq2(s, newS) == 
+            IF s = <<>>
+            THEN newS
+            ELSE
+                LET minitemPos == MinInstancePosition(s[1],s)
+                item == s[minitemPos]
+                swapedSeq == swapSeq(s, minitemPos, s[1])
+                IN
+                sortseq2(Delete(swapedSeq,1), Append(newS,item ))
+    IN     
+        sortseq2(seq, <<>>)         
+           
+OrderingInstancesSecondLevel(scc) ==
+        LET 
+            SortedInstances == SortSeq2(SetToSeq(scc))
+        IN  { <<Index, SortedInstances[Index]>> : Index \in 1..Len(SortedInstances) }
                         
 
 
@@ -1585,8 +1624,8 @@ ExecuteCommand(replica, i) ==
         /\ rec.inst = i
         /\ rec.status = "causally-committed" \/ rec.status = "strongly-committed"
         /\ LET scc_set == FinalSCC(replica,i) (*finding all scc *)IN 
-            /\ \A scc \in scc_set: 
-                \A instant \in OrderingInstancesFirstLevel(scc): (*ordering each scc *)
+            /\ \A scc \in scc_set: LET firstlevelordering ==  OrderingInstancesFirstLevel(scc) IN (*ordering based on seq number *)
+                \A instant \in OrderingInstancesSecondLevel(firstlevelordering): (*ordering based on instance number to gurantee the session causality *)
                     \E rec2 \in cmdLog[instant[2][1]]:
                         /\rec2.inst=instant[2][2]
                         /\ LET max_execution_order_inst == FindMaxExecutionOrder(replica)
@@ -1856,5 +1895,5 @@ Termination == <>((\A r \in Replicas:
 
 =============================================================================
 \* Modification History
-\* Last modified Tue Feb 13 15:07:40 EST 2024 by santamariashithil
+\* Last modified Sun Feb 18 22:39:22 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil
