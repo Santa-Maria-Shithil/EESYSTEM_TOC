@@ -1379,9 +1379,11 @@ PrepareFinalize(replica, i, Q) ==
                                 /\ preparing' = [preparing EXCEPT ![replica] = @ \ {i}]
                                 /\ UNCHANGED << proposed, executed, crtInst, committed, ballots>>)
                 \/  /\ \A msg \in replies : msg.status = "not-seen"
-                    /\ StartPhase1([op |-> [key |-> "", type |-> ""]], replica, Q, i, rec.ballot, replies, newClk[replica], "none", "none")
+                    /\ StartPhase1([op |-> [key |-> "", type |-> ""]], replica, Q, i, rec.ballot, replies, newClk[replica], "strong", 0) (* no dependency will be build on it *)
                     /\ preparing' = [preparing EXCEPT ![replica] = @ \ {i}]
                     /\ UNCHANGED << proposed, executed, crtInst, committed, ballots >>   
+                    
+  
                     
                     
 ReplyTryPreaccept(replica) ==
@@ -1942,5 +1944,5 @@ Termination == <>((\A r \in Replicas:
 
 =============================================================================
 \* Modification History
-\* Last modified Mon Feb 19 15:46:43 EST 2024 by santamariashithil
+\* Last modified Mon Feb 19 16:03:03 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil

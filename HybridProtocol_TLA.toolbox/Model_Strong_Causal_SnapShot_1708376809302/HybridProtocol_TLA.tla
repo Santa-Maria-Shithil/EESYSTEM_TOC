@@ -48,7 +48,7 @@ ASSUME \A r \in Replicas:
 (* Special none command                                                    *)
 (***************************************************************************)
 
-none == CHOOSE c : c \notin Commands
+none == [op |-> [key |-> "", type |-> ""]]
 
 (***************************************************************************)
 (* Special empty instance                                                  *)
@@ -78,8 +78,8 @@ Instances == Replicas \X (1..Cardinality(Commands))
 (* The possible status of a command in the log of a replica.               *)
 (***************************************************************************)
 
-Status == {"not-seen", "pre-accepted", "accepted", "causally-committed", "strongly-comitted", "executed" , "discarded"}
-State == {"ready", "waiting", "done"}
+Status == {"not-seen", "pre-accepted", "accepted", "causally-committed", "strongly-comitted", "executed" , "discarded", "none"}
+State == {"not-seen", "ready", "waiting", "done", "none"}
 
 
 (***************************************************************************)
@@ -89,29 +89,28 @@ State == {"ready", "waiting", "done"}
 Message ==
         [type: {"pre-accept"}, src: Replicas, dst: Replicas,
         inst: Instances, ballot: Nat \X Replicas,
-        cmd: Commands \cup {none}, deps: SUBSET Instances, seq: Nat,   consistency: Consistency_level, ctxid: Nat,clk: Nat, commit_order: Nat]
+        cmd: Commands \cup {[op |-> [key |-> "", type |-> ""]]}, deps: SUBSET Instances, seq: Nat,   consistency: Consistency_level, ctxid: Ctx_id \cup {0},clk: Nat, commit_order: Nat]
   \cup  [type: {"accept"}, src: Replicas, dst: Replicas,
         inst: Instances, ballot: Nat \X Replicas,
-        cmd: Commands \cup {none}, deps: SUBSET Instances, seq: Nat, consistency: Consistency_level, ctxid:  Nat, clk: Nat, commit_order: Nat]
+        cmd: Commands \cup {[op |-> [key |-> "", type |-> ""]]}, deps: SUBSET Instances, seq: Nat, consistency: Consistency_level, ctxid:  Ctx_id \cup {0}, clk: Nat, commit_order: Nat]
   \cup  [type: {"commit"}, 
         inst: Instances, ballot: Nat \X Replicas,
-        cmd: Commands \cup {none}, deps: SUBSET Instances, seq: Nat, consistency: Consistency_level, ctxid:  Nat, clk: Nat, commit_order: Nat]
-  \cup  [type: {"prepare"}, src: Replicas, dst: Replicas,
-        inst: Instances, ballot: Nat \X Replicas]
-  \cup  [type: {"pre-accept-reply"}, src: Replicas, dst: Replicas,
-        inst: Instances, ballot: Nat \X Replicas,
-        deps: SUBSET Instances, seq: Nat, committed: SUBSET Instances, consistency: Consistency_level, ctxid:  Nat, clk: Nat, commit_order: Nat]
-  \cup  [type: {"accept-reply"}, src: Replicas, dst: Replicas,
-        inst: Instances, ballot: Nat \X Replicas,cmd: Commands \cup {none}, deps: SUBSET Instances, seq: Nat,consistency: Consistency_level, ctxid:  Nat,clk: Nat, commit_order: Nat ]
-  \cup  [type: {"prepare-reply"}, src: Replicas, dst: Replicas,
-        inst: Instances, ballot: Nat \X Replicas, prev_ballot: Nat \X Replicas,
-        status: Status,
-        cmd: Commands \cup {none}, deps: SUBSET Instances, seq: Nat]
-  \cup  [type: {"try-pre-accept"}, src: Replicas, dst: Replicas,
-        inst: Instances, ballot: Nat \X Replicas,
-        cmd: Commands \cup {none}, deps: SUBSET Instances, seq: Nat]
-  \cup  [type: {"try-pre-accept-reply"}, src: Replicas, dst: Replicas,
-        inst: Instances, ballot: Nat \X Replicas, status: Status \cup {"OK"}]
+        cmd: Commands \cup {[op |-> [key |-> "", type |-> ""]]}, deps: SUBSET Instances, seq: Nat, consistency: Consistency_level, ctxid:  Ctx_id \cup {0}, clk: Nat, commit_order: Nat]
+  \cup  [type: {"prepare"}, src: Replicas, dst: Replicas, inst: Instances, ballot: Nat \X Replicas]
+  \cup  [type: {"pre-accept-reply"}, src: Replicas, dst: Replicas, inst: Instances, ballot: Nat \X Replicas,
+        deps: SUBSET Instances, seq: Nat, committed: SUBSET Instances, consistency: Consistency_level \cup {"not-seen"}, ctxid:  Ctx_id \cup {0}, clk: Nat, commit_order: Nat]
+  \cup  [type: {"accept-reply"}, src: Replicas, dst: Replicas, inst: Instances, ballot: Nat \X Replicas,cmd: Commands \cup {[op |-> [key |-> "", type |-> ""]]}, deps: SUBSET Instances, 
+         seq: Nat,consistency: Consistency_level \cup {"not-seen"}, ctxid:  Ctx_id \cup {0},clk: Nat, commit_order: Nat ]
+  \cup  [type: {"prepare-reply"}, src: Replicas, dst: Replicas, inst: Instances, ballot: Nat \X Replicas, prev_ballot: Nat \X Replicas, commit_order: Nat,
+        status: Status, consistency: Consistency_level \cup {"not-seen"}, ctxid:  Ctx_id \cup {0}, cmd: Commands \cup {[op |-> [key |-> "", type |-> ""]]}, deps: SUBSET Instances, seq: Nat]
+  \cup  [type: {"try-pre-accept"}, src: Replicas, dst: Replicas, inst: Instances, ballot: Nat \X Replicas,
+        cmd: Commands \cup {[op |-> [key |-> "", type |-> ""]]}, deps: SUBSET Instances, seq: Nat]
+  \cup  [type: {"try-pre-accept-reply"}, src: Replicas, dst: Replicas, inst: Instances, ballot: Nat \X Replicas, status: Status \cup {"OK"}]
+        
+        
+        
+        
+
         
 
 (*******************************************************************************)
@@ -141,23 +140,23 @@ VARIABLES cmdLog, proposed, executed, sentMsg, crtInst, leaderOfInst,
 
 TypeOK ==
     /\ cmdLog \in [Replicas -> SUBSET [inst: Instances, 
-                                       status: Status \cup {none},
-                                       state: State \cup {none},
+                                       status: Status,
+                                       state: State,
                                        ballot: Nat \X Replicas,
-                                       cmd: Commands \cup {none},
+                                       cmd: Commands \cup {[op |-> [key |-> "", type |-> ""]]},
                                        deps: SUBSET Instances,
                                        seq: Nat,
-                                       consistency: Consistency_level \cup {none},
-                                       ctxid: Ctx_id \cup {none},
+                                       consistency: Consistency_level \cup {"not-seen","none"},
+                                       ctxid: Ctx_id \cup {0}, (* context id 0 means unknown context id *)
                                        execution_order: Nat, (* This is the global order of execution in a specific replica. Ordering will start from 1. O means not executed yet and no specific execution order. *)
-                                       commit_order : Nat,
+                                       commit_order : Nat, (* 0 means not committed *)
                                        execution_order_list: SUBSET {Nat \X Instances}]]
     /\ proposed \in SUBSET Commands
     /\ executed \in [Replicas -> SUBSET (Nat \X Commands)]
     /\ sentMsg \in SUBSET Message
     /\ crtInst \in [Replicas -> Nat]
     /\ leaderOfInst \in [Replicas -> SUBSET Instances]
-    /\ committed \in [Instances -> SUBSET ((Commands \cup {none}) \X
+    /\ committed \in [Instances -> SUBSET ((Commands \cup {[op |-> [key |-> "", type |-> ""]]}) \X
                                            (SUBSET Instances) \X 
                                            Nat)]
     /\ ballots \in Nat
@@ -1189,7 +1188,6 @@ SendPrepare(replica, i, Q) ==
                               ballot|-> msg.ballot,
                               prev_ballot|-> rec.ballot,
                               status|-> rec.status,
-                              state |-> rec.state,
                               cmd   |-> rec.cmd,
                               deps  |-> rec.deps,
                               seq   |-> rec.seq,
@@ -1226,26 +1224,28 @@ SendPrepare(replica, i, Q) ==
                               ballot|-> msg.ballot,
                               prev_ballot|-> << 0, replica >>,
                               status|-> "not-seen",
-                              state |-> none,
-                              cmd   |-> none,
+                              cmd   |-> [op |-> [key |-> "", type |-> ""]],
                               deps  |-> {},
                               seq   |-> 0,
-                              consistency |-> none,
-                              ctxid |-> none]}
+                              consistency |-> "not-seen",
+                              ctxid |-> 0, (* ctxid 0 means unknown context id *)
+                              commit_order |-> 0]} (* commit_order 0 means not committed *)
               /\ cmdLog' = [cmdLog EXCEPT ![replica] = @ \cup
                             {[inst  |-> msg.inst,
                               status|-> "not-seen",
-                              state |-> none,
+                              state |-> "not-seen",
                               ballot|-> msg.ballot,
-                              cmd   |-> none,
+                              cmd   |-> [op |-> [key |-> "", type |-> ""]],
                               deps  |-> {},
                               seq   |-> 0,
-                              consistency|-> none,
-                              ctxid |-> none,
+                              consistency|-> "not-seen",
+                              ctxid |-> 0,
                               execution_order |-> 0,
-                              execution_order_list |-> {} ]}]
+                              execution_order_list |-> {},
+                              commit_order |-> 0 ]}]
               /\ UNCHANGED << proposed, executed, committed, crtInst, ballots,
-                              leaderOfInst, preparing,clk >>       
+                              leaderOfInst, preparing,clk >>     
+  
                               
 PrepareFinalize(replica, i, Q) ==
     /\ i \in preparing[replica]
@@ -1374,14 +1374,16 @@ PrepareFinalize(replica, i, Q) ==
                                \/ \E pl \in preaccepts : pl.src = i[1]
                                \/ Cardinality(preaccepts) < Cardinality(Q) \div 2
                             /\ preaccepts # {}
-                            /\ LET pac == CHOOSE pac \in preaccepts : pac.cmd # none IN
+                            /\ LET pac == CHOOSE pac \in preaccepts : pac.cmd # [op |-> [key |-> "", type |-> ""]] IN
                                 /\ StartPhase1(pac.cmd, replica, Q, i, rec.ballot, replies, newClk[replica], pac.conistency,pac.ctxid)
                                 /\ preparing' = [preparing EXCEPT ![replica] = @ \ {i}]
                                 /\ UNCHANGED << proposed, executed, crtInst, committed, ballots>>)
                 \/  /\ \A msg \in replies : msg.status = "not-seen"
-                    /\ StartPhase1(none, replica, Q, i, rec.ballot, replies, newClk[replica], none, none)
+                    /\ StartPhase1([op |-> [key |-> "", type |-> ""]], replica, Q, i, rec.ballot, replies, newClk[replica], "strong", 0) (* no dependency will be build on it *)
                     /\ preparing' = [preparing EXCEPT ![replica] = @ \ {i}]
                     /\ UNCHANGED << proposed, executed, crtInst, committed, ballots >>   
+                    
+  
                     
                     
 ReplyTryPreaccept(replica) ==
@@ -1589,10 +1591,6 @@ MinSeq(allInstances) ==
         ChoosingSetElement("a", <<inst[1],inst[2]>>) <= ChoosingSetElement("a",<<otherInst[1],otherInst[2]>>)(*--replace replica value--*)
 
 OrderingInstancesFirstLevel(scc) ==  (*ordering based on sequence number (ascending)*)(* returns a set of sequences with ordered instance.*)
-(* return this set { <<1, <<"a", 0>>>>,
-     <<2, <<"b", 0>>>>,
-     <<3, <<"c", 0>>>>,
-     <<4, <<"a", 1>>>> }*)
      LET
         RECURSIVE minCover(_, _, _)
         minCover(SeqSet, Cover, i) ==
@@ -1742,12 +1740,6 @@ ExecuteCommand(replica, i) ==
                                                       commit_order |-> rec2.commit_order  ]}]
                                                /\UNCHANGED <<proposed, executed, sentMsg, crtInst, leaderOfInst,
                                                  committed, ballots, preparing, clk>>
-     (* instant == { <<1, <<"a", 0>>>>,
-     <<2, <<"b", 0>>>>,
-     <<3, <<"c", 0>>>>,
-     <<4, <<"a", 1>>>> } *)
-
-
                 
 
 (***************************************************************************)
@@ -1952,5 +1944,5 @@ Termination == <>((\A r \in Replicas:
 
 =============================================================================
 \* Modification History
-\* Last modified Mon Feb 19 14:17:12 EST 2024 by santamariashithil
+\* Last modified Mon Feb 19 16:03:03 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil
