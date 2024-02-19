@@ -1224,7 +1224,7 @@ SendPrepare(replica, i, Q) ==
                               ballot|-> msg.ballot,
                               prev_ballot|-> << 0, replica >>,
                               status|-> "not-seen",
-                              cmd   |-> [op |-> [key |-> "", type |-> ""]],
+                              cmd   |-> {[op |-> [key |-> "", type |-> ""]]},
                               deps  |-> {},
                               seq   |-> 0,
                               consistency |-> "not-seen",
@@ -1235,7 +1235,7 @@ SendPrepare(replica, i, Q) ==
                               status|-> "not-seen",
                               state |-> "not-seen",
                               ballot|-> msg.ballot,
-                              cmd   |-> [op |-> [key |-> "", type |-> ""]],
+                              cmd   |-> {[op |-> [key |-> "", type |-> ""]]},
                               deps  |-> {},
                               seq   |-> 0,
                               consistency|-> "not-seen",
@@ -1942,5 +1942,5 @@ Termination == <>((\A r \in Replicas:
 
 =============================================================================
 \* Modification History
-\* Last modified Mon Feb 19 15:46:43 EST 2024 by santamariashithil
+\* Last modified Mon Feb 19 15:43:38 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil

@@ -2,7 +2,7 @@
 TLC2 Version 2.16 of 31 December 2020 (rev: cdddf55)
 @!@!@ENDMSG 2262 @!@!@
 @!@!@STARTMSG 2187:0 @!@!@
-Running breadth-first search Model-Checking with fp 90 and seed 2152542785516921473 with 4 workers on 8 cores with 1214MB heap and 2730MB offheap memory [pid: 5135] (Mac OS X 10.16 x86_64, AdoptOpenJDK 14.0.1 x86_64, OffHeapDiskFPSet, DiskStateQueue).
+Running breadth-first search Model-Checking with fp 118 and seed 5509294913680126886 with 4 workers on 8 cores with 1214MB heap and 2730MB offheap memory [pid: 1152] (Mac OS X 10.16 x86_64, AdoptOpenJDK 14.0.1 x86_64, OffHeapDiskFPSet, DiskStateQueue).
 @!@!@ENDMSG 2187 @!@!@
 @!@!@STARTMSG 2220:0 @!@!@
 Starting SANY...
@@ -23,14 +23,35 @@ Semantic processing of module MC
 SANY finished.
 @!@!@ENDMSG 2219 @!@!@
 @!@!@STARTMSG 2185:0 @!@!@
-Starting... (2024-02-19 03:23:33)
+Starting... (2024-02-19 15:46:54)
 @!@!@ENDMSG 2185 @!@!@
 @!@!@STARTMSG 2189:0 @!@!@
 Computing initial states...
 @!@!@ENDMSG 2189 @!@!@
 @!@!@STARTMSG 2190:0 @!@!@
-Finished computing initial states: 1 distinct state generated at 2024-02-19 03:23:34.
+Finished computing initial states: 1 distinct state generated at 2024-02-19 15:46:55.
 @!@!@ENDMSG 2190 @!@!@
 @!@!@STARTMSG 2200:0 @!@!@
-Progress(5) at 2024-02-19 03:23:37: 12,196 states generated (12,196 s/min), 7,466 distinct states found (7,466 ds/min), 7,476 states left on queue.
+Progress(5) at 2024-02-19 15:46:58: 14,435 states generated (14,435 s/min), 8,863 distinct states found (8,863 ds/min), 8,860 states left on queue.
+@!@!@ENDMSG 2200 @!@!@
+@!@!@STARTMSG 2200:0 @!@!@
+Progress(6) at 2024-02-19 15:47:58: 1,019,489 states generated (1,005,054 s/min), 437,172 distinct states found (428,309 ds/min), 435,228 states left on queue.
+@!@!@ENDMSG 2200 @!@!@
+@!@!@STARTMSG 2200:0 @!@!@
+Progress(6) at 2024-02-19 15:48:58: 2,127,273 states generated (1,107,784 s/min), 853,015 distinct states found (415,843 ds/min), 848,701 states left on queue.
+@!@!@ENDMSG 2200 @!@!@
+@!@!@STARTMSG 2200:0 @!@!@
+Progress(6) at 2024-02-19 15:49:58: 3,104,617 states generated (977,344 s/min), 1,279,729 distinct states found (426,714 ds/min), 1,273,313 states left on queue.
+@!@!@ENDMSG 2200 @!@!@
+@!@!@STARTMSG 2200:0 @!@!@
+Progress(6) at 2024-02-19 15:50:58: 4,178,984 states generated (1,074,367 s/min), 1,697,012 distinct states found (417,283 ds/min), 1,688,352 states left on queue.
+@!@!@ENDMSG 2200 @!@!@
+@!@!@STARTMSG 2200:0 @!@!@
+Progress(6) at 2024-02-19 15:51:58: 5,250,897 states generated (1,071,913 s/min), 2,108,813 distinct states found (411,801 ds/min), 2,097,853 states left on queue.
+@!@!@ENDMSG 2200 @!@!@
+@!@!@STARTMSG 2200:0 @!@!@
+Progress(6) at 2024-02-19 15:52:58: 6,253,484 states generated (1,002,587 s/min), 2,527,849 distinct states found (419,036 ds/min), 2,514,772 states left on queue.
+@!@!@ENDMSG 2200 @!@!@
+@!@!@STARTMSG 2200:0 @!@!@
+Progress(6) at 2024-02-19 15:53:58: 7,325,633 states generated (1,072,149 s/min), 2,936,686 distinct states found (408,837 ds/min), 2,921,353 states left on queue.
 @!@!@ENDMSG 2200 @!@!@
