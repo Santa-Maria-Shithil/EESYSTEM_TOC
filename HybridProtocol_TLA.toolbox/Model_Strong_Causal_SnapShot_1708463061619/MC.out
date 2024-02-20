@@ -18,8 +18,20 @@ Semantic processing of module MC
 SANY finished.
 @!@!@ENDMSG 2219 @!@!@
 @!@!@STARTMSG 2185:0 @!@!@
-Starting... (2024-02-20 16:06:09)
+Starting... (2024-02-20 16:01:41)
 @!@!@ENDMSG 2185 @!@!@
-@!@!@STARTMSG 7008:0 @!@!@
-Waiting for 2 FPSet server(s) to register (2024-02-20 16:06:10)
-@!@!@ENDMSG 7008 @!@!@
+@!@!@STARTMSG 2189:0 @!@!@
+Computing initial states...
+@!@!@ENDMSG 2189 @!@!@
+@!@!@STARTMSG 2190:0 @!@!@
+Finished computing initial states: 1 distinct state(s) generated at 2024-02-20 16:01:42.
+@!@!@ENDMSG 2190 @!@!@
+@!@!@STARTMSG 7000:0 @!@!@
+TLC server at Santas-MacBook-Pro.local is ready (2024-02-20 16:01:42)
+@!@!@ENDMSG 7000 @!@!@
+@!@!@STARTMSG 2200:0 @!@!@
+Progress(1) at 2024-02-20 16:02:42: 1 states generated (1 s/min), 1 distinct states found (1 ds/min), 1 states left on queue.
+@!@!@ENDMSG 2200 @!@!@
+@!@!@STARTMSG 2200:0 @!@!@
+Progress(1) at 2024-02-20 16:03:42: 1 states generated (0 s/min), 1 distinct states found (0 ds/min), 1 states left on queue.
+@!@!@ENDMSG 2200 @!@!@
