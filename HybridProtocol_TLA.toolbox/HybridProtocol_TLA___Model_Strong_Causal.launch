@@ -9,12 +9,12 @@
     <intAttribute key="distributedFPSetCount" value="0"/>
     <stringAttribute key="distributedNetworkInterface" value="10.1.148.39"/>
     <intAttribute key="distributedNodesCount" value="1"/>
-    <stringAttribute key="distributedTLC" value="ad hoc"/>
+    <stringAttribute key="distributedTLC" value="off"/>
     <stringAttribute key="distributedTLCVMArgs" value="-Djava.rmi.server.hostname=130.245.173.103"/>
     <intAttribute key="fpBits" value="1"/>
-    <intAttribute key="fpIndex" value="129"/>
+    <intAttribute key="fpIndex" value="51"/>
     <booleanAttribute key="fpIndexRandom" value="true"/>
-    <intAttribute key="maxHeapSize" value="30"/>
+    <intAttribute key="maxHeapSize" value="40"/>
     <intAttribute key="maxSetSize" value="1000000"/>
     <booleanAttribute key="mcMode" value="true"/>
     <stringAttribute key="modelBehaviorInit" value=""/>
@@ -38,7 +38,7 @@
     <listAttribute key="modelCorrectnessProperties">
         <listEntry value="1Termination"/>
     </listAttribute>
-    <intAttribute key="modelEditorOpenTabs" value="8"/>
+    <intAttribute key="modelEditorOpenTabs" value="12"/>
     <stringAttribute key="modelExpressionEval" value=""/>
     <stringAttribute key="modelParameterActionConstraint" value=""/>
     <listAttribute key="modelParameterConstants">
@@ -54,14 +54,14 @@
     <stringAttribute key="modelParameterModelValues" value="{}"/>
     <stringAttribute key="modelParameterNewDefinitions" value=""/>
     <intAttribute key="modelVersion" value="20191005"/>
-    <intAttribute key="numberOfWorkers" value="0"/>
+    <intAttribute key="numberOfWorkers" value="64"/>
     <booleanAttribute key="recover" value="false"/>
     <stringAttribute key="result.mail.address" value=""/>
     <intAttribute key="simuAril" value="-1"/>
     <intAttribute key="simuDepth" value="100"/>
     <intAttribute key="simuSeed" value="-1"/>
     <stringAttribute key="specName" value="HybridProtocol_TLA"/>
-    <stringAttribute key="tlcResourcesProfile" value="ad hoc"/>
+    <stringAttribute key="tlcResourcesProfile" value="local custom"/>
     <stringAttribute key="view" value=""/>
     <booleanAttribute key="visualizeStateGraph" value="false"/>
 </launchConfiguration>

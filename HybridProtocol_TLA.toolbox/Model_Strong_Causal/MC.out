@@ -1,4 +1,9 @@
-TLC2 TLC Server Version 2.16 of 31 December 2020
+@!@!@STARTMSG 2262:0 @!@!@
+TLC2 Version 2.16 of 31 December 2020 (rev: cdddf55)
+@!@!@ENDMSG 2262 @!@!@
+@!@!@STARTMSG 2187:0 @!@!@
+Running breadth-first search Model-Checking with fp 62 and seed 4546274569322149534 with 64 workers on 8 cores with 1943MB heap and 4368MB offheap memory [pid: 1021] (Mac OS X 10.16 x86_64, AdoptOpenJDK 14.0.1 x86_64, OffHeapDiskFPSet, DiskStateQueue).
+@!@!@ENDMSG 2187 @!@!@
 @!@!@STARTMSG 2220:0 @!@!@
 Starting SANY...
 @!@!@ENDMSG 2220 @!@!@
@@ -18,14 +23,17 @@ Semantic processing of module MC
 SANY finished.
 @!@!@ENDMSG 2219 @!@!@
 @!@!@STARTMSG 2185:0 @!@!@
-Starting... (2024-02-20 22:16:26)
+Starting... (2024-02-21 14:16:43)
 @!@!@ENDMSG 2185 @!@!@
+@!@!@STARTMSG 2212:0 @!@!@
+Implied-temporal checking--satisfiability problem has 1 branches.
+@!@!@ENDMSG 2212 @!@!@
 @!@!@STARTMSG 2189:0 @!@!@
 Computing initial states...
 @!@!@ENDMSG 2189 @!@!@
 @!@!@STARTMSG 2190:0 @!@!@
-Finished computing initial states: 1 distinct state(s) generated at 2024-02-20 22:16:28.
+Finished computing initial states: 1 distinct state generated at 2024-02-21 14:16:44.
 @!@!@ENDMSG 2190 @!@!@
-@!@!@STARTMSG 7000:0 @!@!@
-TLC server at Santas-MacBook-Pro.local is ready (2024-02-20 22:16:28)
-@!@!@ENDMSG 7000 @!@!@
+@!@!@STARTMSG 2200:0 @!@!@
+Progress(8) at 2024-02-21 14:16:47: 5,813 states generated (5,813 s/min), 2,856 distinct states found (2,856 ds/min), 2,972 states left on queue.
+@!@!@ENDMSG 2200 @!@!@

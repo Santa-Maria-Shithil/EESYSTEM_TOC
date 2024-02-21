@@ -95,15 +95,19 @@ Message ==
         deps: SUBSET Instances, seq: Nat, committed: SUBSET Instances, consistency: Consistency_level \cup {"not-seen"}, ctxid:  Ctx_id \cup {0}, clk: Nat, commit_order: Nat]
   \cup  [type: {"accept-reply"}, src: Replicas, dst: Replicas, inst: Instances, ballot: Nat \X Replicas,cmd: Commands \cup {[op |-> [key |-> "", type |-> ""]]}, deps: SUBSET Instances, 
          seq: Nat,consistency: Consistency_level \cup {"not-seen"}, ctxid:  Ctx_id \cup {0},clk: Nat, commit_order: Nat ]
-  \cup  [type: {"prepare-reply"}, src: Replicas, dst: Replicas, inst: Instances, ballot: Nat \X Replicas, prev_ballot: Nat \X Replicas, commit_order: Nat,
-        status: Status, consistency: Consistency_level \cup {"not-seen"}, ctxid:  Ctx_id \cup {0}, cmd: Commands \cup {[op |-> [key |-> "", type |-> ""]]}, deps: SUBSET Instances, seq: Nat, clk: Nat]
+    
+         
+  \cup  [type: {"prepare-reply"}, src: Replicas, dst: Replicas, inst: Instances, status: Status, ballot: Nat \X Replicas, prev_ballot: Nat \X Replicas, commit_order: Nat,
+         consistency: Consistency_level \cup {"not-seen"}, ctxid:  Ctx_id \cup {0}, cmd: Commands \cup {[op |-> [key |-> "", type |-> ""]]}, 
+        deps: SUBSET Instances, seq: Nat, clk: Nat]
+  
+  
   \cup  [type: {"try-pre-accept"}, src: Replicas, dst: Replicas, inst: Instances, ballot: Nat \X Replicas,  status: Status,
         cmd: Commands \cup {[op |-> [key |-> "", type |-> ""]]}, deps: SUBSET Instances, seq: Nat, clk: Nat]
   \cup  [type: {"try-pre-accept-reply"}, src: Replicas, dst: Replicas, inst: Instances, ballot: Nat \X Replicas, status: Status \cup {"OK"}, consistency: Consistency_level, ctxid: Ctx_id \cup {0}]
         
         
-        
-        
+      
 
         
 
@@ -1189,7 +1193,8 @@ SendPrepare(replica, i, Q) ==
                               seq   |-> rec.seq,
                               consistency |-> rec.consistency,
                               ctxid |-> rec.ctxid,
-                              commit_order |-> rec.commit_order]}
+                              commit_order |-> rec.commit_order,
+                              clk |-> clk[replica]]}
                  /\ cmdLog' = [cmdLog EXCEPT ![replica] = (@ \ {rec}) \cup
                             {[inst  |-> rec.inst,
                               status|-> rec.status,
@@ -1939,5 +1944,5 @@ Termination == <>((\A r \in Replicas:
 
 =============================================================================
 \* Modification History
-\* Last modified Mon Feb 19 21:10:35 EST 2024 by santamariashithil
+\* Last modified Tue Feb 20 21:57:15 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil
