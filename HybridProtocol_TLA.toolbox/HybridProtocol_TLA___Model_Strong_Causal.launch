@@ -6,7 +6,7 @@
     <booleanAttribute key="deferLiveness" value="false"/>
     <intAttribute key="dfidDepth" value="100"/>
     <booleanAttribute key="dfidMode" value="false"/>
-    <intAttribute key="distributedFPSetCount" value="3"/>
+    <intAttribute key="distributedFPSetCount" value="0"/>
     <stringAttribute key="distributedNetworkInterface" value="10.1.148.39"/>
     <intAttribute key="distributedNodesCount" value="1"/>
     <stringAttribute key="distributedTLC" value="ad hoc"/>
@@ -23,7 +23,7 @@
     <intAttribute key="modelBehaviorSpecType" value="1"/>
     <stringAttribute key="modelBehaviorVars" value="sentMsg, executed, crtInst, clk, ballots, cmdLog, leaderOfInst, committed, proposed, preparing"/>
     <stringAttribute key="modelComments" value=""/>
-    <booleanAttribute key="modelCorrectnessCheckDeadlock" value="false"/>
+    <booleanAttribute key="modelCorrectnessCheckDeadlock" value="true"/>
     <listAttribute key="modelCorrectnessInvariants">
         <listEntry value="1TypeOK"/>
         <listEntry value="1Nontriviality"/>
@@ -36,7 +36,7 @@
         <listEntry value="1RealTimeOrderingOfStrong"/>
     </listAttribute>
     <listAttribute key="modelCorrectnessProperties">
-        <listEntry value="1Termination"/>
+        <listEntry value="0Termination"/>
     </listAttribute>
     <intAttribute key="modelEditorOpenTabs" value="12"/>
     <stringAttribute key="modelExpressionEval" value=""/>
