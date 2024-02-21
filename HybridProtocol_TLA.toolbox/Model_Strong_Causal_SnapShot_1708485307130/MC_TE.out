@@ -1,0 +1,135 @@
+@!@!@STARTMSG 2262:0 @!@!@
+TLC2 Version 2.16 of 31 December 2020 (rev: cdddf55)
+@!@!@ENDMSG 2262 @!@!@
+@!@!@STARTMSG 2187:0 @!@!@
+Running breadth-first search Model-Checking with fp 129 and seed -153412575830173363 with 6 workers on 8 cores with 3884MB heap and 8737MB offheap memory [pid: 3949] (Mac OS X 10.16 x86_64, AdoptOpenJDK 14.0.1 x86_64, OffHeapDiskFPSet, DiskStateQueue).
+@!@!@ENDMSG 2187 @!@!@
+@!@!@STARTMSG 2220:0 @!@!@
+Starting SANY...
+@!@!@ENDMSG 2220 @!@!@
+Parsing file /Volumes/StudyMaterials/Project/EESYSTEM_TOC/HybridProtocol_TLA.toolbox/Model_Strong_Causal/MC.tla
+Parsing file /Volumes/StudyMaterials/Project/EESYSTEM_TOC/HybridProtocol_TLA.toolbox/Model_Strong_Causal/HybridProtocol_TLA.tla
+Parsing file /Applications/TLA+ Toolbox.app/Contents/Eclipse/plugins/org.lamport.tlatools_1.0.0.202012311918/tla2sany/StandardModules/TLC.tla
+Parsing file /Applications/TLA+ Toolbox.app/Contents/Eclipse/plugins/org.lamport.tlatools_1.0.0.202012311918/tla2sany/StandardModules/Naturals.tla
+Parsing file /Applications/TLA+ Toolbox.app/Contents/Eclipse/plugins/org.lamport.tlatools_1.0.0.202012311918/tla2sany/StandardModules/FiniteSets.tla
+Parsing file /Applications/TLA+ Toolbox.app/Contents/Eclipse/plugins/org.lamport.tlatools_1.0.0.202012311918/tla2sany/StandardModules/Sequences.tla
+Semantic processing of module Naturals
+Semantic processing of module Sequences
+Semantic processing of module FiniteSets
+Semantic processing of module HybridProtocol_TLA
+Semantic processing of module TLC
+Semantic processing of module MC
+@!@!@STARTMSG 2219:0 @!@!@
+SANY finished.
+@!@!@ENDMSG 2219 @!@!@
+@!@!@STARTMSG 2185:0 @!@!@
+Starting... (2024-02-20 22:04:02)
+@!@!@ENDMSG 2185 @!@!@
+@!@!@STARTMSG 2212:0 @!@!@
+Implied-temporal checking--satisfiability problem has 1 branches.
+@!@!@ENDMSG 2212 @!@!@
+@!@!@STARTMSG 2189:0 @!@!@
+Computing initial states...
+@!@!@ENDMSG 2189 @!@!@
+@!@!@STARTMSG 2190:0 @!@!@
+Finished computing initial states: 1 distinct state generated at 2024-02-20 22:04:05.
+@!@!@ENDMSG 2190 @!@!@
+@!@!@STARTMSG 2192:0 @!@!@
+Checking temporal properties for the current state space with 18 total distinct states at (2024-02-20 22:04:08)
+@!@!@ENDMSG 2192 @!@!@
+@!@!@STARTMSG 2267:0 @!@!@
+Finished checking temporal properties in 00s at 2024-02-20 22:04:08
+@!@!@ENDMSG 2267 @!@!@
+@!@!@STARTMSG 2200:0 @!@!@
+Progress(6) at 2024-02-20 22:04:08: 9,342 states generated (9,342 s/min), 5,885 distinct states found (5,885 ds/min), 5,871 states left on queue.
+@!@!@ENDMSG 2200 @!@!@
+@!@!@STARTMSG 2192:0 @!@!@
+Checking temporal properties for the current state space with 2814 total distinct states at (2024-02-20 22:05:08)
+@!@!@ENDMSG 2192 @!@!@
+@!@!@STARTMSG 2267:0 @!@!@
+Finished checking temporal properties in 00s at 2024-02-20 22:05:08
+@!@!@ENDMSG 2267 @!@!@
+@!@!@STARTMSG 2200:0 @!@!@
+Progress(7) at 2024-02-20 22:05:08: 1,358,072 states generated (1,348,730 s/min), 596,280 distinct states found (590,395 ds/min), 593,457 states left on queue.
+@!@!@ENDMSG 2200 @!@!@
+@!@!@STARTMSG 2192:0 @!@!@
+Checking temporal properties for the current state space with 6278 total distinct states at (2024-02-20 22:06:08)
+@!@!@ENDMSG 2192 @!@!@
+@!@!@STARTMSG 2267:0 @!@!@
+Finished checking temporal properties in 00s at 2024-02-20 22:06:08
+@!@!@ENDMSG 2267 @!@!@
+@!@!@STARTMSG 2200:0 @!@!@
+Progress(7) at 2024-02-20 22:06:08: 2,835,588 states generated (1,477,516 s/min), 1,193,908 distinct states found (597,628 ds/min), 1,187,620 states left on queue.
+@!@!@ENDMSG 2200 @!@!@
+@!@!@STARTMSG 2192:0 @!@!@
+Checking temporal properties for the current state space with 9729 total distinct states at (2024-02-20 22:07:08)
+@!@!@ENDMSG 2192 @!@!@
+@!@!@STARTMSG 2267:0 @!@!@
+Finished checking temporal properties in 00s at 2024-02-20 22:07:08
+@!@!@ENDMSG 2267 @!@!@
+@!@!@STARTMSG 2200:0 @!@!@
+Progress(7) at 2024-02-20 22:07:08: 4,355,889 states generated (1,520,301 s/min), 1,788,640 distinct states found (594,732 ds/min), 1,778,902 states left on queue.
+@!@!@ENDMSG 2200 @!@!@
+@!@!@STARTMSG 2192:0 @!@!@
+Checking temporal properties for the current state space with 12840 total distinct states at (2024-02-20 22:08:08)
+@!@!@ENDMSG 2192 @!@!@
+@!@!@STARTMSG 2267:0 @!@!@
+Finished checking temporal properties in 00s at 2024-02-20 22:08:08
+@!@!@ENDMSG 2267 @!@!@
+@!@!@STARTMSG 2200:0 @!@!@
+Progress(7) at 2024-02-20 22:08:08: 5,712,950 states generated (1,357,061 s/min), 2,392,104 distinct states found (603,464 ds/min), 2,379,257 states left on queue.
+@!@!@ENDMSG 2200 @!@!@
+@!@!@STARTMSG 2192:0 @!@!@
+Checking temporal properties for the current state space with 16193 total distinct states at (2024-02-20 22:09:08)
+@!@!@ENDMSG 2192 @!@!@
+@!@!@STARTMSG 2267:0 @!@!@
+Finished checking temporal properties in 00s at 2024-02-20 22:09:09
+@!@!@ENDMSG 2267 @!@!@
+@!@!@STARTMSG 2200:0 @!@!@
+Progress(7) at 2024-02-20 22:09:09: 7,187,118 states generated (1,474,168 s/min), 2,986,286 distinct states found (594,182 ds/min), 2,970,084 states left on queue.
+@!@!@ENDMSG 2200 @!@!@
+@!@!@STARTMSG 2192:0 @!@!@
+Checking temporal properties for the current state space with 19511 total distinct states at (2024-02-20 22:10:09)
+@!@!@ENDMSG 2192 @!@!@
+@!@!@STARTMSG 2267:0 @!@!@
+Finished checking temporal properties in 00s at 2024-02-20 22:10:09
+@!@!@ENDMSG 2267 @!@!@
+@!@!@STARTMSG 2200:0 @!@!@
+Progress(7) at 2024-02-20 22:10:09: 8,675,199 states generated (1,488,081 s/min), 3,579,345 distinct states found (593,059 ds/min), 3,559,827 states left on queue.
+@!@!@ENDMSG 2200 @!@!@
+@!@!@STARTMSG 2192:0 @!@!@
+Checking temporal properties for the current state space with 22588 total distinct states at (2024-02-20 22:11:09)
+@!@!@ENDMSG 2192 @!@!@
+@!@!@STARTMSG 2267:0 @!@!@
+Finished checking temporal properties in 00s at 2024-02-20 22:11:09
+@!@!@ENDMSG 2267 @!@!@
+@!@!@STARTMSG 2200:0 @!@!@
+Progress(7) at 2024-02-20 22:11:09: 10,061,274 states generated (1,386,075 s/min), 4,157,230 distinct states found (577,885 ds/min), 4,134,634 states left on queue.
+@!@!@ENDMSG 2200 @!@!@
+@!@!@STARTMSG 2192:0 @!@!@
+Checking temporal properties for the current state space with 25838 total distinct states at (2024-02-20 22:12:09)
+@!@!@ENDMSG 2192 @!@!@
+@!@!@STARTMSG 2267:0 @!@!@
+Finished checking temporal properties in 00s at 2024-02-20 22:12:09
+@!@!@ENDMSG 2267 @!@!@
+@!@!@STARTMSG 2200:0 @!@!@
+Progress(7) at 2024-02-20 22:12:09: 11,512,544 states generated (1,451,270 s/min), 4,729,639 distinct states found (572,409 ds/min), 4,703,791 states left on queue.
+@!@!@ENDMSG 2200 @!@!@
+@!@!@STARTMSG 2192:0 @!@!@
+Checking temporal properties for the current state space with 29225 total distinct states at (2024-02-20 22:13:09)
+@!@!@ENDMSG 2192 @!@!@
+@!@!@STARTMSG 2267:0 @!@!@
+Finished checking temporal properties in 00s at 2024-02-20 22:13:09
+@!@!@ENDMSG 2267 @!@!@
+@!@!@STARTMSG 2200:0 @!@!@
+Progress(7) at 2024-02-20 22:13:09: 12,962,488 states generated (1,449,944 s/min), 5,309,173 distinct states found (579,534 ds/min), 5,279,941 states left on queue.
+@!@!@ENDMSG 2200 @!@!@
+@!@!@STARTMSG 2192:0 @!@!@
+Checking temporal properties for the current state space with 32550 total distinct states at (2024-02-20 22:14:09)
+@!@!@ENDMSG 2192 @!@!@
+@!@!@STARTMSG 2267:0 @!@!@
+Finished checking temporal properties in 00s at 2024-02-20 22:14:09
+@!@!@ENDMSG 2267 @!@!@
+@!@!@STARTMSG 2200:0 @!@!@
+Progress(7) at 2024-02-20 22:14:09: 14,377,636 states generated (1,415,148 s/min), 5,905,067 distinct states found (595,894 ds/min), 5,872,512 states left on queue.
+@!@!@ENDMSG 2200 @!@!@
