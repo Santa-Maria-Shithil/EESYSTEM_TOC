@@ -2,7 +2,7 @@
 TLC2 Version 2.16 of 31 December 2020 (rev: cdddf55)
 @!@!@ENDMSG 2262 @!@!@
 @!@!@STARTMSG 2187:0 @!@!@
-Running breadth-first search Model-Checking with fp 41 and seed -7622557390741280110 with 64 workers on 8 cores with 1943MB heap and 4368MB offheap memory [pid: 20072] (Mac OS X 10.16 x86_64, AdoptOpenJDK 14.0.1 x86_64, OffHeapDiskFPSet, DiskStateQueue).
+Running breadth-first search Model-Checking with fp 4 and seed 849929379372569283 with 64 workers on 8 cores with 1943MB heap and 4368MB offheap memory [pid: 20026] (Mac OS X 10.16 x86_64, AdoptOpenJDK 14.0.1 x86_64, OffHeapDiskFPSet, DiskStateQueue).
 @!@!@ENDMSG 2187 @!@!@
 @!@!@STARTMSG 2220:0 @!@!@
 Starting SANY...
@@ -23,7 +23,7 @@ Semantic processing of module MC
 SANY finished.
 @!@!@ENDMSG 2219 @!@!@
 @!@!@STARTMSG 2185:0 @!@!@
-Starting... (2024-02-28 02:46:58)
+Starting... (2024-02-28 02:41:23)
 @!@!@ENDMSG 2185 @!@!@
 @!@!@STARTMSG 2212:0 @!@!@
 Implied-temporal checking--satisfiability problem has 1 branches.
@@ -32,43 +32,34 @@ Implied-temporal checking--satisfiability problem has 1 branches.
 Computing initial states...
 @!@!@ENDMSG 2189 @!@!@
 @!@!@STARTMSG 2190:0 @!@!@
-Finished computing initial states: 1 distinct state generated at 2024-02-28 02:46:59.
+Finished computing initial states: 1 distinct state generated at 2024-02-28 02:41:25.
 @!@!@ENDMSG 2190 @!@!@
 @!@!@STARTMSG 2192:0 @!@!@
-Checking temporal properties for the current state space with 167 total distinct states at (2024-02-28 02:47:04)
+Checking temporal properties for the current state space with 75 total distinct states at (2024-02-28 02:41:28)
 @!@!@ENDMSG 2192 @!@!@
 @!@!@STARTMSG 2267:0 @!@!@
-Finished checking temporal properties in 00s at 2024-02-28 02:47:04
+Finished checking temporal properties in 00s at 2024-02-28 02:41:28
 @!@!@ENDMSG 2267 @!@!@
 @!@!@STARTMSG 2200:0 @!@!@
-Progress(8) at 2024-02-28 02:47:04: 7,162 states generated (7,162 s/min), 7,161 distinct states found (7,161 ds/min), 6,930 states left on queue.
+Progress(8) at 2024-02-28 02:41:28: 3,514 states generated (3,514 s/min), 3,513 distinct states found (3,513 ds/min), 3,374 states left on queue.
 @!@!@ENDMSG 2200 @!@!@
 @!@!@STARTMSG 2192:0 @!@!@
-Checking temporal properties for the current state space with 42163 total distinct states at (2024-02-28 02:48:04)
+Checking temporal properties for the current state space with 40670 total distinct states at (2024-02-28 02:42:29)
 @!@!@ENDMSG 2192 @!@!@
 @!@!@STARTMSG 2267:0 @!@!@
-Finished checking temporal properties in 00s at 2024-02-28 02:48:04
+Finished checking temporal properties in 00s at 2024-02-28 02:42:29
 @!@!@ENDMSG 2267 @!@!@
 @!@!@STARTMSG 2200:0 @!@!@
-Progress(10) at 2024-02-28 02:48:04: 1,631,628 states generated (1,624,466 s/min), 1,045,641 distinct states found (1,038,480 ds/min), 1,003,410 states left on queue.
+Progress(9) at 2024-02-28 02:42:29: 1,614,294 states generated (1,610,780 s/min), 1,019,166 distinct states found (1,015,653 ds/min), 978,432 states left on queue.
 @!@!@ENDMSG 2200 @!@!@
 @!@!@STARTMSG 2192:0 @!@!@
-Checking temporal properties for the current state space with 89927 total distinct states at (2024-02-28 02:49:04)
+Checking temporal properties for the current state space with 87518 total distinct states at (2024-02-28 02:43:29)
 @!@!@ENDMSG 2192 @!@!@
 @!@!@STARTMSG 2267:0 @!@!@
-Finished checking temporal properties in 00s at 2024-02-28 02:49:04
+Finished checking temporal properties in 00s at 2024-02-28 02:43:29
 @!@!@ENDMSG 2267 @!@!@
 @!@!@STARTMSG 2200:0 @!@!@
-Progress(10) at 2024-02-28 02:49:04: 3,580,385 states generated (1,948,757 s/min), 2,066,430 distinct states found (1,020,789 ds/min), 1,976,433 states left on queue.
-@!@!@ENDMSG 2200 @!@!@
-@!@!@STARTMSG 2192:0 @!@!@
-Checking temporal properties for the current state space with 142191 total distinct states at (2024-02-28 02:50:04)
-@!@!@ENDMSG 2192 @!@!@
-@!@!@STARTMSG 2267:0 @!@!@
-Finished checking temporal properties in 00s at 2024-02-28 02:50:04
-@!@!@ENDMSG 2267 @!@!@
-@!@!@STARTMSG 2200:0 @!@!@
-Progress(10) at 2024-02-28 02:50:05: 5,493,288 states generated (1,912,903 s/min), 3,073,888 distinct states found (1,007,458 ds/min), 2,931,960 states left on queue.
+Progress(10) at 2024-02-28 02:43:29: 3,474,483 states generated (1,860,189 s/min), 1,984,602 distinct states found (965,436 ds/min), 1,897,065 states left on queue.
 @!@!@ENDMSG 2200 @!@!@
 @!@!@STARTMSG 2111:1 @!@!@
 Evaluating invariant GlobalOrderingOfRead failed.
@@ -235,10 +226,10 @@ The behavior up to this point is:
 
 @!@!@ENDMSG 2217 @!@!@
 @!@!@STARTMSG 2200:0 @!@!@
-Progress(10) at 2024-02-28 02:50:41: 6,558,516 states generated (1,746,709 s/min), 3,660,200 distinct states found (974,809 ds/min), 3,487,482 states left on queue.
+Progress(10) at 2024-02-28 02:43:49: 4,105,658 states generated (1,666,234 s/min), 2,288,241 distinct states found (928,656 ds/min), 2,186,334 states left on queue.
 @!@!@ENDMSG 2200 @!@!@
 @!@!@STARTMSG 2199:0 @!@!@
-6558516 states generated, 3660200 distinct states found, 3487482 states left on queue.
+4105658 states generated, 2288241 distinct states found, 2186334 states left on queue.
 @!@!@ENDMSG 2199 @!@!@
 @!@!@STARTMSG 2194:0 @!@!@
 The depth of the complete state graph search is 10.
@@ -247,5 +238,5 @@ The depth of the complete state graph search is 10.
 The average outdegree of the complete state graph is 21 (minimum is 0, the maximum 31 and the 95th percentile is 31).
 @!@!@ENDMSG 2268 @!@!@
 @!@!@STARTMSG 2186:0 @!@!@
-Finished in 225374ms at (2024-02-28 02:50:41)
+Finished in 147877ms at (2024-02-28 02:43:49)
 @!@!@ENDMSG 2186 @!@!@

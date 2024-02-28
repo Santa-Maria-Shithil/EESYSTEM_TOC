@@ -168,16 +168,16 @@ TypeOK ==
                                        commit_order : Nat (* 0 means not committed *)
                                        ]]
     /\ proposed \in SUBSET Commands
-    /\ executed \in [Replicas -> SUBSET (Nat \X Commands)]
+    (*/\ executed \in [Replicas -> SUBSET (Nat \X Commands)]
     /\ sentMsg \in SUBSET Message
     /\ crtInst \in [Replicas -> Nat]
     /\ leaderOfInst \in [Replicas -> SUBSET Instances]
-    /\ committed \in [Instances -> SUBSET ((Commands \cup {[op |-> [key |-> "", type |-> ""]]}) \X
+   (* /\ committed \in [Instances -> SUBSET ((Commands \cup {[op |-> [key |-> "", type |-> ""]]}) \X
                                            (SUBSET Instances) \X 
-                                           Nat)]
+                                           Nat)]*)
     /\ ballots \in Nat
     /\ preparing \in [Replicas -> SUBSET Instances]
-    /\ clk \in [Replicas -> Nat]
+    /\ clk \in [Replicas -> Nat]*)
    
     
 vars == << cmdLog, proposed, executed, sentMsg, crtInst, leaderOfInst, 
@@ -1962,5 +1962,5 @@ Termination == <>((\A r \in Replicas:
 
 =============================================================================
 \* Modification History
-\* Last modified Wed Feb 28 02:46:50 EST 2024 by santamariashithil
+\* Last modified Wed Feb 28 02:37:47 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil

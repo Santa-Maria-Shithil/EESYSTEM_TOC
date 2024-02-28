@@ -73,7 +73,7 @@ Instances == Replicas \X (1..Cardinality(Commands))
 (* The possible status of a command in the log of a replica.               *)
 (***************************************************************************)
 
-Status == {"not-seen", "pre-accepted", "accepted", "causally-committed", "strongly-committed", "executed" , "discarded", "none"}
+Status == {"not-seen", "pre-accepted", "accepted", "causally-committed", "strongly-comitted", "executed" , "discarded", "none"}
 State == {"not-seen", "ready", "waiting", "done", "none"}
 
 
@@ -154,7 +154,7 @@ VARIABLES cmdLog, proposed, executed, sentMsg, crtInst, leaderOfInst,
           committed, ballots, preparing, clk 
 
 TypeOK ==
-   /\ cmdLog \in [Replicas -> SUBSET [inst: Instances, 
+    /\ cmdLog \in [Replicas -> SUBSET [inst: Instances, 
                                        status: Status,
                                        state: State,
                                        ballot: Nat \X Replicas,
@@ -172,9 +172,9 @@ TypeOK ==
     /\ sentMsg \in SUBSET Message
     /\ crtInst \in [Replicas -> Nat]
     /\ leaderOfInst \in [Replicas -> SUBSET Instances]
-    /\ committed \in [Instances -> SUBSET ((Commands \cup {[op |-> [key |-> "", type |-> ""]]}) \X
+   (* /\ committed \in [Instances -> SUBSET ((Commands \cup {[op |-> [key |-> "", type |-> ""]]}) \X
                                            (SUBSET Instances) \X 
-                                           Nat)]
+                                           Nat)]*)
     /\ ballots \in Nat
     /\ preparing \in [Replicas -> SUBSET Instances]
     /\ clk \in [Replicas -> Nat]
@@ -1962,5 +1962,5 @@ Termination == <>((\A r \in Replicas:
 
 =============================================================================
 \* Modification History
-\* Last modified Wed Feb 28 02:46:50 EST 2024 by santamariashithil
+\* Last modified Wed Feb 28 02:04:53 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil

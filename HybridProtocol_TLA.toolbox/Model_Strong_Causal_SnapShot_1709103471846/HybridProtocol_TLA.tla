@@ -43,7 +43,11 @@ ASSUME \A r \in Replicas:
     /\ Cardinality(FQ) = (Cardinality(Replicas) \div 2) + 
                          ((Cardinality(Replicas) \div 2) + 1) \div 2*)
  
-  
+(***************************************************************************)
+(* Special none command                                                    *)
+(***************************************************************************)
+
+none == CHOOSE c : c \notin Commands   
 
 (***************************************************************************)
 (* Special empty instance                                                  *)
@@ -73,7 +77,7 @@ Instances == Replicas \X (1..Cardinality(Commands))
 (* The possible status of a command in the log of a replica.               *)
 (***************************************************************************)
 
-Status == {"not-seen", "pre-accepted", "accepted", "causally-committed", "strongly-committed", "executed" , "discarded", "none"}
+Status == {"not-seen", "pre-accepted", "accepted", "causally-committed", "strongly-comitted", "executed" , "discarded", "none"}
 State == {"not-seen", "ready", "waiting", "done", "none"}
 
 
@@ -154,7 +158,7 @@ VARIABLES cmdLog, proposed, executed, sentMsg, crtInst, leaderOfInst,
           committed, ballots, preparing, clk 
 
 TypeOK ==
-   /\ cmdLog \in [Replicas -> SUBSET [inst: Instances, 
+    /\ cmdLog \in [Replicas -> SUBSET [inst: Instances, 
                                        status: Status,
                                        state: State,
                                        ballot: Nat \X Replicas,
@@ -172,7 +176,7 @@ TypeOK ==
     /\ sentMsg \in SUBSET Message
     /\ crtInst \in [Replicas -> Nat]
     /\ leaderOfInst \in [Replicas -> SUBSET Instances]
-    /\ committed \in [Instances -> SUBSET ((Commands \cup {[op |-> [key |-> "", type |-> ""]]}) \X
+    /\ committed \in [Instances -> SUBSET ((Commands \cup {[op |-> [key |-> "", type |-> ""]]} \cup {none}) \X
                                            (SUBSET Instances) \X 
                                            Nat)]
     /\ ballots \in Nat
@@ -1962,5 +1966,5 @@ Termination == <>((\A r \in Replicas:
 
 =============================================================================
 \* Modification History
-\* Last modified Wed Feb 28 02:46:50 EST 2024 by santamariashithil
+\* Last modified Wed Feb 28 01:56:33 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil

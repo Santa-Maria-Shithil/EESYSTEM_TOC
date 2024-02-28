@@ -1,0 +1,309 @@
+@!@!@STARTMSG 2262:0 @!@!@
+TLC2 Version 2.16 of 31 December 2020 (rev: cdddf55)
+@!@!@ENDMSG 2262 @!@!@
+@!@!@STARTMSG 2187:0 @!@!@
+Running breadth-first search Model-Checking with fp 83 and seed -2938033021924716807 with 64 workers on 8 cores with 1943MB heap and 4368MB offheap memory [pid: 19950] (Mac OS X 10.16 x86_64, AdoptOpenJDK 14.0.1 x86_64, OffHeapDiskFPSet, DiskStateQueue).
+@!@!@ENDMSG 2187 @!@!@
+@!@!@STARTMSG 2220:0 @!@!@
+Starting SANY...
+@!@!@ENDMSG 2220 @!@!@
+Parsing file /Volumes/StudyMaterials/Project/EESYSTEM_TOC/HybridProtocol_TLA.toolbox/Model_Strong_Causal/MC.tla
+Parsing file /Volumes/StudyMaterials/Project/EESYSTEM_TOC/HybridProtocol_TLA.toolbox/Model_Strong_Causal/HybridProtocol_TLA.tla
+Parsing file /Applications/TLA+ Toolbox.app/Contents/Eclipse/plugins/org.lamport.tlatools_1.0.0.202012311918/tla2sany/StandardModules/TLC.tla
+Parsing file /Applications/TLA+ Toolbox.app/Contents/Eclipse/plugins/org.lamport.tlatools_1.0.0.202012311918/tla2sany/StandardModules/Naturals.tla
+Parsing file /Applications/TLA+ Toolbox.app/Contents/Eclipse/plugins/org.lamport.tlatools_1.0.0.202012311918/tla2sany/StandardModules/FiniteSets.tla
+Parsing file /Applications/TLA+ Toolbox.app/Contents/Eclipse/plugins/org.lamport.tlatools_1.0.0.202012311918/tla2sany/StandardModules/Sequences.tla
+Semantic processing of module Naturals
+Semantic processing of module Sequences
+Semantic processing of module FiniteSets
+Semantic processing of module HybridProtocol_TLA
+Semantic processing of module TLC
+Semantic processing of module MC
+@!@!@STARTMSG 2219:0 @!@!@
+SANY finished.
+@!@!@ENDMSG 2219 @!@!@
+@!@!@STARTMSG 2185:0 @!@!@
+Starting... (2024-02-28 02:31:00)
+@!@!@ENDMSG 2185 @!@!@
+@!@!@STARTMSG 2212:0 @!@!@
+Implied-temporal checking--satisfiability problem has 1 branches.
+@!@!@ENDMSG 2212 @!@!@
+@!@!@STARTMSG 2189:0 @!@!@
+Computing initial states...
+@!@!@ENDMSG 2189 @!@!@
+@!@!@STARTMSG 2190:0 @!@!@
+Finished computing initial states: 1 distinct state generated at 2024-02-28 02:31:02.
+@!@!@ENDMSG 2190 @!@!@
+@!@!@STARTMSG 2192:0 @!@!@
+Checking temporal properties for the current state space with 71 total distinct states at (2024-02-28 02:31:05)
+@!@!@ENDMSG 2192 @!@!@
+@!@!@STARTMSG 2267:0 @!@!@
+Finished checking temporal properties in 00s at 2024-02-28 02:31:05
+@!@!@ENDMSG 2267 @!@!@
+@!@!@STARTMSG 2200:0 @!@!@
+Progress(8) at 2024-02-28 02:31:05: 3,394 states generated (3,394 s/min), 3,329 distinct states found (3,329 ds/min), 3,199 states left on queue.
+@!@!@ENDMSG 2200 @!@!@
+@!@!@STARTMSG 2192:0 @!@!@
+Checking temporal properties for the current state space with 38861 total distinct states at (2024-02-28 02:32:06)
+@!@!@ENDMSG 2192 @!@!@
+@!@!@STARTMSG 2267:0 @!@!@
+Finished checking temporal properties in 00s at 2024-02-28 02:32:06
+@!@!@ENDMSG 2267 @!@!@
+@!@!@STARTMSG 2200:0 @!@!@
+Progress(10) at 2024-02-28 02:32:06: 1,532,614 states generated (1,529,220 s/min), 983,290 distinct states found (979,961 ds/min), 944,408 states left on queue.
+@!@!@ENDMSG 2200 @!@!@
+@!@!@STARTMSG 2192:0 @!@!@
+Checking temporal properties for the current state space with 86733 total distinct states at (2024-02-28 02:33:06)
+@!@!@ENDMSG 2192 @!@!@
+@!@!@STARTMSG 2267:0 @!@!@
+Finished checking temporal properties in 00s at 2024-02-28 02:33:06
+@!@!@ENDMSG 2267 @!@!@
+@!@!@STARTMSG 2200:0 @!@!@
+Progress(10) at 2024-02-28 02:33:06: 3,489,309 states generated (1,956,695 s/min), 1,983,028 distinct states found (999,738 ds/min), 1,896,280 states left on queue.
+@!@!@ENDMSG 2200 @!@!@
+@!@!@STARTMSG 2110:1 @!@!@
+Invariant TypeOK is violated.
+@!@!@ENDMSG 2110 @!@!@
+@!@!@STARTMSG 2121:1 @!@!@
+The behavior up to this point is:
+@!@!@ENDMSG 2121 @!@!@
+@!@!@STARTMSG 2217:4 @!@!@
+1: <Initial predicate>
+/\ sentMsg = {}
+/\ executed = <<{}, {}, {}>>
+/\ crtInst = <<1, 1, 1>>
+/\ clk = <<0, 0, 0>>
+/\ ballots = 1
+/\ cmdLog = <<{}, {}, {}>>
+/\ leaderOfInst = <<{}, {}, {}>>
+/\ committed = ( <<1, 1>> :> {} @@
+  <<1, 2>> :> {} @@
+  <<1, 3>> :> {} @@
+  <<1, 4>> :> {} @@
+  <<1, 5>> :> {} @@
+  <<1, 6>> :> {} @@
+  <<2, 1>> :> {} @@
+  <<2, 2>> :> {} @@
+  <<2, 3>> :> {} @@
+  <<2, 4>> :> {} @@
+  <<2, 5>> :> {} @@
+  <<2, 6>> :> {} @@
+  <<3, 1>> :> {} @@
+  <<3, 2>> :> {} @@
+  <<3, 3>> :> {} @@
+  <<3, 4>> :> {} @@
+  <<3, 5>> :> {} @@
+  <<3, 6>> :> {} )
+/\ proposed = {}
+/\ preparing = <<{}, {}, {}>>
+
+@!@!@ENDMSG 2217 @!@!@
+@!@!@STARTMSG 2217:4 @!@!@
+2: <CommandLeaderAction line 1769, col 9 to line 1772, col 72 of module HybridProtocol_TLA>
+/\ sentMsg = {[type |-> "commit", inst |-> <<1, 1>>, ballot |-> <<0, 1>>, cmd |-> [op |-> [key |-> "x", type |-> "r"]], deps |-> {}, seq |-> 2, consistency |-> "causal", ctxid |-> 1, commit_order |-> 0, clk |-> 1]}
+/\ executed = <<{}, {}, {}>>
+/\ crtInst = <<2, 1, 1>>
+/\ clk = <<1, 0, 0>>
+/\ ballots = 1
+/\ cmdLog = <<{[inst |-> <<1, 1>>, status |-> "causally-committed", state |-> "done", ballot |-> <<0, 1>>, cmd |-> [op |-> [key |-> "x", type |-> "r"]], deps |-> {}, seq |-> 2, consistency |-> "causal", ctxid |-> 1, execution_order |-> 0, execution_order_list |-> {}, commit_order |-> 0]}, {}, {}>>
+/\ leaderOfInst = <<{<<1, 1>>}, {}, {}>>
+/\ committed = ( <<1, 1>> :> {} @@
+  <<1, 2>> :> {} @@
+  <<1, 3>> :> {} @@
+  <<1, 4>> :> {} @@
+  <<1, 5>> :> {} @@
+  <<1, 6>> :> {} @@
+  <<2, 1>> :> {} @@
+  <<2, 2>> :> {} @@
+  <<2, 3>> :> {} @@
+  <<2, 4>> :> {} @@
+  <<2, 5>> :> {} @@
+  <<2, 6>> :> {} @@
+  <<3, 1>> :> {} @@
+  <<3, 2>> :> {} @@
+  <<3, 3>> :> {} @@
+  <<3, 4>> :> {} @@
+  <<3, 5>> :> {} @@
+  <<3, 6>> :> {} )
+/\ proposed = {[op |-> [key |-> "x", type |-> "r"]]}
+/\ preparing = <<{}, {}, {}>>
+
+@!@!@ENDMSG 2217 @!@!@
+@!@!@STARTMSG 2217:4 @!@!@
+3: <CommandLeaderAction line 1769, col 9 to line 1772, col 72 of module HybridProtocol_TLA>
+/\ sentMsg = {[type |-> "commit", inst |-> <<1, 1>>, ballot |-> <<0, 1>>, cmd |-> [op |-> [key |-> "x", type |-> "r"]], deps |-> {}, seq |-> 2, consistency |-> "causal", ctxid |-> 1, commit_order |-> 0, clk |-> 1], [type |-> "commit", inst |-> <<1, 2>>, ballot |-> <<0, 1>>, cmd |-> [op |-> [key |-> "x", type |-> "w"]], deps |-> {}, seq |-> 3, consistency |-> "causal", ctxid |-> 2, commit_order |-> 0, clk |-> 2]}
+/\ executed = <<{}, {}, {}>>
+/\ crtInst = <<3, 1, 1>>
+/\ clk = <<2, 0, 0>>
+/\ ballots = 1
+/\ cmdLog = <<{[inst |-> <<1, 1>>, status |-> "causally-committed", state |-> "done", ballot |-> <<0, 1>>, cmd |-> [op |-> [key |-> "x", type |-> "r"]], deps |-> {}, seq |-> 2, consistency |-> "causal", ctxid |-> 1, execution_order |-> 0, execution_order_list |-> {}, commit_order |-> 0], [inst |-> <<1, 2>>, status |-> "causally-committed", state |-> "done", ballot |-> <<0, 1>>, cmd |-> [op |-> [key |-> "x", type |-> "w"]], deps |-> {}, seq |-> 3, consistency |-> "causal", ctxid |-> 2, execution_order |-> 0, execution_order_list |-> {}, commit_order |-> 0]}, {}, {}>>
+/\ leaderOfInst = <<{<<1, 1>>, <<1, 2>>}, {}, {}>>
+/\ committed = ( <<1, 1>> :> {} @@
+  <<1, 2>> :> {} @@
+  <<1, 3>> :> {} @@
+  <<1, 4>> :> {} @@
+  <<1, 5>> :> {} @@
+  <<1, 6>> :> {} @@
+  <<2, 1>> :> {} @@
+  <<2, 2>> :> {} @@
+  <<2, 3>> :> {} @@
+  <<2, 4>> :> {} @@
+  <<2, 5>> :> {} @@
+  <<2, 6>> :> {} @@
+  <<3, 1>> :> {} @@
+  <<3, 2>> :> {} @@
+  <<3, 3>> :> {} @@
+  <<3, 4>> :> {} @@
+  <<3, 5>> :> {} @@
+  <<3, 6>> :> {} )
+/\ proposed = {[op |-> [key |-> "x", type |-> "r"]], [op |-> [key |-> "x", type |-> "w"]]}
+/\ preparing = <<{}, {}, {}>>
+
+@!@!@ENDMSG 2217 @!@!@
+@!@!@STARTMSG 2217:4 @!@!@
+4: <CommandLeaderAction line 1769, col 9 to line 1772, col 72 of module HybridProtocol_TLA>
+/\ sentMsg = {[type |-> "commit", inst |-> <<1, 1>>, ballot |-> <<0, 1>>, cmd |-> [op |-> [key |-> "x", type |-> "r"]], deps |-> {}, seq |-> 2, consistency |-> "causal", ctxid |-> 1, commit_order |-> 0, clk |-> 1], [type |-> "commit", inst |-> <<1, 2>>, ballot |-> <<0, 1>>, cmd |-> [op |-> [key |-> "x", type |-> "w"]], deps |-> {}, seq |-> 3, consistency |-> "causal", ctxid |-> 2, commit_order |-> 0, clk |-> 2], [type |-> "pre-accept", inst |-> <<1, 3>>, ballot |-> <<0, 1>>, cmd |-> [op |-> [key |-> "w", type |-> "w"]], deps |-> {<<1, 1>>}, seq |-> 4, consistency |-> "strong", ctxid |-> 1, commit_order |-> 2, src |-> 1, dst |-> 2, clk |-> 3], [type |-> "pre-accept", inst |-> <<1, 3>>, ballot |-> <<0, 1>>, cmd |-> [op |-> [key |-> "w", type |-> "w"]], deps |-> {<<1, 1>>}, seq |-> 4, consistency |-> "strong", ctxid |-> 1, commit_order |-> 2, src |-> 1, dst |-> 3, clk |-> 3]}
+/\ executed = <<{}, {}, {}>>
+/\ crtInst = <<4, 1, 1>>
+/\ clk = <<3, 0, 0>>
+/\ ballots = 1
+/\ cmdLog = <<{[inst |-> <<1, 1>>, status |-> "causally-committed", state |-> "done", ballot |-> <<0, 1>>, cmd |-> [op |-> [key |-> "x", type |-> "r"]], deps |-> {}, seq |-> 2, consistency |-> "causal", ctxid |-> 1, execution_order |-> 0, execution_order_list |-> {}, commit_order |-> 0], [inst |-> <<1, 2>>, status |-> "causally-committed", state |-> "done", ballot |-> <<0, 1>>, cmd |-> [op |-> [key |-> "x", type |-> "w"]], deps |-> {}, seq |-> 3, consistency |-> "causal", ctxid |-> 2, execution_order |-> 0, execution_order_list |-> {}, commit_order |-> 0], [inst |-> <<1, 3>>, status |-> "pre-accepted", state |-> "done", ballot |-> <<0, 1>>, cmd |-> [op |-> [key |-> "w", type |-> "w"]], deps |-> {<<1, 1>>}, seq |-> 4, consistency |-> "strong", ctxid |-> 1, execution_order |-> 0, execution_order_list |-> {}, commit_order |-> 2]}, {}, {}>>
+/\ leaderOfInst = <<{<<1, 1>>, <<1, 2>>, <<1, 3>>}, {}, {}>>
+/\ committed = ( <<1, 1>> :> {} @@
+  <<1, 2>> :> {} @@
+  <<1, 3>> :> {} @@
+  <<1, 4>> :> {} @@
+  <<1, 5>> :> {} @@
+  <<1, 6>> :> {} @@
+  <<2, 1>> :> {} @@
+  <<2, 2>> :> {} @@
+  <<2, 3>> :> {} @@
+  <<2, 4>> :> {} @@
+  <<2, 5>> :> {} @@
+  <<2, 6>> :> {} @@
+  <<3, 1>> :> {} @@
+  <<3, 2>> :> {} @@
+  <<3, 3>> :> {} @@
+  <<3, 4>> :> {} @@
+  <<3, 5>> :> {} @@
+  <<3, 6>> :> {} )
+/\ proposed = { [op |-> [key |-> "x", type |-> "r"]],
+  [op |-> [key |-> "x", type |-> "w"]],
+  [op |-> [key |-> "w", type |-> "w"]] }
+/\ preparing = <<{}, {}, {}>>
+
+@!@!@ENDMSG 2217 @!@!@
+@!@!@STARTMSG 2217:4 @!@!@
+5: <Phase1Reply line 593, col 5 to line 697, col 72 of module HybridProtocol_TLA>
+/\ sentMsg = {[type |-> "commit", inst |-> <<1, 1>>, ballot |-> <<0, 1>>, cmd |-> [op |-> [key |-> "x", type |-> "r"]], deps |-> {}, seq |-> 2, consistency |-> "causal", ctxid |-> 1, commit_order |-> 0, clk |-> 1], [type |-> "commit", inst |-> <<1, 2>>, ballot |-> <<0, 1>>, cmd |-> [op |-> [key |-> "x", type |-> "w"]], deps |-> {}, seq |-> 3, consistency |-> "causal", ctxid |-> 2, commit_order |-> 0, clk |-> 2], [type |-> "pre-accept", inst |-> <<1, 3>>, ballot |-> <<0, 1>>, cmd |-> [op |-> [key |-> "w", type |-> "w"]], deps |-> {<<1, 1>>}, seq |-> 4, consistency |-> "strong", ctxid |-> 1, commit_order |-> 2, src |-> 1, dst |-> 3, clk |-> 3], [type |-> "pre-accept-reply", inst |-> <<1, 3>>, ballot |-> <<0, 1>>, deps |-> {<<1, 1>>}, seq |-> 5, consistency |-> "strong", ctxid |-> 1, commit_order |-> 2, src |-> 2, dst |-> 1, clk |-> 5, committed |-> {}]}
+/\ executed = <<{}, {}, {}>>
+/\ crtInst = <<4, 1, 1>>
+/\ clk = <<3, 5, 0>>
+/\ ballots = 1
+/\ cmdLog = <<{[inst |-> <<1, 1>>, status |-> "causally-committed", state |-> "done", ballot |-> <<0, 1>>, cmd |-> [op |-> [key |-> "x", type |-> "r"]], deps |-> {}, seq |-> 2, consistency |-> "causal", ctxid |-> 1, execution_order |-> 0, execution_order_list |-> {}, commit_order |-> 0], [inst |-> <<1, 2>>, status |-> "causally-committed", state |-> "done", ballot |-> <<0, 1>>, cmd |-> [op |-> [key |-> "x", type |-> "w"]], deps |-> {}, seq |-> 3, consistency |-> "causal", ctxid |-> 2, execution_order |-> 0, execution_order_list |-> {}, commit_order |-> 0], [inst |-> <<1, 3>>, status |-> "pre-accepted", state |-> "done", ballot |-> <<0, 1>>, cmd |-> [op |-> [key |-> "w", type |-> "w"]], deps |-> {<<1, 1>>}, seq |-> 4, consistency |-> "strong", ctxid |-> 1, execution_order |-> 0, execution_order_list |-> {}, commit_order |-> 2]}, {[inst |-> <<1, 3>>, status |-> "pre-accepted", state |-> "done", ballot |-> <<0, 1>>, cmd |-> [op |-> [key |-> "w", type |-> "w"]], deps |-> {<<1, 1>>}, seq |-> 5, consistency |-> "strong", ctxid |-> 1, execution_order |-> 0, execution_order_list |-> {}, commit_order |-> 2]}, {}>>
+/\ leaderOfInst = <<{<<1, 1>>, <<1, 2>>, <<1, 3>>}, {}, {}>>
+/\ committed = ( <<1, 1>> :> {} @@
+  <<1, 2>> :> {} @@
+  <<1, 3>> :> {} @@
+  <<1, 4>> :> {} @@
+  <<1, 5>> :> {} @@
+  <<1, 6>> :> {} @@
+  <<2, 1>> :> {} @@
+  <<2, 2>> :> {} @@
+  <<2, 3>> :> {} @@
+  <<2, 4>> :> {} @@
+  <<2, 5>> :> {} @@
+  <<2, 6>> :> {} @@
+  <<3, 1>> :> {} @@
+  <<3, 2>> :> {} @@
+  <<3, 3>> :> {} @@
+  <<3, 4>> :> {} @@
+  <<3, 5>> :> {} @@
+  <<3, 6>> :> {} )
+/\ proposed = { [op |-> [key |-> "x", type |-> "r"]],
+  [op |-> [key |-> "x", type |-> "w"]],
+  [op |-> [key |-> "w", type |-> "w"]] }
+/\ preparing = <<{}, {}, {}>>
+
+@!@!@ENDMSG 2217 @!@!@
+@!@!@STARTMSG 2217:4 @!@!@
+6: <Phase1Reply line 593, col 5 to line 697, col 72 of module HybridProtocol_TLA>
+/\ sentMsg = {[type |-> "commit", inst |-> <<1, 1>>, ballot |-> <<0, 1>>, cmd |-> [op |-> [key |-> "x", type |-> "r"]], deps |-> {}, seq |-> 2, consistency |-> "causal", ctxid |-> 1, commit_order |-> 0, clk |-> 1], [type |-> "commit", inst |-> <<1, 2>>, ballot |-> <<0, 1>>, cmd |-> [op |-> [key |-> "x", type |-> "w"]], deps |-> {}, seq |-> 3, consistency |-> "causal", ctxid |-> 2, commit_order |-> 0, clk |-> 2], [type |-> "pre-accept-reply", inst |-> <<1, 3>>, ballot |-> <<0, 1>>, deps |-> {<<1, 1>>}, seq |-> 5, consistency |-> "strong", ctxid |-> 1, commit_order |-> 2, src |-> 2, dst |-> 1, clk |-> 5, committed |-> {}], [type |-> "pre-accept-reply", inst |-> <<1, 3>>, ballot |-> <<0, 1>>, deps |-> {<<1, 1>>}, seq |-> 5, consistency |-> "strong", ctxid |-> 1, commit_order |-> 2, src |-> 3, dst |-> 1, clk |-> 5, committed |-> {}]}
+/\ executed = <<{}, {}, {}>>
+/\ crtInst = <<4, 1, 1>>
+/\ clk = <<3, 5, 5>>
+/\ ballots = 1
+/\ cmdLog = <<{[inst |-> <<1, 1>>, status |-> "causally-committed", state |-> "done", ballot |-> <<0, 1>>, cmd |-> [op |-> [key |-> "x", type |-> "r"]], deps |-> {}, seq |-> 2, consistency |-> "causal", ctxid |-> 1, execution_order |-> 0, execution_order_list |-> {}, commit_order |-> 0], [inst |-> <<1, 2>>, status |-> "causally-committed", state |-> "done", ballot |-> <<0, 1>>, cmd |-> [op |-> [key |-> "x", type |-> "w"]], deps |-> {}, seq |-> 3, consistency |-> "causal", ctxid |-> 2, execution_order |-> 0, execution_order_list |-> {}, commit_order |-> 0], [inst |-> <<1, 3>>, status |-> "pre-accepted", state |-> "done", ballot |-> <<0, 1>>, cmd |-> [op |-> [key |-> "w", type |-> "w"]], deps |-> {<<1, 1>>}, seq |-> 4, consistency |-> "strong", ctxid |-> 1, execution_order |-> 0, execution_order_list |-> {}, commit_order |-> 2]}, {[inst |-> <<1, 3>>, status |-> "pre-accepted", state |-> "done", ballot |-> <<0, 1>>, cmd |-> [op |-> [key |-> "w", type |-> "w"]], deps |-> {<<1, 1>>}, seq |-> 5, consistency |-> "strong", ctxid |-> 1, execution_order |-> 0, execution_order_list |-> {}, commit_order |-> 2]}, {[inst |-> <<1, 3>>, status |-> "pre-accepted", state |-> "done", ballot |-> <<0, 1>>, cmd |-> [op |-> [key |-> "w", type |-> "w"]], deps |-> {<<1, 1>>}, seq |-> 5, consistency |-> "strong", ctxid |-> 1, execution_order |-> 0, execution_order_list |-> {}, commit_order |-> 2]}>>
+/\ leaderOfInst = <<{<<1, 1>>, <<1, 2>>, <<1, 3>>}, {}, {}>>
+/\ committed = ( <<1, 1>> :> {} @@
+  <<1, 2>> :> {} @@
+  <<1, 3>> :> {} @@
+  <<1, 4>> :> {} @@
+  <<1, 5>> :> {} @@
+  <<1, 6>> :> {} @@
+  <<2, 1>> :> {} @@
+  <<2, 2>> :> {} @@
+  <<2, 3>> :> {} @@
+  <<2, 4>> :> {} @@
+  <<2, 5>> :> {} @@
+  <<2, 6>> :> {} @@
+  <<3, 1>> :> {} @@
+  <<3, 2>> :> {} @@
+  <<3, 3>> :> {} @@
+  <<3, 4>> :> {} @@
+  <<3, 5>> :> {} @@
+  <<3, 6>> :> {} )
+/\ proposed = { [op |-> [key |-> "x", type |-> "r"]],
+  [op |-> [key |-> "x", type |-> "w"]],
+  [op |-> [key |-> "w", type |-> "w"]] }
+/\ preparing = <<{}, {}, {}>>
+
+@!@!@ENDMSG 2217 @!@!@
+@!@!@STARTMSG 2217:4 @!@!@
+7: <CommandLeaderAction line 1773, col 35 to line 1777, col 87 of module HybridProtocol_TLA>
+/\ sentMsg = {[type |-> "commit", inst |-> <<1, 1>>, ballot |-> <<0, 1>>, cmd |-> [op |-> [key |-> "x", type |-> "r"]], deps |-> {}, seq |-> 2, consistency |-> "causal", ctxid |-> 1, commit_order |-> 0, clk |-> 1], [type |-> "commit", inst |-> <<1, 2>>, ballot |-> <<0, 1>>, cmd |-> [op |-> [key |-> "x", type |-> "w"]], deps |-> {}, seq |-> 3, consistency |-> "causal", ctxid |-> 2, commit_order |-> 0, clk |-> 2], [type |-> "commit", inst |-> <<1, 3>>, ballot |-> <<0, 1>>, cmd |-> [op |-> [key |-> "w", type |-> "w"]], deps |-> {<<1, 1>>}, seq |-> 5, consistency |-> "strong", ctxid |-> 1, commit_order |-> 2, clk |-> 6]}
+/\ executed = <<{}, {}, {}>>
+/\ crtInst = <<4, 1, 1>>
+/\ clk = <<6, 5, 5>>
+/\ ballots = 1
+/\ cmdLog = <<{[inst |-> <<1, 1>>, status |-> "causally-committed", state |-> "done", ballot |-> <<0, 1>>, cmd |-> [op |-> [key |-> "x", type |-> "r"]], deps |-> {}, seq |-> 2, consistency |-> "causal", ctxid |-> 1, execution_order |-> 0, execution_order_list |-> {}, commit_order |-> 0], [inst |-> <<1, 2>>, status |-> "causally-committed", state |-> "done", ballot |-> <<0, 1>>, cmd |-> [op |-> [key |-> "x", type |-> "w"]], deps |-> {}, seq |-> 3, consistency |-> "causal", ctxid |-> 2, execution_order |-> 0, execution_order_list |-> {}, commit_order |-> 0], [inst |-> <<1, 3>>, status |-> "strongly-committed", state |-> "done", ballot |-> <<0, 1>>, cmd |-> [op |-> [key |-> "w", type |-> "w"]], deps |-> {<<1, 1>>}, seq |-> 5, consistency |-> "strong", ctxid |-> 1, execution_order |-> 0, execution_order_list |-> {}, commit_order |-> 2]}, {[inst |-> <<1, 3>>, status |-> "pre-accepted", state |-> "done", ballot |-> <<0, 1>>, cmd |-> [op |-> [key |-> "w", type |-> "w"]], deps |-> {<<1, 1>>}, seq |-> 5, consistency |-> "strong", ctxid |-> 1, execution_order |-> 0, execution_order_list |-> {}, commit_order |-> 2]}, {[inst |-> <<1, 3>>, status |-> "pre-accepted", state |-> "done", ballot |-> <<0, 1>>, cmd |-> [op |-> [key |-> "w", type |-> "w"]], deps |-> {<<1, 1>>}, seq |-> 5, consistency |-> "strong", ctxid |-> 1, execution_order |-> 0, execution_order_list |-> {}, commit_order |-> 2]}>>
+/\ leaderOfInst = <<{<<1, 1>>, <<1, 2>>}, {}, {}>>
+/\ committed = ( <<1, 1>> :> {} @@
+  <<1, 2>> :> {} @@
+  <<1, 3>> :> {<<[op |-> [key |-> "w", type |-> "w"]], {<<1, 1>>}, 5>>} @@
+  <<1, 4>> :> {} @@
+  <<1, 5>> :> {} @@
+  <<1, 6>> :> {} @@
+  <<2, 1>> :> {} @@
+  <<2, 2>> :> {} @@
+  <<2, 3>> :> {} @@
+  <<2, 4>> :> {} @@
+  <<2, 5>> :> {} @@
+  <<2, 6>> :> {} @@
+  <<3, 1>> :> {} @@
+  <<3, 2>> :> {} @@
+  <<3, 3>> :> {} @@
+  <<3, 4>> :> {} @@
+  <<3, 5>> :> {} @@
+  <<3, 6>> :> {} )
+/\ proposed = { [op |-> [key |-> "x", type |-> "r"]],
+  [op |-> [key |-> "x", type |-> "w"]],
+  [op |-> [key |-> "w", type |-> "w"]] }
+/\ preparing = <<{}, {}, {}>>
+
+@!@!@ENDMSG 2217 @!@!@
+@!@!@STARTMSG 2200:0 @!@!@
+Progress(11) at 2024-02-28 02:34:02: 5,097,852 states generated (1,670,696 s/min), 2,886,332 distinct states found (945,924 ds/min), 2,754,779 states left on queue.
+@!@!@ENDMSG 2200 @!@!@
+@!@!@STARTMSG 2199:0 @!@!@
+5097852 states generated, 2886332 distinct states found, 2754779 states left on queue.
+@!@!@ENDMSG 2199 @!@!@
+@!@!@STARTMSG 2194:0 @!@!@
+The depth of the complete state graph search is 11.
+@!@!@ENDMSG 2194 @!@!@
+@!@!@STARTMSG 2268:0 @!@!@
+The average outdegree of the complete state graph is 21 (minimum is 0, the maximum 31 and the 95th percentile is 31).
+@!@!@ENDMSG 2268 @!@!@
+@!@!@STARTMSG 2186:0 @!@!@
+Finished in 183123ms at (2024-02-28 02:34:02)
+@!@!@ENDMSG 2186 @!@!@
