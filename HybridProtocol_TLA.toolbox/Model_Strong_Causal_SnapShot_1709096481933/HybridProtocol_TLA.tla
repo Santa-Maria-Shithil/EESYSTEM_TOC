@@ -83,26 +83,16 @@ State == {"not-seen", "ready", "waiting", "done", "none"}
 Message ==
         [type: {"pre-accept"}, src: Replicas, dst: Replicas,
         inst: Instances, ballot: Nat \X Replicas,
-        cmd: Commands \cup {[op |-> [key |-> "", type |-> ""]]}, deps: SUBSET Instances, seq: Nat,   consistency: Consistency_level,
-         ctxid: Ctx_id \cup {0},clk: Nat, commit_order: Nat]
-         
+        cmd: Commands \cup {[op |-> [key |-> "", type |-> ""]]}, deps: SUBSET Instances, seq: Nat,   consistency: Consistency_level, ctxid: Ctx_id \cup {0},clk: Nat, commit_order: Nat]
   \cup  [type: {"accept"}, src: Replicas, dst: Replicas,
         inst: Instances, ballot: Nat \X Replicas,
-        cmd: Commands \cup {[op |-> [key |-> "", type |-> ""]]}, deps: SUBSET Instances, seq: Nat, consistency: Consistency_level, 
-        ctxid:  Ctx_id \cup {0},  commit_order: Nat, clk: Nat]
-        
-        
-  \cup  [type: {"commit"}, inst: Instances, ballot: Nat \X Replicas, cmd: Commands \cup {[op |-> [key |-> "", type |-> ""]]}, 
-        deps: SUBSET Instances, seq: Nat, consistency: Consistency_level, ctxid: Ctx_id \cup {0}, commit_order: Nat,  clk: Nat]
-        
-        
+        cmd: Commands \cup {[op |-> [key |-> "", type |-> ""]]}, deps: SUBSET Instances, seq: Nat, consistency: Consistency_level, ctxid:  Ctx_id \cup {0}, clk: Nat, commit_order: Nat]
+  \cup  [type: {"commit"}, 
+        inst: Instances, ballot: Nat \X Replicas,
+        cmd: Commands \cup {[op |-> [key |-> "", type |-> ""]]}, deps: SUBSET Instances, seq: Nat, consistency: Consistency_level, ctxid:  Ctx_id \cup {0}, clk: Nat, commit_order: Nat]
   \cup  [type: {"prepare"}, src: Replicas, dst: Replicas, inst: Instances, ballot: Nat \X Replicas]
-  
   \cup  [type: {"pre-accept-reply"}, src: Replicas, dst: Replicas, inst: Instances, ballot: Nat \X Replicas,
-        deps: SUBSET Instances, seq: Nat, committed: SUBSET Instances, consistency: Consistency_level \cup {"not-seen"}, 
-        ctxid:  Ctx_id \cup {0}, clk: Nat, commit_order: Nat]
-        
-        
+        deps: SUBSET Instances, seq: Nat, committed: SUBSET Instances, consistency: Consistency_level \cup {"not-seen"}, ctxid:  Ctx_id \cup {0}, clk: Nat, commit_order: Nat]
   \cup  [type: {"accept-reply"}, src: Replicas, dst: Replicas, inst: Instances, ballot: Nat \X Replicas,cmd: Commands \cup {[op |-> [key |-> "", type |-> ""]]}, deps: SUBSET Instances, 
          seq: Nat,consistency: Consistency_level \cup {"not-seen"}, ctxid:  Ctx_id \cup {0},clk: Nat, commit_order: Nat ]
     
@@ -117,10 +107,8 @@ Message ==
   \cup  [type: {"try-pre-accept-reply"}, src: Replicas, dst: Replicas, inst: Instances, ballot: Nat \X Replicas, status: Status \cup {"OK"}, consistency: Consistency_level, ctxid: Ctx_id \cup {0}]
         
         
- (*sentMsg = {[type |-> "commit", inst |-> <<1, 1>>, ballot |-> <<0, 1>>, cmd |-> [op |-> [key |-> "x", 
- type |-> "r"]], deps |-> {}, seq |-> 3, consistency |-> "strong",
-  ctxid |-> 1, commit_order |-> 2, clk |-> 4]}*)
-  
+      
+
         
 
 (*******************************************************************************)
@@ -1956,5 +1944,5 @@ Termination == <>((\A r \in Replicas:
 
 =============================================================================
 \* Modification History
-\* Last modified Wed Feb 28 00:42:20 EST 2024 by santamariashithil
+\* Last modified Tue Feb 27 23:57:11 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil

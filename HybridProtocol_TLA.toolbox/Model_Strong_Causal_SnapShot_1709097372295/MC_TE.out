@@ -1,0 +1,251 @@
+@!@!@STARTMSG 2262:0 @!@!@
+TLC2 Version 2.16 of 31 December 2020 (rev: cdddf55)
+@!@!@ENDMSG 2262 @!@!@
+@!@!@STARTMSG 2187:0 @!@!@
+Running breadth-first search Model-Checking with fp 33 and seed 6115762838790173934 with 64 workers on 8 cores with 1943MB heap and 4368MB offheap memory [pid: 19201] (Mac OS X 10.16 x86_64, AdoptOpenJDK 14.0.1 x86_64, OffHeapDiskFPSet, DiskStateQueue).
+@!@!@ENDMSG 2187 @!@!@
+@!@!@STARTMSG 2220:0 @!@!@
+Starting SANY...
+@!@!@ENDMSG 2220 @!@!@
+Parsing file /Volumes/StudyMaterials/Project/EESYSTEM_TOC/HybridProtocol_TLA.toolbox/Model_Strong_Causal/MC.tla
+Parsing file /Volumes/StudyMaterials/Project/EESYSTEM_TOC/HybridProtocol_TLA.toolbox/Model_Strong_Causal/HybridProtocol_TLA.tla
+Parsing file /Applications/TLA+ Toolbox.app/Contents/Eclipse/plugins/org.lamport.tlatools_1.0.0.202012311918/tla2sany/StandardModules/TLC.tla
+Parsing file /Applications/TLA+ Toolbox.app/Contents/Eclipse/plugins/org.lamport.tlatools_1.0.0.202012311918/tla2sany/StandardModules/Naturals.tla
+Parsing file /Applications/TLA+ Toolbox.app/Contents/Eclipse/plugins/org.lamport.tlatools_1.0.0.202012311918/tla2sany/StandardModules/FiniteSets.tla
+Parsing file /Applications/TLA+ Toolbox.app/Contents/Eclipse/plugins/org.lamport.tlatools_1.0.0.202012311918/tla2sany/StandardModules/Sequences.tla
+Semantic processing of module Naturals
+Semantic processing of module Sequences
+Semantic processing of module FiniteSets
+Semantic processing of module HybridProtocol_TLA
+Semantic processing of module TLC
+Semantic processing of module MC
+@!@!@STARTMSG 2219:0 @!@!@
+SANY finished.
+@!@!@ENDMSG 2219 @!@!@
+@!@!@STARTMSG 2185:0 @!@!@
+Starting... (2024-02-28 00:11:40)
+@!@!@ENDMSG 2185 @!@!@
+@!@!@STARTMSG 2212:0 @!@!@
+Implied-temporal checking--satisfiability problem has 1 branches.
+@!@!@ENDMSG 2212 @!@!@
+@!@!@STARTMSG 2189:0 @!@!@
+Computing initial states...
+@!@!@ENDMSG 2189 @!@!@
+@!@!@STARTMSG 2190:0 @!@!@
+Finished computing initial states: 1 distinct state generated at 2024-02-28 00:11:42.
+@!@!@ENDMSG 2190 @!@!@
+@!@!@STARTMSG 2200:0 @!@!@
+Progress(7) at 2024-02-28 00:11:45: 1,632 states generated (1,632 s/min), 1,631 distinct states found (1,631 ds/min), 1,524 states left on queue.
+@!@!@ENDMSG 2200 @!@!@
+@!@!@STARTMSG 2192:0 @!@!@
+Checking temporal properties for the current state space with 40106 total distinct states at (2024-02-28 00:12:48)
+@!@!@ENDMSG 2192 @!@!@
+@!@!@STARTMSG 2267:0 @!@!@
+Finished checking temporal properties in 00s at 2024-02-28 00:12:48
+@!@!@ENDMSG 2267 @!@!@
+@!@!@STARTMSG 2200:0 @!@!@
+Progress(9) at 2024-02-28 00:12:48: 1,615,086 states generated (1,613,454 s/min), 1,017,659 distinct states found (1,016,028 ds/min), 977,489 states left on queue.
+@!@!@ENDMSG 2200 @!@!@
+@!@!@STARTMSG 2192:0 @!@!@
+Checking temporal properties for the current state space with 86074 total distinct states at (2024-02-28 00:13:48)
+@!@!@ENDMSG 2192 @!@!@
+@!@!@STARTMSG 2267:0 @!@!@
+Finished checking temporal properties in 00s at 2024-02-28 00:13:48
+@!@!@ENDMSG 2267 @!@!@
+@!@!@STARTMSG 2200:0 @!@!@
+Progress(9) at 2024-02-28 00:13:48: 3,510,375 states generated (1,895,289 s/min), 2,024,169 distinct states found (1,006,510 ds/min), 1,938,083 states left on queue.
+@!@!@ENDMSG 2200 @!@!@
+@!@!@STARTMSG 2192:0 @!@!@
+Checking temporal properties for the current state space with 136292 total distinct states at (2024-02-28 00:14:48)
+@!@!@ENDMSG 2192 @!@!@
+@!@!@STARTMSG 2267:0 @!@!@
+Finished checking temporal properties in 00s at 2024-02-28 00:14:48
+@!@!@ENDMSG 2267 @!@!@
+@!@!@STARTMSG 2200:0 @!@!@
+Progress(10) at 2024-02-28 00:14:48: 5,348,991 states generated (1,838,616 s/min), 3,010,572 distinct states found (986,403 ds/min), 2,874,058 states left on queue.
+@!@!@ENDMSG 2200 @!@!@
+@!@!@STARTMSG 2192:0 @!@!@
+Checking temporal properties for the current state space with 186345 total distinct states at (2024-02-28 00:15:48)
+@!@!@ENDMSG 2192 @!@!@
+@!@!@STARTMSG 2267:0 @!@!@
+Finished checking temporal properties in 00s at 2024-02-28 00:15:48
+@!@!@ENDMSG 2267 @!@!@
+@!@!@STARTMSG 2200:0 @!@!@
+Progress(10) at 2024-02-28 00:15:48: 7,122,661 states generated (1,773,670 s/min), 4,006,792 distinct states found (996,220 ds/min), 3,820,413 states left on queue.
+@!@!@ENDMSG 2200 @!@!@
+@!@!@STARTMSG 2110:1 @!@!@
+Invariant TypeOK is violated.
+@!@!@ENDMSG 2110 @!@!@
+@!@!@STARTMSG 2121:1 @!@!@
+The behavior up to this point is:
+@!@!@ENDMSG 2121 @!@!@
+@!@!@STARTMSG 2217:4 @!@!@
+1: <Initial predicate>
+/\ sentMsg = {}
+/\ executed = <<{}, {}, {}>>
+/\ crtInst = <<1, 1, 1>>
+/\ clk = <<0, 0, 0>>
+/\ ballots = 1
+/\ cmdLog = <<{}, {}, {}>>
+/\ leaderOfInst = <<{}, {}, {}>>
+/\ committed = ( <<1, 1>> :> {} @@
+  <<1, 2>> :> {} @@
+  <<1, 3>> :> {} @@
+  <<1, 4>> :> {} @@
+  <<1, 5>> :> {} @@
+  <<1, 6>> :> {} @@
+  <<2, 1>> :> {} @@
+  <<2, 2>> :> {} @@
+  <<2, 3>> :> {} @@
+  <<2, 4>> :> {} @@
+  <<2, 5>> :> {} @@
+  <<2, 6>> :> {} @@
+  <<3, 1>> :> {} @@
+  <<3, 2>> :> {} @@
+  <<3, 3>> :> {} @@
+  <<3, 4>> :> {} @@
+  <<3, 5>> :> {} @@
+  <<3, 6>> :> {} )
+/\ proposed = {}
+/\ preparing = <<{}, {}, {}>>
+
+@!@!@ENDMSG 2217 @!@!@
+@!@!@STARTMSG 2217:4 @!@!@
+2: <CommandLeaderAction line 1760, col 9 to line 1763, col 72 of module HybridProtocol_TLA>
+/\ sentMsg = {[type |-> "pre-accept", inst |-> <<1, 1>>, ballot |-> <<0, 1>>, cmd |-> [op |-> [key |-> "x", type |-> "r"]], deps |-> {}, seq |-> 2, consistency |-> "strong", ctxid |-> 1, commit_order |-> 2, src |-> 1, dst |-> 2, clk |-> 1], [type |-> "pre-accept", inst |-> <<1, 1>>, ballot |-> <<0, 1>>, cmd |-> [op |-> [key |-> "x", type |-> "r"]], deps |-> {}, seq |-> 2, consistency |-> "strong", ctxid |-> 1, commit_order |-> 2, src |-> 1, dst |-> 3, clk |-> 1]}
+/\ executed = <<{}, {}, {}>>
+/\ crtInst = <<2, 1, 1>>
+/\ clk = <<1, 0, 0>>
+/\ ballots = 1
+/\ cmdLog = <<{[inst |-> <<1, 1>>, status |-> "pre-accepted", state |-> "done", ballot |-> <<0, 1>>, cmd |-> [op |-> [key |-> "x", type |-> "r"]], deps |-> {}, seq |-> 2, consistency |-> "strong", ctxid |-> 1, execution_order |-> 0, execution_order_list |-> {}, commit_order |-> 2]}, {}, {}>>
+/\ leaderOfInst = <<{<<1, 1>>}, {}, {}>>
+/\ committed = ( <<1, 1>> :> {} @@
+  <<1, 2>> :> {} @@
+  <<1, 3>> :> {} @@
+  <<1, 4>> :> {} @@
+  <<1, 5>> :> {} @@
+  <<1, 6>> :> {} @@
+  <<2, 1>> :> {} @@
+  <<2, 2>> :> {} @@
+  <<2, 3>> :> {} @@
+  <<2, 4>> :> {} @@
+  <<2, 5>> :> {} @@
+  <<2, 6>> :> {} @@
+  <<3, 1>> :> {} @@
+  <<3, 2>> :> {} @@
+  <<3, 3>> :> {} @@
+  <<3, 4>> :> {} @@
+  <<3, 5>> :> {} @@
+  <<3, 6>> :> {} )
+/\ proposed = {[op |-> [key |-> "x", type |-> "r"]]}
+/\ preparing = <<{}, {}, {}>>
+
+@!@!@ENDMSG 2217 @!@!@
+@!@!@STARTMSG 2217:4 @!@!@
+3: <Phase1Reply line 584, col 5 to line 688, col 72 of module HybridProtocol_TLA>
+/\ sentMsg = {[type |-> "pre-accept", inst |-> <<1, 1>>, ballot |-> <<0, 1>>, cmd |-> [op |-> [key |-> "x", type |-> "r"]], deps |-> {}, seq |-> 2, consistency |-> "strong", ctxid |-> 1, commit_order |-> 2, src |-> 1, dst |-> 3, clk |-> 1], [type |-> "pre-accept-reply", inst |-> <<1, 1>>, ballot |-> <<0, 1>>, deps |-> {}, seq |-> 3, consistency |-> "strong", ctxid |-> 1, commit_order |-> 2, src |-> 2, dst |-> 1, clk |-> 3, committed |-> {}]}
+/\ executed = <<{}, {}, {}>>
+/\ crtInst = <<2, 1, 1>>
+/\ clk = <<1, 3, 0>>
+/\ ballots = 1
+/\ cmdLog = <<{[inst |-> <<1, 1>>, status |-> "pre-accepted", state |-> "done", ballot |-> <<0, 1>>, cmd |-> [op |-> [key |-> "x", type |-> "r"]], deps |-> {}, seq |-> 2, consistency |-> "strong", ctxid |-> 1, execution_order |-> 0, execution_order_list |-> {}, commit_order |-> 2]}, {[inst |-> <<1, 1>>, status |-> "pre-accepted", state |-> "done", ballot |-> <<0, 1>>, cmd |-> [op |-> [key |-> "x", type |-> "r"]], deps |-> {}, seq |-> 3, consistency |-> "strong", ctxid |-> 1, execution_order |-> 0, execution_order_list |-> {}, commit_order |-> 2]}, {}>>
+/\ leaderOfInst = <<{<<1, 1>>}, {}, {}>>
+/\ committed = ( <<1, 1>> :> {} @@
+  <<1, 2>> :> {} @@
+  <<1, 3>> :> {} @@
+  <<1, 4>> :> {} @@
+  <<1, 5>> :> {} @@
+  <<1, 6>> :> {} @@
+  <<2, 1>> :> {} @@
+  <<2, 2>> :> {} @@
+  <<2, 3>> :> {} @@
+  <<2, 4>> :> {} @@
+  <<2, 5>> :> {} @@
+  <<2, 6>> :> {} @@
+  <<3, 1>> :> {} @@
+  <<3, 2>> :> {} @@
+  <<3, 3>> :> {} @@
+  <<3, 4>> :> {} @@
+  <<3, 5>> :> {} @@
+  <<3, 6>> :> {} )
+/\ proposed = {[op |-> [key |-> "x", type |-> "r"]]}
+/\ preparing = <<{}, {}, {}>>
+
+@!@!@ENDMSG 2217 @!@!@
+@!@!@STARTMSG 2217:4 @!@!@
+4: <Phase1Reply line 584, col 5 to line 688, col 72 of module HybridProtocol_TLA>
+/\ sentMsg = {[type |-> "pre-accept-reply", inst |-> <<1, 1>>, ballot |-> <<0, 1>>, deps |-> {}, seq |-> 3, consistency |-> "strong", ctxid |-> 1, commit_order |-> 2, src |-> 2, dst |-> 1, clk |-> 3, committed |-> {}], [type |-> "pre-accept-reply", inst |-> <<1, 1>>, ballot |-> <<0, 1>>, deps |-> {}, seq |-> 3, consistency |-> "strong", ctxid |-> 1, commit_order |-> 2, src |-> 3, dst |-> 1, clk |-> 3, committed |-> {}]}
+/\ executed = <<{}, {}, {}>>
+/\ crtInst = <<2, 1, 1>>
+/\ clk = <<1, 3, 3>>
+/\ ballots = 1
+/\ cmdLog = <<{[inst |-> <<1, 1>>, status |-> "pre-accepted", state |-> "done", ballot |-> <<0, 1>>, cmd |-> [op |-> [key |-> "x", type |-> "r"]], deps |-> {}, seq |-> 2, consistency |-> "strong", ctxid |-> 1, execution_order |-> 0, execution_order_list |-> {}, commit_order |-> 2]}, {[inst |-> <<1, 1>>, status |-> "pre-accepted", state |-> "done", ballot |-> <<0, 1>>, cmd |-> [op |-> [key |-> "x", type |-> "r"]], deps |-> {}, seq |-> 3, consistency |-> "strong", ctxid |-> 1, execution_order |-> 0, execution_order_list |-> {}, commit_order |-> 2]}, {[inst |-> <<1, 1>>, status |-> "pre-accepted", state |-> "done", ballot |-> <<0, 1>>, cmd |-> [op |-> [key |-> "x", type |-> "r"]], deps |-> {}, seq |-> 3, consistency |-> "strong", ctxid |-> 1, execution_order |-> 0, execution_order_list |-> {}, commit_order |-> 2]}>>
+/\ leaderOfInst = <<{<<1, 1>>}, {}, {}>>
+/\ committed = ( <<1, 1>> :> {} @@
+  <<1, 2>> :> {} @@
+  <<1, 3>> :> {} @@
+  <<1, 4>> :> {} @@
+  <<1, 5>> :> {} @@
+  <<1, 6>> :> {} @@
+  <<2, 1>> :> {} @@
+  <<2, 2>> :> {} @@
+  <<2, 3>> :> {} @@
+  <<2, 4>> :> {} @@
+  <<2, 5>> :> {} @@
+  <<2, 6>> :> {} @@
+  <<3, 1>> :> {} @@
+  <<3, 2>> :> {} @@
+  <<3, 3>> :> {} @@
+  <<3, 4>> :> {} @@
+  <<3, 5>> :> {} @@
+  <<3, 6>> :> {} )
+/\ proposed = {[op |-> [key |-> "x", type |-> "r"]]}
+/\ preparing = <<{}, {}, {}>>
+
+@!@!@ENDMSG 2217 @!@!@
+@!@!@STARTMSG 2217:4 @!@!@
+5: <CommandLeaderAction line 1764, col 35 to line 1768, col 87 of module HybridProtocol_TLA>
+/\ sentMsg = {[type |-> "commit", inst |-> <<1, 1>>, ballot |-> <<0, 1>>, cmd |-> [op |-> [key |-> "x", type |-> "r"]], deps |-> {}, seq |-> 3, consistency |-> "strong", ctxid |-> 1, commit_order |-> 2, clk |-> 4]}
+/\ executed = <<{}, {}, {}>>
+/\ crtInst = <<2, 1, 1>>
+/\ clk = <<4, 3, 3>>
+/\ ballots = 1
+/\ cmdLog = <<{[inst |-> <<1, 1>>, status |-> "strongly-committed", state |-> "done", ballot |-> <<0, 1>>, cmd |-> [op |-> [key |-> "x", type |-> "r"]], deps |-> {}, seq |-> 3, consistency |-> "strong", ctxid |-> 1, execution_order |-> 0, execution_order_list |-> {}, commit_order |-> 2]}, {[inst |-> <<1, 1>>, status |-> "pre-accepted", state |-> "done", ballot |-> <<0, 1>>, cmd |-> [op |-> [key |-> "x", type |-> "r"]], deps |-> {}, seq |-> 3, consistency |-> "strong", ctxid |-> 1, execution_order |-> 0, execution_order_list |-> {}, commit_order |-> 2]}, {[inst |-> <<1, 1>>, status |-> "pre-accepted", state |-> "done", ballot |-> <<0, 1>>, cmd |-> [op |-> [key |-> "x", type |-> "r"]], deps |-> {}, seq |-> 3, consistency |-> "strong", ctxid |-> 1, execution_order |-> 0, execution_order_list |-> {}, commit_order |-> 2]}>>
+/\ leaderOfInst = <<{}, {}, {}>>
+/\ committed = ( <<1, 1>> :> {<<[op |-> [key |-> "x", type |-> "r"]], {}, 3>>} @@
+  <<1, 2>> :> {} @@
+  <<1, 3>> :> {} @@
+  <<1, 4>> :> {} @@
+  <<1, 5>> :> {} @@
+  <<1, 6>> :> {} @@
+  <<2, 1>> :> {} @@
+  <<2, 2>> :> {} @@
+  <<2, 3>> :> {} @@
+  <<2, 4>> :> {} @@
+  <<2, 5>> :> {} @@
+  <<2, 6>> :> {} @@
+  <<3, 1>> :> {} @@
+  <<3, 2>> :> {} @@
+  <<3, 3>> :> {} @@
+  <<3, 4>> :> {} @@
+  <<3, 5>> :> {} @@
+  <<3, 6>> :> {} )
+/\ proposed = {[op |-> [key |-> "x", type |-> "r"]]}
+/\ preparing = <<{}, {}, {}>>
+
+@!@!@ENDMSG 2217 @!@!@
+@!@!@STARTMSG 2200:0 @!@!@
+Progress(10) at 2024-02-28 00:16:10: 7,773,851 states generated (1,714,290 s/min), 4,353,827 distinct states found (960,106 ds/min), 4,149,568 states left on queue.
+@!@!@ENDMSG 2200 @!@!@
+@!@!@STARTMSG 2199:0 @!@!@
+7773851 states generated, 4353827 distinct states found, 4149568 states left on queue.
+@!@!@ENDMSG 2199 @!@!@
+@!@!@STARTMSG 2194:0 @!@!@
+The depth of the complete state graph search is 10.
+@!@!@ENDMSG 2194 @!@!@
+@!@!@STARTMSG 2268:0 @!@!@
+The average outdegree of the complete state graph is 21 (minimum is 0, the maximum 31 and the 95th percentile is 31).
+@!@!@ENDMSG 2268 @!@!@
+@!@!@STARTMSG 2186:0 @!@!@
+Finished in 272167ms at (2024-02-28 00:16:11)
+@!@!@ENDMSG 2186 @!@!@
