@@ -602,9 +602,9 @@ Propose(C, cleader,cl,ctx) ==
         newBallot == <<0, cleader>> 
         newClk == [clk EXCEPT ![cleader] = @ + 1]
     IN  /\ proposed' = proposed \cup {C}
-        (*/\ (\A replica \in Replicas:
+        /\ (\A replica \in Replicas:
             /\ LET oldRecs == {rec \in cmdLog[replica] : rec.inst = newInst} IN
-                cmdLog' = [cmdLog EXCEPT ![replica] = (@ \ oldRecs) \cup 
+                cmdLog' = [cmdLog EXCEPT ![replica] = (@ \ oldRecs)]) (*\cup 
                         {[inst   |-> newInst,
                           status |-> "none",
                           state |-> "waiting",
@@ -1997,5 +1997,5 @@ Termination == <>((\A r \in Replicas:
 
 =============================================================================
 \* Modification History
-\* Last modified Wed Feb 28 14:33:56 EST 2024 by santamariashithil
+\* Last modified Wed Feb 28 13:42:20 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil

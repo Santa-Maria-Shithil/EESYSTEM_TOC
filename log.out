@@ -1843,7 +1843,7 @@ State 3: <CommandLeaderAction line 1763, col 9 to line 1766, col 72 of module Hy
 /\ preparing = <<{}, {}, {}>>
 
 State 4: <Phase1Reply line 587, col 5 to line 691, col 72 of module HybridProtocol_TLA>
-/\ sentMsg = {[type |-> "commit", inst |-> <<1, 2>>, ballot |-> <<0, 1>>, cmd |-> [op |-> [key |-> "x", type |-> "w"]], deps |-> {<<1, 1>>}, seq |-> 3, consistency |-> "causal", ctxid |-> 1, commit_order |-> 0, clk |-> 2], [type |-> "pre-accept", inst |-> <<1, 1>>, ballot |-> <<0, 1>>, cmd |-> [op |-> [key |-> "x", type |-> "r"]], deps |-> {}, seq |-> 2, consistency |-> "strong", ctxid |-> 1, commit_order |-> 2, src |-> 1, dst |-> 3, clk |-> 1], [type |-> "pre-accept-reply", inst |-> <<1, 1>>, ballot |-> <<0, 1>>, deps |-> {}, seq |-> 3, consistency |-> "strong", ctxid |-> 1, commit_order |-> 2, src |-> 2, dst |-> 1, clk |-> 3, committed |-> {}]}
+/\ sentMsg = {[type |-> "commit", inst |-> <<1, 2>>, ballot |-> <<0, 1>>, cmd |-> [op |-> [key |-> "x", type |-> "w"]], deps |-> {<<1, 1>>}, seq |-> 3, consistency |-> "causal", ctxid |-> 1, commit_order |-> 0, clk |-> 2], [type |-> "pre-accept", inst |-> <<1, 1>>, ballot |-> <<0, 1>>, cmd |-> [op |-> [key |-> "x", type |-> "r"]], deps |-> {}, seq |-> 2, consistency |-> "strong", ctxid |-> 1, commit_order |-> 2, src |-> 1, dst |-> 3, clk |-> 1], [type |-> "pre-accept-reply", inst |-> <<1, 1>>, ballot |-> <<0, 1>>, deps |-> {}, seq |-> 3, consistency |-> "strong", ctxid |-> 1, commit_order |-> 2, src |-> 2, dst |-> 1, clk |-> 3]}
 /\ executed = <<{}, {}, {}>>
 /\ crtInst = <<3, 1, 1>>
 /\ clk = <<2, 3, 0>>
@@ -1872,7 +1872,7 @@ State 4: <Phase1Reply line 587, col 5 to line 691, col 72 of module HybridProtoc
 /\ preparing = <<{}, {}, {}>>
 
 State 5: <Phase1Reply line 587, col 5 to line 691, col 72 of module HybridProtocol_TLA>
-/\ sentMsg = {[type |-> "commit", inst |-> <<1, 2>>, ballot |-> <<0, 1>>, cmd |-> [op |-> [key |-> "x", type |-> "w"]], deps |-> {<<1, 1>>}, seq |-> 3, consistency |-> "causal", ctxid |-> 1, commit_order |-> 0, clk |-> 2], [type |-> "pre-accept-reply", inst |-> <<1, 1>>, ballot |-> <<0, 1>>, deps |-> {}, seq |-> 3, consistency |-> "strong", ctxid |-> 1, commit_order |-> 2, src |-> 2, dst |-> 1, clk |-> 3, committed |-> {}], [type |-> "pre-accept-reply", inst |-> <<1, 1>>, ballot |-> <<0, 1>>, deps |-> {}, seq |-> 3, consistency |-> "strong", ctxid |-> 1, commit_order |-> 2, src |-> 3, dst |-> 1, clk |-> 3, committed |-> {}]}
+/\ sentMsg = {[type |-> "commit", inst |-> <<1, 2>>, ballot |-> <<0, 1>>, cmd |-> [op |-> [key |-> "x", type |-> "w"]], deps |-> {<<1, 1>>}, seq |-> 3, consistency |-> "causal", ctxid |-> 1, commit_order |-> 0, clk |-> 2], [type |-> "pre-accept-reply", inst |-> <<1, 1>>, ballot |-> <<0, 1>>, deps |-> {}, seq |-> 3, consistency |-> "strong", ctxid |-> 1, commit_order |-> 2, src |-> 2, dst |-> 1, clk |-> 3], [type |-> "pre-accept-reply", inst |-> <<1, 1>>, ballot |-> <<0, 1>>, deps |-> {}, seq |-> 3, consistency |-> "strong", ctxid |-> 1, commit_order |-> 2, src |-> 3, dst |-> 1, clk |-> 3]}
 /\ executed = <<{}, {}, {}>>
 /\ crtInst = <<3, 1, 1>>
 /\ clk = <<2, 3, 3>>

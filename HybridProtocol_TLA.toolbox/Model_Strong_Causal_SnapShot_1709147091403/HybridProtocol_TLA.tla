@@ -420,7 +420,7 @@ StartPhase1Causal(C, cleader, Q, inst, ballot, oldMsg, oldClk,cl,ctx) ==
             newDeps == deps1 \cup deps2
             newSeq == 1 + Max({t.seq: t \in cmdLog[cleader]} \cup {oldClk}) 
             oldRecs == {rec \in cmdLog[cleader] : rec.inst = inst}
-            waitingRecs== {rec \in cmdLog[cleader]: rec.state = "waiting"} 
+            waitingRecs== {rec \in cmdLog[cleader]: rec.state = "waiting" /\ rec.inst # inst} 
             waitingInst=={rec.inst: rec \in waitingRecs} IN
             IF Cardinality(waitingInst) = 0 THEN
                 /\ cmdLog' = [cmdLog EXCEPT ![cleader] = (@ \ oldRecs) \cup 
@@ -602,7 +602,7 @@ Propose(C, cleader,cl,ctx) ==
         newBallot == <<0, cleader>> 
         newClk == [clk EXCEPT ![cleader] = @ + 1]
     IN  /\ proposed' = proposed \cup {C}
-        (*/\ (\A replica \in Replicas:
+        /\ (\A replica \in Replicas:
             /\ LET oldRecs == {rec \in cmdLog[replica] : rec.inst = newInst} IN
                 cmdLog' = [cmdLog EXCEPT ![replica] = (@ \ oldRecs) \cup 
                         {[inst   |-> newInst,
@@ -616,7 +616,7 @@ Propose(C, cleader,cl,ctx) ==
                           ctxid |-> ctx,
                           execution_order |-> 0,
                           execution_order_list |-> {},
-                          commit_order |-> 0]}])*)
+                          commit_order |-> 0]}])
         /\ (\E Q \in FastQuorums(cleader):
                  StartPhase1(C, cleader, Q, newInst, newBallot, {},newClk[cleader],cl,ctx))
         /\ crtInst' = [crtInst EXCEPT ![cleader] = @ + 1]
@@ -1997,5 +1997,5 @@ Termination == <>((\A r \in Replicas:
 
 =============================================================================
 \* Modification History
-\* Last modified Wed Feb 28 14:33:56 EST 2024 by santamariashithil
+\* Last modified Wed Feb 28 14:04:12 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil
