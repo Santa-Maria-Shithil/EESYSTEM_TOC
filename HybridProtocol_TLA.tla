@@ -1838,8 +1838,8 @@ ReplicaAction ==
          \/ ReplyPrepare(replica)
          \/ \E i \in preparing[replica] :
             \E Q \in SlowQuorums(replica) : PrepareFinalize(replica, i, Q)
-         (*\/ ReplyTryPreaccept(replica)
-         \/ \E inst \in cmdLog[replica]: ExecuteCommand(replica, inst)*)
+         \/ ReplyTryPreaccept(replica)
+         (*\/ \E inst \in cmdLog[replica]: ExecuteCommand(replica, inst)*)
          )
 
 
@@ -2047,5 +2047,5 @@ Termination == <>((\A r \in Replicas:
 
 =============================================================================
 \* Modification History
-\* Last modified Fri Mar 01 17:29:50 EST 2024 by santamariashithil
+\* Last modified Fri Mar 01 17:30:45 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil
