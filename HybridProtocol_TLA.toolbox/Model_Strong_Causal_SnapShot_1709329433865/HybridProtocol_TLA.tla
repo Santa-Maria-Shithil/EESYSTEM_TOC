@@ -109,9 +109,10 @@ Message ==
          commit_order: Nat, src: Replicas, dst: Replicas, clk: Nat
          ]
          
-  \cup  [type: {"accept"}, inst: Instances,  ballot: Nat \X Replicas, cmd: Commands \cup {[op |-> [key |-> "", type |-> ""]]},
-        deps: SUBSET Instances, seq: Nat, consistency: Consistency_level, ctxid:  Ctx_id \cup {0}, commit_order: Nat, 
-        src: Replicas, dst: Replicas, clk: Nat]
+  \cup  [type: {"accept"}, src: Replicas, dst: Replicas,
+        inst: Instances, ballot: Nat \X Replicas,
+        cmd: Commands \cup {[op |-> [key |-> "", type |-> ""]]}, deps: SUBSET Instances, seq: Nat, consistency: Consistency_level, 
+        ctxid:  Ctx_id \cup {0},  commit_order: Nat, clk: Nat]
         
         
   \cup  [type: {"commit"}, inst: Instances, ballot: Nat \X Replicas, 
@@ -132,9 +133,9 @@ Message ==
         commit_order: Nat, src: Replicas, dst: Replicas, clk: Nat]
     
          
-  \cup  [type: {"prepare-reply"}, inst: Instances, status: Status, ballot: Nat \X Replicas,cmd: Commands \cup {[op |-> [key |-> "", type |-> ""]]}, 
-          deps: SUBSET Instances, seq: Nat, consistency: Consistency_level \cup {"not-seen"},   ctxid:  Ctx_id \cup {0}, 
-          commit_order: Nat, src: Replicas, dst: Replicas,  clk: Nat,   prev_ballot: Nat \X Replicas]
+  \cup  [type: {"prepare-reply"}, src: Replicas, dst: Replicas, inst: Instances, status: Status, ballot: Nat \X Replicas, prev_ballot: Nat \X Replicas, commit_order: Nat,
+         consistency: Consistency_level \cup {"not-seen"}, ctxid:  Ctx_id \cup {0}, cmd: Commands \cup {[op |-> [key |-> "", type |-> ""]]}, 
+        deps: SUBSET Instances, seq: Nat, clk: Nat]
   
   
   \cup  [type: {"try-pre-accept"}, src: Replicas, dst: Replicas, inst: Instances, ballot: Nat \X Replicas,  status: Status,
@@ -142,9 +143,9 @@ Message ==
   \cup  [type: {"try-pre-accept-reply"}, src: Replicas, dst: Replicas, inst: Instances, ballot: Nat \X Replicas, status: Status \cup {"OK"}, consistency: Consistency_level, ctxid: Ctx_id \cup {0}]
         
         
-(*[type |-> "prepare-reply", inst |-> <<1, 1>>, status |-> "not-seen", ballot |-> <<1, 2>>, cmd |-> [op |-> [key |-> "", type |-> ""]],
- deps |-> {}, seq |-> 0, consistency |-> "not-seen", ctxid |-> 0, commit_order |-> 0, src |-> 3, dst |-> 2, clk |-> 0, 
- prev_ballot |-> <<0, 3>>]*)
+ (*sentMsg = {[type |-> "commit", inst |-> <<1, 1>>, ballot |-> <<0, 1>>, cmd |-> [op |-> [key |-> "x", 
+ type |-> "r"]], deps |-> {}, seq |-> 3, consistency |-> "strong",
+  ctxid |-> 1, commit_order |-> 2, clk |-> 4]}*)
   
         
 
@@ -1355,9 +1356,7 @@ PrepareFinalize(replica, i, Q) ==
                                   deps  : {acc.deps},
                                   seq   : {acc.seq},
                                   consistency : {acc.consistency},
-                                  ctxid : {acc.ctxid},
-                                  commit_order: {acc.commit_order}, 
-                                  clk: {newClk} ]
+                                  ctxid : {acc.ctxid}]
                         /\ cmdLog' = [cmdLog EXCEPT ![replica] = (@ \ {rec}) \cup
                                 {[inst  |-> i,
                                   status|-> "accepted",
@@ -1391,9 +1390,7 @@ PrepareFinalize(replica, i, Q) ==
                                           deps  : {pac.deps},
                                           seq   : {pac.seq},
                                           consistency : {pac.consistency},
-                                          ctxid : {pac.ctxid},
-                                          commit_order: {pac.commit_order}, 
-                                          clk: {newClk} ]
+                                          ctxid : {pac.ctxid}]
                                 /\ cmdLog' = [cmdLog EXCEPT ![replica] = (@ \ {rec}) \cup
                                         {[inst  |-> i,
                                           status|-> "accepted",
@@ -1439,7 +1436,7 @@ PrepareFinalize(replica, i, Q) ==
                                \/ Cardinality(preaccepts) < Cardinality(Q) \div 2
                             /\ preaccepts # {}
                             /\ LET pac == CHOOSE pac \in preaccepts : pac.cmd # [op |-> [key |-> "", type |-> ""]] IN
-                                /\ StartPhase1(pac.cmd, replica, Q, i, rec.ballot, replies, newClk, pac.consistency,pac.ctxid)
+                                /\ StartPhase1(pac.cmd, replica, Q, i, rec.ballot, replies, newClk[replica], pac.conistency,pac.ctxid)
                                 /\ preparing' = [preparing EXCEPT ![replica] = @ \ {i}]
                                 /\ UNCHANGED << proposed, executed, crtInst, committed, ballots>>)
                 \/  /\ \A msg \in replies : msg.status = "not-seen"
@@ -1447,7 +1444,24 @@ PrepareFinalize(replica, i, Q) ==
                     /\ preparing' = [preparing EXCEPT ![replica] = @ \ {i}]
                     /\ UNCHANGED << proposed, executed, crtInst, committed, ballots >>   
                     
-      
+  
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
 ReplyTryPreaccept(replica) ==
     \E tpa \in sentMsg :
         /\ tpa.type = "try-pre-accept" 
@@ -1523,9 +1537,7 @@ FinalizeTryPreAccept(cleader, i, Q) ==
                               deps  : {rec.deps},
                               seq   : {rec.seq},
                               consistency : {rec.consistency},
-                              ctxid : {rec.ctxid},
-                              commit_order: {rec.commit_order}, 
-                              clk: {newClk} ]           
+                              ctxid : {rec.ctxid}]           
                   /\ cmdLog' = [cmdLog EXCEPT ![cleader] = (@ \ {rec}) \cup
                             {[inst  |-> i,
                               status|-> "accepted",
@@ -1818,9 +1830,9 @@ CommandLeaderAction ==
             \/ (\E Q \in FastQuorums(cleader) : Phase1Fast(cleader, inst, Q))
             \/ (\E Q \in SlowQuorums(cleader) : Phase1Slow(cleader, inst, Q))
             \/ (\E Q \in SlowQuorums(cleader) : Phase2Finalize(cleader, inst, Q))
-           (* \/ (\E Q \in SlowQuorums(cleader) : FinalizeTryPreAccept(cleader, inst, Q))*)) 
-    (*\/ (\E replica \in Replicas: 
-            \E inst \in cmdLog[replica]: ExecuteCommand(replica, inst))*)
+            \/ (\E Q \in SlowQuorums(cleader) : FinalizeTryPreAccept(cleader, inst, Q))) 
+    \/ (\E replica \in Replicas: 
+            \E inst \in cmdLog[replica]: ExecuteCommand(replica, inst))
     
     
   
@@ -1835,11 +1847,11 @@ ReplicaAction ==
          \/ \E i \in Instances : 
             /\ crtInst[i[1]] > i[2] 
             /\ \E Q \in SlowQuorums(replica) : SendPrepare(replica, i, Q)
-         (*\/ ReplyPrepare(replica)
+         \/ ReplyPrepare(replica)
          \/ \E i \in preparing[replica] :
             \E Q \in SlowQuorums(replica) : PrepareFinalize(replica, i, Q)
          \/ ReplyTryPreaccept(replica)
-         \/ \E inst \in cmdLog[replica]: ExecuteCommand(replica, inst)*)
+         \/ \E inst \in cmdLog[replica]: ExecuteCommand(replica, inst)
          )
 
 
@@ -2047,5 +2059,5 @@ Termination == <>((\A r \in Replicas:
 
 =============================================================================
 \* Modification History
-\* Last modified Fri Mar 01 17:16:12 EST 2024 by santamariashithil
+\* Last modified Fri Mar 01 16:43:40 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil

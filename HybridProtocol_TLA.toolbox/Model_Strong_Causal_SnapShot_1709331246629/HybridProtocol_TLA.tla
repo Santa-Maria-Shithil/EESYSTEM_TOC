@@ -1832,10 +1832,10 @@ ReplicaAction ==
         (\/ Phase1Reply(replica)
          \/ \E cmsg \in sentMsg : (cmsg.type = "commit" /\ Commit(replica, cmsg))
          \/ Phase2Reply(replica)
-         \/ \E i \in Instances : 
+         (*\/ \E i \in Instances : 
             /\ crtInst[i[1]] > i[2] 
             /\ \E Q \in SlowQuorums(replica) : SendPrepare(replica, i, Q)
-         (*\/ ReplyPrepare(replica)
+         \/ ReplyPrepare(replica)
          \/ \E i \in preparing[replica] :
             \E Q \in SlowQuorums(replica) : PrepareFinalize(replica, i, Q)
          \/ ReplyTryPreaccept(replica)
@@ -2047,5 +2047,5 @@ Termination == <>((\A r \in Replicas:
 
 =============================================================================
 \* Modification History
-\* Last modified Fri Mar 01 17:16:12 EST 2024 by santamariashithil
+\* Last modified Fri Mar 01 17:13:47 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil

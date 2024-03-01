@@ -109,10 +109,9 @@ Message ==
          commit_order: Nat, src: Replicas, dst: Replicas, clk: Nat
          ]
          
-  \cup  [type: {"accept"}, src: Replicas, dst: Replicas,
-        inst: Instances, ballot: Nat \X Replicas,
-        cmd: Commands \cup {[op |-> [key |-> "", type |-> ""]]}, deps: SUBSET Instances, seq: Nat, consistency: Consistency_level, 
-        ctxid:  Ctx_id \cup {0},  commit_order: Nat, clk: Nat]
+  \cup  [type: {"accept"}, inst: Instances,  ballot: Nat \X Replicas, cmd: Commands \cup {[op |-> [key |-> "", type |-> ""]]},
+        deps: SUBSET Instances, seq: Nat, consistency: Consistency_level, ctxid:  Ctx_id \cup {0}, commit_order: Nat, 
+        src: Replicas, dst: Replicas, clk: Nat]
         
         
   \cup  [type: {"commit"}, inst: Instances, ballot: Nat \X Replicas, 
@@ -129,13 +128,13 @@ Message ==
         clk: Nat, committed: SUBSET Instances]
         
         
-  \cup  [type: {"accept-reply"}, src: Replicas, dst: Replicas, inst: Instances, ballot: Nat \X Replicas,cmd: Commands \cup {[op |-> [key |-> "", type |-> ""]]}, deps: SUBSET Instances, 
-         seq: Nat,consistency: Consistency_level \cup {"not-seen"}, ctxid:  Ctx_id \cup {0},clk: Nat, commit_order: Nat ]
+  \cup  [type: {"accept-reply"}, inst: Instances,  ballot: Nat \X Replicas, consistency: Consistency_level \cup {"not-seen"},
+        commit_order: Nat, src: Replicas, dst: Replicas, clk: Nat]
     
          
-  \cup  [type: {"prepare-reply"}, src: Replicas, dst: Replicas, inst: Instances, status: Status, ballot: Nat \X Replicas, prev_ballot: Nat \X Replicas, commit_order: Nat,
-         consistency: Consistency_level \cup {"not-seen"}, ctxid:  Ctx_id \cup {0}, cmd: Commands \cup {[op |-> [key |-> "", type |-> ""]]}, 
-        deps: SUBSET Instances, seq: Nat, clk: Nat]
+  \cup  [type: {"prepare-reply"}, inst: Instances, status: Status, ballot: Nat \X Replicas,cmd: Commands \cup {[op |-> [key |-> "", type |-> ""]]}, 
+          deps: SUBSET Instances, seq: Nat, consistency: Consistency_level \cup {"not-seen"},   ctxid:  Ctx_id \cup {0}, 
+          commit_order: Nat, src: Replicas, dst: Replicas,  clk: Nat,   prev_ballot: Nat \X Replicas]
   
   
   \cup  [type: {"try-pre-accept"}, src: Replicas, dst: Replicas, inst: Instances, ballot: Nat \X Replicas,  status: Status,
@@ -143,9 +142,9 @@ Message ==
   \cup  [type: {"try-pre-accept-reply"}, src: Replicas, dst: Replicas, inst: Instances, ballot: Nat \X Replicas, status: Status \cup {"OK"}, consistency: Consistency_level, ctxid: Ctx_id \cup {0}]
         
         
- (*sentMsg = {[type |-> "commit", inst |-> <<1, 1>>, ballot |-> <<0, 1>>, cmd |-> [op |-> [key |-> "x", 
- type |-> "r"]], deps |-> {}, seq |-> 3, consistency |-> "strong",
-  ctxid |-> 1, commit_order |-> 2, clk |-> 4]}*)
+(*[type |-> "prepare-reply", inst |-> <<1, 1>>, status |-> "not-seen", ballot |-> <<1, 2>>, cmd |-> [op |-> [key |-> "", type |-> ""]],
+ deps |-> {}, seq |-> 0, consistency |-> "not-seen", ctxid |-> 0, commit_order |-> 0, src |-> 3, dst |-> 2, clk |-> 0, 
+ prev_ballot |-> <<0, 3>>]*)
   
         
 
@@ -225,12 +224,19 @@ Init ==
 (* Helper Functions                                                        *)
 (***************************************************************************)
 
-RECURSIVE checkWaiting(_)
-checkWaiting(cleader) == LET waitingRecs== {rec \in cmdLog[cleader]: rec.state = "waiting"} 
-                         waitingInst=={rec.inst: rec \in waitingRecs} IN
-                         IF Cardinality(waitingInst) = 0 THEN
+waitedDeps(deps, replica) == LET waitingRecs== {rec \in cmdLog[replica]: rec.state = "waiting" /\ rec.inst \in deps} 
+                         waitingInst=={rec.inst: rec \in waitingRecs}
+                         allRecs == {rec \in cmdLog[replica]: TRUE}
+                         allInst == {rec.inst: rec \in allRecs} 
+                         notReachedDeps == {dep \in deps: dep \notin allInst} (* instance of deps that are not reached yet in this replica*)
+                         finalWaitingInst == waitingInst \cup notReachedDeps IN
+                         finalWaitingInst
+
+RECURSIVE checkWaiting(_,_)
+checkWaiting(deps, replica) == LET wDeps == waitedDeps(deps, replica) IN
+                         IF Cardinality(wDeps) = 0 THEN
                             "ready"
-                         ELSE checkWaiting(cleader)
+                         ELSE checkWaiting(wDeps, replica)
                          
 FindingWaitingInst(finalDeps) ==
     LET waitingRecs(deps) == {rec \in cmdLog[deps]: rec.state = "waiting"}
@@ -339,41 +345,7 @@ LatestWriteofSpecificKey(key)  ==  (* finidng the latest write of a specific key
     IN
         latestWrite(key, Replicas, {})
         
-        
- DependentWriteInstances(deps_list, replica) == (* finding only dependent write commands *) (* return {<<"a", 1>>, <<"b", 0>>} *)
-    LET 
-        RECURSIVE depWriteInstance(_,_,_)
-            depWriteInstance(dlist, r, fdlist) ==
-                IF dlist = {}
-                THEN fdlist
-                ELSE
-                    LET
-                        dep == CHOOSE x \in dlist: TRUE
-                        rec1 == {rec: rec \in cmdLog[r]}
-                        rec2 == {rec \in rec1:  rec.inst = dep /\ rec.cmd.op.type = "w"} 
-                        inst == {rec.inst: rec \in rec2} IN
-                        depWriteInstance(dlist \ {dep}, r, fdlist \cup inst)           
-    IN
-        depWriteInstance(deps_list, replica, {})
-        
-        
-IsMajorityCommitted(inst) == (* finding in how many replicas the instance is committed *)
-    LET 
-        RECURSIVE majorityCommitted(_, _, _)
-        majorityCommitted(i, r, flist) ==
-            IF r = {}
-            THEN flist
-            ELSE
-                LET
-                    replica == CHOOSE x \in r: TRUE
-                    rec1 == {rec: rec \in cmdLog[replica]}
-                    rec2 == {rec \in rec1: rec.inst = i /\ rec.status \in {"causally-committed", "strongly-committed", "executed", "discarded"}}
-                    inst2 == {rec.inst: rec \in rec2} IN
-                    majorityCommitted(i, r \ {replica}, flist \cup inst2)
-    IN 
-        majorityCommitted(inst, Replicas, {})
-        
-        
+     
         
 MaxCommitNumber(replica) ==  LET recs == {rec \in cmdLog[replica]: rec.status \in {"strongly-committed", "executed", "discarded"} } IN
                                 IF recs = {} THEN emptyInstance
@@ -399,13 +371,61 @@ MaxCommitOrder ==  (* finding the max commit order among all the replicas *)
                     maxCommit(r \ {replica}, max)
     IN 
         maxCommit(Replicas, 1) (* initial commit order number is 1 *)
+        
+        
+       
+ DependentWriteInstances(deps_list, replica) == (* finding only dependent causal write commands *) (* return {<<"a", 1>>, <<"b", 0>>} *)
+    LET 
+        RECURSIVE depWriteInstance(_,_,_)
+            depWriteInstance(dlist, r, fdlist) ==
+                IF dlist = {}
+                THEN fdlist
+                ELSE
+                    LET
+                        dep == CHOOSE x \in dlist: TRUE
+                        rec1 == {rec: rec \in cmdLog[r]}
+                        rec2 == {rec \in rec1:  rec.inst = dep /\ rec.cmd.op.type = "w" /\ rec.consistency \in {"causal"}} 
+                        inst == {rec.inst: rec \in rec2} IN
+                        depWriteInstance(dlist \ {dep}, r, fdlist \cup inst)           
+    IN
+        depWriteInstance(deps_list, replica, {})
+        
+        
+IsMajorityCommitted(inst) == (* finding in how many replicas the instance is committed *)
+    LET 
+        RECURSIVE majorityCommitted(_, _, _)
+        majorityCommitted(i, r, flist) ==
+            IF r = {}
+            THEN flist
+            ELSE
+                LET
+                    replica == CHOOSE x \in r: TRUE
+                    rec1 == {rec: rec \in cmdLog[replica]}
+                    rec2 == {rec \in rec1: rec.inst = i /\ rec.status \in {"causally-committed", "executed", "discarded"}}
+                    inst2 == {rec.inst: rec \in rec2} IN
+                    majorityCommitted(i, r \ {replica}, flist \cup inst2)
+    IN 
+        majorityCommitted(inst, Replicas, {})
+        
+        
+CheckStrongRead(rec) ==  IF rec.cmd.op.type = "r" /\ rec.consistency \in {"strong"} /\ rec.status \in {"strongly-committed", "executed"} THEN
+                            TRUE
+                         ELSE
+                            FALSE      
+                            
+CheckDependentWrite(rec, replica) == LET deps_list == rec.deps 
+                                        dep_write_instances ==  DependentWriteInstances(deps_list, replica) IN  (* retrieving the dependent causal write commnads for a specific strong read command *)
+                                        IF Cardinality(dep_write_instances) = 0 THEN TRUE
+                                        ELSE
+                                            /\ \A inst \in dep_write_instances : LET commitList == IsMajorityCommitted(inst) IN (* retrieving the replicas where the instance is committed or executed or discarded *)
+                                                /\ Cardinality(commitList) >= ((Cardinality(Replicas) \div 2) + 1)
                             
 (***************************************************************************)
 (* Actions                                                                 *)
 (***************************************************************************)
 
 StartPhase1Causal(C, cleader, Q, inst, ballot, oldMsg, oldClk,cl,ctx) ==
-        LET recs1 == {rec \in cmdLog[cleader]: rec.ctxid = ctx}
+         LET recs1 == {rec \in cmdLog[cleader]: rec.ctxid = ctx}
            deps1 == {rec2.inst: rec2 \in recs1} (* same session dependency *)
            
            maxRec == MaxSeq(cleader) (* selecting the rec with the highest sequence number in this specific replica *)
@@ -420,8 +440,8 @@ StartPhase1Causal(C, cleader, Q, inst, ballot, oldMsg, oldClk,cl,ctx) ==
             newDeps == deps1 \cup deps2
             newSeq == 1 + Max({t.seq: t \in cmdLog[cleader]} \cup {oldClk}) 
             oldRecs == {rec \in cmdLog[cleader] : rec.inst = inst}
-            waitingRecs== {rec \in cmdLog[cleader]: rec.state = "waiting"} 
-            waitingInst=={rec.inst: rec \in waitingRecs} IN
+            
+            waitingInst== waitedDeps(newDeps, cleader) IN
             IF Cardinality(waitingInst) = 0 THEN
                 /\ cmdLog' = [cmdLog EXCEPT ![cleader] = (@ \ oldRecs) \cup 
                                         {[inst   |-> inst,
@@ -463,7 +483,7 @@ StartPhase1Causal(C, cleader, Q, inst, ballot, oldMsg, oldClk,cl,ctx) ==
                                           execution_order |-> 0,
                                           execution_order_list |-> {},
                                           commit_order |-> 0   ]}]
-                /\ LET newcmdstate == checkWaiting(cleader) IN
+                /\ LET newcmdstate == checkWaiting(waitingInst, cleader) IN
                      /\ cmdLog' = [cmdLog EXCEPT ![cleader] = (@ \ oldRecs) \cup 
                         {[inst   |-> inst,
                           status |-> "causally-committed",
@@ -493,6 +513,7 @@ StartPhase1Causal(C, cleader, Q, inst, ballot, oldMsg, oldClk,cl,ctx) ==
                                               
                                               
 StartPhase1Strong(C, cleader, Q, inst, ballot, oldMsg, oldClk,cl,ctx) ==
+
     LET recs1 == {rec \in cmdLog[cleader]: rec.ctxid = ctx}
            deps1 == {rec.inst: rec \in recs1} (* same session dependency *)
            maxRec == MaxSeq(cleader) (* selecting the rec with the highest sequence number in this specific replica *)
@@ -512,11 +533,11 @@ StartPhase1Strong(C, cleader, Q, inst, ballot, oldMsg, oldClk,cl,ctx) ==
             
            
            
-           
+    
             newSeq == 1 + Max({t.seq: t \in cmdLog[cleader]} \cup {oldClk}) 
             oldRecs == {rec \in cmdLog[cleader] : rec.inst = inst} 
-            waitingRecs== {rec \in cmdLog[cleader]: rec.state = "waiting"} 
-            waitingInst=={rec.inst: rec \in waitingRecs} IN
+            
+            waitingInst== waitedDeps(newDeps, cleader) IN
             IF Cardinality(waitingInst) = 0 THEN
                 /\ cmdLog' = [cmdLog EXCEPT ![cleader] = (@ \ oldRecs) \cup 
                                         {[inst   |-> inst,
@@ -559,7 +580,7 @@ StartPhase1Strong(C, cleader, Q, inst, ballot, oldMsg, oldClk,cl,ctx) ==
                                           execution_order |-> 0,
                                           execution_order_list |-> {},
                                           commit_order |-> maxCommit+1]}]
-                /\ LET newcmdstate == checkWaiting(cleader) IN
+                /\ LET newcmdstate == checkWaiting(waitingInst, cleader) IN
                      /\ cmdLog' = [cmdLog EXCEPT ![cleader] = (@ \ oldRecs) \cup 
                         {[inst   |-> inst,
                           status |-> "pre-accepted",
@@ -602,21 +623,6 @@ Propose(C, cleader,cl,ctx) ==
         newBallot == <<0, cleader>> 
         newClk == [clk EXCEPT ![cleader] = @ + 1]
     IN  /\ proposed' = proposed \cup {C}
-        /\ (\A replica \in Replicas:
-            /\ LET oldRecs == {rec \in cmdLog[replica] : rec.inst = newInst} IN
-                cmdLog' = [cmdLog EXCEPT ![replica] = (@ \ oldRecs) \cup 
-                        {[inst   |-> newInst,
-                          status |-> "none",
-                          state |-> "waiting",
-                          ballot |-> newBallot,
-                          cmd    |-> C,
-                          deps   |-> {},
-                          seq    |-> 0,
-                          consistency |-> cl,
-                          ctxid |-> ctx,
-                          execution_order |-> 0,
-                          execution_order_list |-> {},
-                          commit_order |-> 0]}])
         /\ (\E Q \in FastQuorums(cleader):
                  StartPhase1(C, cleader, Q, newInst, newBallot, {},newClk[cleader],cl,ctx))
         /\ crtInst' = [crtInst EXCEPT ![cleader] = @ + 1]
@@ -654,10 +660,11 @@ Phase1Reply(replica) ==
                                   1 + Max({t.seq: t \in cmdLog[replica]})})
                    instCom == {t.inst: t \in {tt \in cmdLog[replica] :
                               tt.status \in {"causally-committed", "strongly-committed", "executed", "discarded"}}}
-                   
-                    waitingRecs == {rec \in cmdLog[replica]: rec.state = "waiting"} 
-                    waitingInst == {rec.inst: rec \in waitingRecs} IN
-                    IF Cardinality(waitingInst) = 0 THEN
+  
+                    finalWaitingInst == waitedDeps(newDeps, replica)
+                    
+                    IN
+                    IF Cardinality(finalWaitingInst) = 0 THEN
                         /\ cmdLog' = [cmdLog EXCEPT ![replica] = (@ \ oldRec) \cup
                                             {[inst   |-> msg.inst,
                                               status |-> "pre-accepted",
@@ -701,7 +708,7 @@ Phase1Reply(replica) ==
                                               execution_order |-> 0,
                                               execution_order_list |-> {},
                                               commit_order |-> msg.commit_order  ]}]
-                        /\ LET newcmdstate == checkWaiting(replica) IN
+                        /\ LET newcmdstate == checkWaiting(finalWaitingInst, replica) IN
                             /\ cmdLog' = [cmdLog EXCEPT ![replica] = (@ \ oldRec) \cup
                                             {[inst   |-> msg.inst,
                                               status |-> "pre-accepted",
@@ -753,8 +760,8 @@ Phase1Fast(cleader, i, Q) ==
                 /\ r1.deps = r2.deps
                 /\ r1.seq = r2.seq)
             /\ LET r == CHOOSE r \in replies : TRUE
-                   waitingRecs == {rec \in cmdLog[cleader]: rec.state = "waiting"} 
-                   waitingInst == {rec.inst: rec \in waitingRecs} 
+                   
+                   waitingInst == waitedDeps(r.deps, cleader)
                    newClk == 1 + Max({clk[cleader]} \cup {r.seq})IN               
                         IF Cardinality(waitingInst) = 0 THEN
                         /\ cmdLog' = [cmdLog EXCEPT ![cleader] = (@ \ {record}) \cup 
@@ -804,7 +811,7 @@ Phase1Fast(cleader, i, Q) ==
                                                   execution_order_list |-> {},
                                                   commit_order |-> r.commit_order ]}]
    
-                        /\ LET newcmdstate == checkWaiting(cleader) IN   
+                        /\ LET newcmdstate == checkWaiting(waitingInst, cleader) IN   
                         
                             /\ cmdLog' = [cmdLog EXCEPT ![cleader] = (@ \ {record}) \cup 
                                                     {[inst   |-> i,
@@ -853,8 +860,7 @@ Phase1Slow(cleader, i, Q) ==
             /\ LET finalDeps == UNION {msg.deps : msg \in replies}
                    finalSeq == Max({msg.seq : msg \in replies})
                    newClk == 1 + Max({clk[cleader]} \cup {finalSeq})
-                    waitingRecs == {rec \in cmdLog[cleader]: rec.inst \in finalDeps /\ rec.state = "waiting"} 
-                    waitingInst == {rec.inst: rec \in waitingRecs}  IN   
+                    waitingInst == waitedDeps(finalDeps, cleader)  IN   
                         IF Cardinality(waitingInst) = 0 THEN
                             /\ cmdLog' = [cmdLog EXCEPT ![cleader] = (@ \ {record}) \cup 
                                                     {[inst   |-> i,
@@ -900,7 +906,7 @@ Phase1Slow(cleader, i, Q) ==
                                                       execution_order |-> 0,
                                                       execution_order_list |-> {},
                                                       commit_order |-> record.commit_order  ]}]
-                            /\ LET newcmdstate == checkWaiting(cleader) IN
+                            /\ LET newcmdstate == checkWaiting(waitingInst, cleader) IN
                                 /\ cmdLog' = [cmdLog EXCEPT ![cleader] = (@ \ {record}) \cup 
                                                     {[inst   |-> i,
                                                       status |-> "accepted",
@@ -940,8 +946,8 @@ Phase1Slow(cleader, i, Q) ==
     /\ msg.dst = replica
     /\ LET oldRec == {rec \in cmdLog[replica]: rec.inst = msg.inst}
            newClk == 1 + Max({clk[replica]} \cup {msg.seq})
-           waitingRecs == {rec \in cmdLog[replica]: rec.state = "waiting"} 
-           waitingInst == {rec.inst: rec \in waitingRecs}  IN
+         
+           waitingInst == waitedDeps(msg.deps, replica)  IN
           IF Cardinality(waitingInst) = 0 THEN
         /\ (\A rec \in oldRec: (rec.ballot = msg.ballot \/ 
                                 rec.ballot[1] < msg.ballot[1]))
@@ -965,7 +971,6 @@ Phase1Slow(cleader, i, Q) ==
                                   inst  |-> msg.inst,
                                   ballot|-> msg.ballot,
                                   consistency |-> msg.consistency,
-                                  ctxid |-> msg.ctxid,
                                   clk |-> newClk,
                                   commit_order |-> msg.commit_order]}
         /\ clk' = [clk EXCEPT ![replica] = newClk]
@@ -987,7 +992,7 @@ Phase1Slow(cleader, i, Q) ==
                               execution_order |-> 0,
                               execution_order_list |-> {},
                               commit_order |-> msg.commit_order ]}]
-           /\ LET newcmdstate == checkWaiting(replica) IN   
+           /\ LET newcmdstate == checkWaiting(waitingInst, replica) IN   
              /\ cmdLog' = [cmdLog EXCEPT ![replica] = (@ \ oldRec) \cup
                             {[inst   |-> msg.inst,
                               status |-> "accepted",
@@ -1007,7 +1012,6 @@ Phase1Slow(cleader, i, Q) ==
                                       inst  |-> msg.inst,
                                       ballot|-> msg.ballot,
                                       consistency |-> msg.consistency,
-                                      ctxid |-> msg.ctxid,
                                       clk |-> newClk,
                                       commit_order |-> msg.commit_order]}
               /\ clk' = [clk EXCEPT ![replica] = newClk]
@@ -1070,8 +1074,8 @@ Phase1Slow(cleader, i, Q) ==
 CommitCausal(replica, cmsg) ==
     LET oldRec == {rec \in cmdLog[replica] : rec.inst = cmsg.inst}
             newClk == 1 + Max({clk[replica]} \cup {cmsg.clk})
-            waitingRecs == {rec \in cmdLog[replica]: rec.state = "waiting"} 
-            waitingInst == {rec.inst: rec \in waitingRecs} IN
+            
+            waitingInst == waitedDeps(cmsg.deps, replica) IN
             IF Cardinality(waitingInst) = 0 THEN
                 /\ \A rec \in oldRec : (rec.status \notin {"causally-committed", "executed", "discarded"} /\ 
                                         rec.ballot[1] <= cmsg.ballot[1])
@@ -1109,7 +1113,7 @@ CommitCausal(replica, cmsg) ==
                                               execution_order |-> 0,
                                               execution_order_list |-> {},
                                               commit_order |-> cmsg.commit_order  ]}]
-                /\ LET newcmdstate == checkWaiting(replica) IN
+                /\ LET newcmdstate == checkWaiting(waitingInst, replica) IN
                     /\ cmdLog' = [cmdLog EXCEPT ![replica] = (@ \ oldRec) \cup 
                                                 {[inst     |-> cmsg.inst,
                                                   status   |-> "causally-committed",
@@ -1135,8 +1139,8 @@ CommitCausal(replica, cmsg) ==
 CommitStrong(replica, cmsg) ==
     LET oldRec == {rec \in cmdLog[replica] : rec.inst = cmsg.inst}
             newClk == 1 + Max({clk[replica]} \cup {cmsg.clk})
-            waitingRecs == {rec \in cmdLog[replica]: rec.state = "waiting"} 
-            waitingInst == {rec.inst: rec \in waitingRecs} IN
+         
+            waitingInst == waitedDeps(cmsg.deps, replica) IN
             IF Cardinality(waitingInst) = 0 THEN
                 /\ \A rec \in oldRec : (rec.status \notin {"strongly-committed", "executed", "discarded"} /\ 
                                         rec.ballot[1] <= cmsg.ballot[1])
@@ -1174,7 +1178,7 @@ CommitStrong(replica, cmsg) ==
                                               execution_order |-> 0 ,
                                               execution_order_list |-> {},
                                               commit_order |-> cmsg.commit_order ]}]
-                /\ LET newcmdstate == checkWaiting(replica) IN
+                /\ LET newcmdstate == checkWaiting(waitingInst, replica) IN
                     /\ cmdLog' = [cmdLog EXCEPT ![replica] = (@ \ oldRec) \cup 
                                                 {[inst     |-> cmsg.inst,
                                                   status   |-> "strongly-committed",
@@ -1330,7 +1334,7 @@ PrepareFinalize(replica, i, Q) ==
                                 seq     : {com.seq},
                                 consistency : {com.consistency},
                                 ctxid : {com.ctxid},
-                                clk : newClk[replica],
+                                clk : {newClk},
                                 commit_order : {com.commit_order}]
                         /\ UNCHANGED << cmdLog, proposed, executed, crtInst, leaderOfInst,
                                         committed, ballots>>
@@ -1351,7 +1355,9 @@ PrepareFinalize(replica, i, Q) ==
                                   deps  : {acc.deps},
                                   seq   : {acc.seq},
                                   consistency : {acc.consistency},
-                                  ctxid : {acc.ctxid}]
+                                  ctxid : {acc.ctxid},
+                                  commit_order: {acc.commit_order}, 
+                                  clk: {newClk} ]
                         /\ cmdLog' = [cmdLog EXCEPT ![replica] = (@ \ {rec}) \cup
                                 {[inst  |-> i,
                                   status|-> "accepted",
@@ -1385,7 +1391,9 @@ PrepareFinalize(replica, i, Q) ==
                                           deps  : {pac.deps},
                                           seq   : {pac.seq},
                                           consistency : {pac.consistency},
-                                          ctxid : {pac.ctxid}]
+                                          ctxid : {pac.ctxid},
+                                          commit_order: {pac.commit_order}, 
+                                          clk: {newClk} ]
                                 /\ cmdLog' = [cmdLog EXCEPT ![replica] = (@ \ {rec}) \cup
                                         {[inst  |-> i,
                                           status|-> "accepted",
@@ -1431,17 +1439,15 @@ PrepareFinalize(replica, i, Q) ==
                                \/ Cardinality(preaccepts) < Cardinality(Q) \div 2
                             /\ preaccepts # {}
                             /\ LET pac == CHOOSE pac \in preaccepts : pac.cmd # [op |-> [key |-> "", type |-> ""]] IN
-                                /\ StartPhase1(pac.cmd, replica, Q, i, rec.ballot, replies, newClk[replica], pac.conistency,pac.ctxid)
+                                /\ StartPhase1(pac.cmd, replica, Q, i, rec.ballot, replies, newClk, pac.consistency,pac.ctxid)
                                 /\ preparing' = [preparing EXCEPT ![replica] = @ \ {i}]
                                 /\ UNCHANGED << proposed, executed, crtInst, committed, ballots>>)
                 \/  /\ \A msg \in replies : msg.status = "not-seen"
-                    /\ StartPhase1([op |-> [key |-> "", type |-> ""]], replica, Q, i, rec.ballot, replies, newClk[replica], "strong", 0) (* no dependency will be build on it *)
+                    /\ StartPhase1([op |-> [key |-> "", type |-> ""]], replica, Q, i, rec.ballot, replies, newClk, "strong", 0) (* no dependency will be build on it *)
                     /\ preparing' = [preparing EXCEPT ![replica] = @ \ {i}]
                     /\ UNCHANGED << proposed, executed, crtInst, committed, ballots >>   
                     
-  
-                    
-                    
+      
 ReplyTryPreaccept(replica) ==
     \E tpa \in sentMsg :
         /\ tpa.type = "try-pre-accept" 
@@ -1517,7 +1523,9 @@ FinalizeTryPreAccept(cleader, i, Q) ==
                               deps  : {rec.deps},
                               seq   : {rec.seq},
                               consistency : {rec.consistency},
-                              ctxid : {rec.ctxid}]           
+                              ctxid : {rec.ctxid},
+                              commit_order: {rec.commit_order}, 
+                              clk: {newClk} ]           
                   /\ cmdLog' = [cmdLog EXCEPT ![cleader] = (@ \ {rec}) \cup
                             {[inst  |-> i,
                               status|-> "accepted",
@@ -1810,9 +1818,9 @@ CommandLeaderAction ==
             \/ (\E Q \in FastQuorums(cleader) : Phase1Fast(cleader, inst, Q))
             \/ (\E Q \in SlowQuorums(cleader) : Phase1Slow(cleader, inst, Q))
             \/ (\E Q \in SlowQuorums(cleader) : Phase2Finalize(cleader, inst, Q))
-            \/ (\E Q \in SlowQuorums(cleader) : FinalizeTryPreAccept(cleader, inst, Q))) 
-    \/ (\E replica \in Replicas: 
-            \E inst \in cmdLog[replica]: ExecuteCommand(replica, inst))
+           (* \/ (\E Q \in SlowQuorums(cleader) : FinalizeTryPreAccept(cleader, inst, Q))*)) 
+    (*\/ (\E replica \in Replicas: 
+            \E inst \in cmdLog[replica]: ExecuteCommand(replica, inst))*)
     
     
   
@@ -1827,11 +1835,11 @@ ReplicaAction ==
          \/ \E i \in Instances : 
             /\ crtInst[i[1]] > i[2] 
             /\ \E Q \in SlowQuorums(replica) : SendPrepare(replica, i, Q)
-         \/ ReplyPrepare(replica)
+         (*\/ ReplyPrepare(replica)
          \/ \E i \in preparing[replica] :
             \E Q \in SlowQuorums(replica) : PrepareFinalize(replica, i, Q)
          \/ ReplyTryPreaccept(replica)
-         \/ \E inst \in cmdLog[replica]: ExecuteCommand(replica, inst)
+         \/ \E inst \in cmdLog[replica]: ExecuteCommand(replica, inst)*)
          )
 
 
@@ -1945,23 +1953,65 @@ GlobalOrderingOfWrite == (* checking whether the system is converging or not? *)
                                                 LET all_latest_write == LatestWriteofSpecificKey(key) IN (* retrieving latest write of a specific key across all the replicas *)
                                                 \A recs \in all_latest_write : \A otherrecs \in all_latest_write :
                                                  /\ recs.inst = otherrecs.inst (* comparing whether all latest write for a specific key , across all the replicas are same or not *)
-                                            
-                                            
-                  
+    
+    
+(*CheckStrongRead(rec) ==  IF rec.cmd.op.type = "r" /\ rec.consistency \in {"strong"} /\ rec.status \in {"strongly-committed", "executed"} THEN
+                            TRUE
+                         ELSE
+                            FALSE      
+                            
+CheckDependentWrite(rec, replica) == LET deps_list == rec.deps 
+                                        dep_write_instances ==  DependentWriteInstances(deps_list, replica) IN  (* retrieving the dependent causal write commnads for a specific strong read command *)
+                                        IF Cardinality(dep_write_instances) = 0 THEN TRUE
+                                        ELSE
+                                            /\ \A inst \in dep_write_instances : LET commitList == IsMajorityCommitted(inst) IN (* retrieving the replicas where the instance is committed or executed or discarded *)
+                                                /\ Cardinality(commitList) >= (Cardinality(Replicas) \div 2) + 1
+                                                
+  DependentWriteInstances(deps_list, replica) == (* finding only dependent causal write commands *) (* return {<<"a", 1>>, <<"b", 0>>} *)
+    LET 
+        RECURSIVE depWriteInstance(_,_,_)
+            depWriteInstance(dlist, r, fdlist) ==
+                IF dlist = {}
+                THEN fdlist
+                ELSE
+                    LET
+                        dep == CHOOSE x \in dlist: TRUE
+                        rec1 == {rec: rec \in cmdLog[r]}
+                        rec2 == {rec \in rec1:  rec.inst = dep /\ rec.cmd.op.type = "w" /\ rec.consistency \in {"causal"}} 
+                        inst == {rec.inst: rec \in rec2} IN
+                        depWriteInstance(dlist \ {dep}, r, fdlist \cup inst)           
+    IN
+        depWriteInstance(deps_list, replica, {})
+        
+        
+IsMajorityCommitted(inst) == (* finding in how many replicas the instance is committed *)
+    LET 
+        RECURSIVE majorityCommitted(_, _, _)
+        majorityCommitted(i, r, flist) ==
+            IF r = {}
+            THEN flist
+            ELSE
+                LET
+                    replica == CHOOSE x \in r: TRUE
+                    rec1 == {rec: rec \in cmdLog[replica]}
+                    rec2 == {rec \in rec1: rec.inst = i /\ rec.status \in {"causally-committed", "strongly-committed", "executed", "discarded"}}
+                    inst2 == {rec.inst: rec \in rec2} IN
+                    majorityCommitted(i, r \ {replica}, flist \cup inst2)
+    IN 
+        majorityCommitted(inst, Replicas, {})                                                      *)                                 
+                      
                                                                        
 GlobalOrderingOfRead == (* once a strong read, read any write (strong/weak), all later strong read must observe that write *) 
                         (* I am checking majority committed or not. My assumption is that, is a commit is majority committed then it will be observed by all later strong commands *)
                         \A replica \in Replicas:
                             \A rec \in cmdLog[replica]:
-                               (/\ rec.cmd.op.type = "r"
-                               /\ rec.consistency \in {"strong"}
-                               /\ rec.status \in {"strongly-committed", "executed"})  => (* as the command is read command, hence checking only for "strongly-committed" or executed "*)
-                            
-                                 (/\ LET deps_list == rec.deps 
-                                    dep_write_instances ==  DependentWriteInstances(deps_list, replica)  (* retrieving the dependent write commnads for a specific strong read command *)
-                                    IN
-                                    /\ \A inst \in dep_write_instances : LET commitList == IsMajorityCommitted(inst) IN (* retrieving the replicas where the instance is committed or executed or discarded *)
-                                        /\ Cardinality(commitList) >= (Cardinality(Replicas) \div 2) + 1)
+                                  IF CheckStrongRead(rec) THEN (* as the command is read command, hence checking only for "strongly-committed" or executed "*)
+                                    IF CheckDependentWrite(rec, replica) THEN
+                                        TRUE
+                                    ELSE
+                                        FALSE
+                                  ELSE
+                                    TRUE
                                         
                 (* (GlobalOrderingOfRead): I am doing the following for every strong read command:
                    1) finding the dependent instances of the strong read command
@@ -1997,5 +2047,5 @@ Termination == <>((\A r \in Replicas:
 
 =============================================================================
 \* Modification History
-\* Last modified Wed Feb 28 14:06:00 EST 2024 by santamariashithil
+\* Last modified Fri Mar 01 17:16:12 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil

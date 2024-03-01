@@ -132,9 +132,9 @@ Message ==
         commit_order: Nat, src: Replicas, dst: Replicas, clk: Nat]
     
          
-  \cup  [type: {"prepare-reply"}, inst: Instances, status: Status, ballot: Nat \X Replicas,cmd: Commands \cup {[op |-> [key |-> "", type |-> ""]]}, 
-          deps: SUBSET Instances, seq: Nat, consistency: Consistency_level \cup {"not-seen"},   ctxid:  Ctx_id \cup {0}, 
-          commit_order: Nat, src: Replicas, dst: Replicas,  clk: Nat,   prev_ballot: Nat \X Replicas]
+  \cup  [type: {"prepare-reply"}, src: Replicas, dst: Replicas, inst: Instances, status: Status, ballot: Nat \X Replicas, prev_ballot: Nat \X Replicas, commit_order: Nat,
+         consistency: Consistency_level \cup {"not-seen"}, ctxid:  Ctx_id \cup {0}, cmd: Commands \cup {[op |-> [key |-> "", type |-> ""]]}, 
+        deps: SUBSET Instances, seq: Nat, clk: Nat]
   
   
   \cup  [type: {"try-pre-accept"}, src: Replicas, dst: Replicas, inst: Instances, ballot: Nat \X Replicas,  status: Status,
@@ -142,9 +142,9 @@ Message ==
   \cup  [type: {"try-pre-accept-reply"}, src: Replicas, dst: Replicas, inst: Instances, ballot: Nat \X Replicas, status: Status \cup {"OK"}, consistency: Consistency_level, ctxid: Ctx_id \cup {0}]
         
         
-(*[type |-> "prepare-reply", inst |-> <<1, 1>>, status |-> "not-seen", ballot |-> <<1, 2>>, cmd |-> [op |-> [key |-> "", type |-> ""]],
- deps |-> {}, seq |-> 0, consistency |-> "not-seen", ctxid |-> 0, commit_order |-> 0, src |-> 3, dst |-> 2, clk |-> 0, 
- prev_ballot |-> <<0, 3>>]*)
+ (*sentMsg = {[type |-> "commit", inst |-> <<1, 1>>, ballot |-> <<0, 1>>, cmd |-> [op |-> [key |-> "x", 
+ type |-> "r"]], deps |-> {}, seq |-> 3, consistency |-> "strong",
+  ctxid |-> 1, commit_order |-> 2, clk |-> 4]}*)
   
         
 
@@ -1818,9 +1818,9 @@ CommandLeaderAction ==
             \/ (\E Q \in FastQuorums(cleader) : Phase1Fast(cleader, inst, Q))
             \/ (\E Q \in SlowQuorums(cleader) : Phase1Slow(cleader, inst, Q))
             \/ (\E Q \in SlowQuorums(cleader) : Phase2Finalize(cleader, inst, Q))
-           (* \/ (\E Q \in SlowQuorums(cleader) : FinalizeTryPreAccept(cleader, inst, Q))*)) 
-    (*\/ (\E replica \in Replicas: 
-            \E inst \in cmdLog[replica]: ExecuteCommand(replica, inst))*)
+            \/ (\E Q \in SlowQuorums(cleader) : FinalizeTryPreAccept(cleader, inst, Q))) 
+    \/ (\E replica \in Replicas: 
+            \E inst \in cmdLog[replica]: ExecuteCommand(replica, inst))
     
     
   
@@ -1835,11 +1835,11 @@ ReplicaAction ==
          \/ \E i \in Instances : 
             /\ crtInst[i[1]] > i[2] 
             /\ \E Q \in SlowQuorums(replica) : SendPrepare(replica, i, Q)
-         (*\/ ReplyPrepare(replica)
+         \/ ReplyPrepare(replica)
          \/ \E i \in preparing[replica] :
             \E Q \in SlowQuorums(replica) : PrepareFinalize(replica, i, Q)
          \/ ReplyTryPreaccept(replica)
-         \/ \E inst \in cmdLog[replica]: ExecuteCommand(replica, inst)*)
+         \/ \E inst \in cmdLog[replica]: ExecuteCommand(replica, inst)
          )
 
 
@@ -2047,5 +2047,5 @@ Termination == <>((\A r \in Replicas:
 
 =============================================================================
 \* Modification History
-\* Last modified Fri Mar 01 17:16:12 EST 2024 by santamariashithil
+\* Last modified Fri Mar 01 16:58:26 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil
