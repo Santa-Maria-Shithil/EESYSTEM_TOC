@@ -187,7 +187,7 @@ TypeOK ==
                                        execution_order_list: SUBSET {Nat \X Instances},
                                        commit_order : Nat (* 0 means not committed *)
                                        ]]
-   (* /\ proposed \in SUBSET Commands
+    /\ proposed \in SUBSET Commands
     /\ executed \in [Replicas -> SUBSET (Nat \X Commands)]
     /\ sentMsg \in SUBSET Message
     /\ crtInst \in [Replicas -> Nat]
@@ -197,7 +197,7 @@ TypeOK ==
                                            Nat)]
     /\ ballots \in Nat
     /\ preparing \in [Replicas -> SUBSET Instances]
-    /\ clk \in [Replicas -> Nat]*)
+    /\ clk \in [Replicas -> Nat]
    
     
 vars == << cmdLog, proposed, executed, sentMsg, crtInst, leaderOfInst, 
@@ -1441,7 +1441,7 @@ PrepareFinalize(replica, i, Q) ==
                                \/ \E pl \in preaccepts : pl.src = i[1]
                                \/ Cardinality(preaccepts) < Cardinality(Q) \div 2
                             /\ preaccepts # {}
-                            /\ LET pac == CHOOSE pac \in preaccepts : pac.cmd # [op |-> [key |-> "", type |-> ""]] IN
+                            /\ LET pac == CHOOSE pac \in preaccepts : TRUE IN
                                 /\ StartPhase1(pac.cmd, replica, Q, i, rec.ballot, replies, newClk, pac.consistency,pac.ctxid)
                                 /\ preparing' = [preparing EXCEPT ![replica] = @ \ {i}]
                                 /\ UNCHANGED << proposed, executed, crtInst, committed, ballots>>)
@@ -1822,8 +1822,8 @@ CommandLeaderAction ==
             \/ (\E Q \in SlowQuorums(cleader) : Phase1Slow(cleader, inst, Q))
             \/ (\E Q \in SlowQuorums(cleader) : Phase2Finalize(cleader, inst, Q))
             \/ (\E Q \in SlowQuorums(cleader) : FinalizeTryPreAccept(cleader, inst, Q))) 
-    (*\/ (\E replica \in Replicas: 
-            \E inst \in cmdLog[replica]: ExecuteCommand(replica, inst))*)
+    \/ (\E replica \in Replicas: 
+            \E inst \in cmdLog[replica]: ExecuteCommand(replica, inst))
     
     
   
@@ -1842,7 +1842,7 @@ ReplicaAction ==
          \/ \E i \in preparing[replica] :
             \E Q \in SlowQuorums(replica) : PrepareFinalize(replica, i, Q)
          \/ ReplyTryPreaccept(replica)
-         (*\/ \E inst \in cmdLog[replica]: ExecuteCommand(replica, inst)*)
+         \/ \E inst \in cmdLog[replica]: ExecuteCommand(replica, inst)
          )
 
 
@@ -2050,5 +2050,5 @@ Termination == <>((\A r \in Replicas:
 
 =============================================================================
 \* Modification History
-\* Last modified Fri Mar 01 18:08:26 EST 2024 by santamariashithil
+\* Last modified Fri Mar 01 20:22:07 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil

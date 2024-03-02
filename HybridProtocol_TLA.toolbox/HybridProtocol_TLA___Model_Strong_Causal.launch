@@ -12,7 +12,7 @@
     <stringAttribute key="distributedTLC" value="off"/>
     <stringAttribute key="distributedTLCVMArgs" value="-Djava.rmi.server.hostname=130.245.173.103"/>
     <intAttribute key="fpBits" value="1"/>
-    <intAttribute key="fpIndex" value="130"/>
+    <intAttribute key="fpIndex" value="70"/>
     <booleanAttribute key="fpIndexRandom" value="true"/>
     <intAttribute key="maxHeapSize" value="40"/>
     <intAttribute key="maxSetSize" value="1000000"/>
@@ -26,10 +26,10 @@
     <booleanAttribute key="modelCorrectnessCheckDeadlock" value="true"/>
     <listAttribute key="modelCorrectnessInvariants">
         <listEntry value="1TypeOK"/>
-        <listEntry value="0Nontriviality"/>
-        <listEntry value="0Consistency"/>
-        <listEntry value="0Stability"/>
-        <listEntry value="0SameSessionCausality"/>
+        <listEntry value="1Nontriviality"/>
+        <listEntry value="1Consistency"/>
+        <listEntry value="1Stability"/>
+        <listEntry value="1SameSessionCausality"/>
         <listEntry value="0GetFromCausality"/>
         <listEntry value="0GlobalOrderingOfWrite"/>
         <listEntry value="0GlobalOrderingOfRead"/>

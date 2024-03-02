@@ -187,7 +187,7 @@ TypeOK ==
                                        execution_order_list: SUBSET {Nat \X Instances},
                                        commit_order : Nat (* 0 means not committed *)
                                        ]]
-   (* /\ proposed \in SUBSET Commands
+    /\ proposed \in SUBSET Commands
     /\ executed \in [Replicas -> SUBSET (Nat \X Commands)]
     /\ sentMsg \in SUBSET Message
     /\ crtInst \in [Replicas -> Nat]
@@ -197,7 +197,7 @@ TypeOK ==
                                            Nat)]
     /\ ballots \in Nat
     /\ preparing \in [Replicas -> SUBSET Instances]
-    /\ clk \in [Replicas -> Nat]*)
+    /\ clk \in [Replicas -> Nat]
    
     
 vars == << cmdLog, proposed, executed, sentMsg, crtInst, leaderOfInst, 
@@ -1369,7 +1369,8 @@ PrepareFinalize(replica, i, Q) ==
                                   consistency |-> acc.consistency,
                                   ctxid |-> acc.ctxid,
                                   execution_order |-> 0,
-                                  execution_order_list |-> {} ]}]
+                                  execution_order_list |-> {},
+                                  commit_order |-> acc.commit_order ]}]
                          /\ preparing' = [preparing EXCEPT ![replica] = @ \ {i}]
                          /\ leaderOfInst' = [leaderOfInst EXCEPT ![replica] = @ \cup {i}]
                          /\ UNCHANGED << proposed, executed, crtInst, committed, ballots>>
@@ -1405,7 +1406,8 @@ PrepareFinalize(replica, i, Q) ==
                                           consistency |-> pac.consistency,
                                           ctxid |-> pac.ctxid,
                                           execution_order |-> 0,
-                                          execution_order_list |-> {} ]}]
+                                          execution_order_list |-> {},
+                                          commit_order |-> pac.commit_order ]}]
                                  /\ preparing' = [preparing EXCEPT ![replica] = @ \ {i}]
                                  /\ leaderOfInst' = [leaderOfInst EXCEPT ![replica] = @ \cup {i}]
                                  /\ UNCHANGED << proposed, executed, crtInst, committed, ballots >>
@@ -1439,7 +1441,7 @@ PrepareFinalize(replica, i, Q) ==
                                \/ \E pl \in preaccepts : pl.src = i[1]
                                \/ Cardinality(preaccepts) < Cardinality(Q) \div 2
                             /\ preaccepts # {}
-                            /\ LET pac == CHOOSE pac \in preaccepts : pac.cmd # [op |-> [key |-> "", type |-> ""]] IN
+                            /\ LET pac == CHOOSE pac \in preaccepts : TRUE IN
                                 /\ StartPhase1(pac.cmd, replica, Q, i, rec.ballot, replies, newClk, pac.consistency,pac.ctxid)
                                 /\ preparing' = [preparing EXCEPT ![replica] = @ \ {i}]
                                 /\ UNCHANGED << proposed, executed, crtInst, committed, ballots>>)
@@ -1820,8 +1822,8 @@ CommandLeaderAction ==
             \/ (\E Q \in SlowQuorums(cleader) : Phase1Slow(cleader, inst, Q))
             \/ (\E Q \in SlowQuorums(cleader) : Phase2Finalize(cleader, inst, Q))
             \/ (\E Q \in SlowQuorums(cleader) : FinalizeTryPreAccept(cleader, inst, Q))) 
-    (*\/ (\E replica \in Replicas: 
-            \E inst \in cmdLog[replica]: ExecuteCommand(replica, inst))*)
+    \/ (\E replica \in Replicas: 
+            \E inst \in cmdLog[replica]: ExecuteCommand(replica, inst))
     
     
   
@@ -1840,7 +1842,7 @@ ReplicaAction ==
          \/ \E i \in preparing[replica] :
             \E Q \in SlowQuorums(replica) : PrepareFinalize(replica, i, Q)
          \/ ReplyTryPreaccept(replica)
-         (*\/ \E inst \in cmdLog[replica]: ExecuteCommand(replica, inst)*)
+         \/ \E inst \in cmdLog[replica]: ExecuteCommand(replica, inst)
          )
 
 
@@ -1954,52 +1956,7 @@ GlobalOrderingOfWrite == (* checking whether the system is converging or not? *)
                                                 LET all_latest_write == LatestWriteofSpecificKey(key) IN (* retrieving latest write of a specific key across all the replicas *)
                                                 \A recs \in all_latest_write : \A otherrecs \in all_latest_write :
                                                  /\ recs.inst = otherrecs.inst (* comparing whether all latest write for a specific key , across all the replicas are same or not *)
-    
-    
-(*CheckStrongRead(rec) ==  IF rec.cmd.op.type = "r" /\ rec.consistency \in {"strong"} /\ rec.status \in {"strongly-committed", "executed"} THEN
-                            TRUE
-                         ELSE
-                            FALSE      
-                            
-CheckDependentWrite(rec, replica) == LET deps_list == rec.deps 
-                                        dep_write_instances ==  DependentWriteInstances(deps_list, replica) IN  (* retrieving the dependent causal write commnads for a specific strong read command *)
-                                        IF Cardinality(dep_write_instances) = 0 THEN TRUE
-                                        ELSE
-                                            /\ \A inst \in dep_write_instances : LET commitList == IsMajorityCommitted(inst) IN (* retrieving the replicas where the instance is committed or executed or discarded *)
-                                                /\ Cardinality(commitList) >= (Cardinality(Replicas) \div 2) + 1
-                                                
-  DependentWriteInstances(deps_list, replica) == (* finding only dependent causal write commands *) (* return {<<"a", 1>>, <<"b", 0>>} *)
-    LET 
-        RECURSIVE depWriteInstance(_,_,_)
-            depWriteInstance(dlist, r, fdlist) ==
-                IF dlist = {}
-                THEN fdlist
-                ELSE
-                    LET
-                        dep == CHOOSE x \in dlist: TRUE
-                        rec1 == {rec: rec \in cmdLog[r]}
-                        rec2 == {rec \in rec1:  rec.inst = dep /\ rec.cmd.op.type = "w" /\ rec.consistency \in {"causal"}} 
-                        inst == {rec.inst: rec \in rec2} IN
-                        depWriteInstance(dlist \ {dep}, r, fdlist \cup inst)           
-    IN
-        depWriteInstance(deps_list, replica, {})
-        
-        
-IsMajorityCommitted(inst) == (* finding in how many replicas the instance is committed *)
-    LET 
-        RECURSIVE majorityCommitted(_, _, _)
-        majorityCommitted(i, r, flist) ==
-            IF r = {}
-            THEN flist
-            ELSE
-                LET
-                    replica == CHOOSE x \in r: TRUE
-                    rec1 == {rec: rec \in cmdLog[replica]}
-                    rec2 == {rec \in rec1: rec.inst = i /\ rec.status \in {"causally-committed", "strongly-committed", "executed", "discarded"}}
-                    inst2 == {rec.inst: rec \in rec2} IN
-                    majorityCommitted(i, r \ {replica}, flist \cup inst2)
-    IN 
-        majorityCommitted(inst, Replicas, {})                                                      *)                                 
+                                 
                       
                                                                        
 GlobalOrderingOfRead == (* once a strong read, read any write (strong/weak), all later strong read must observe that write *) 
@@ -2048,5 +2005,5 @@ Termination == <>((\A r \in Replicas:
 
 =============================================================================
 \* Modification History
-\* Last modified Fri Mar 01 18:04:56 EST 2024 by santamariashithil
+\* Last modified Fri Mar 01 20:53:39 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil

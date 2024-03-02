@@ -1956,52 +1956,7 @@ GlobalOrderingOfWrite == (* checking whether the system is converging or not? *)
                                                 LET all_latest_write == LatestWriteofSpecificKey(key) IN (* retrieving latest write of a specific key across all the replicas *)
                                                 \A recs \in all_latest_write : \A otherrecs \in all_latest_write :
                                                  /\ recs.inst = otherrecs.inst (* comparing whether all latest write for a specific key , across all the replicas are same or not *)
-    
-    
-(*CheckStrongRead(rec) ==  IF rec.cmd.op.type = "r" /\ rec.consistency \in {"strong"} /\ rec.status \in {"strongly-committed", "executed"} THEN
-                            TRUE
-                         ELSE
-                            FALSE      
-                            
-CheckDependentWrite(rec, replica) == LET deps_list == rec.deps 
-                                        dep_write_instances ==  DependentWriteInstances(deps_list, replica) IN  (* retrieving the dependent causal write commnads for a specific strong read command *)
-                                        IF Cardinality(dep_write_instances) = 0 THEN TRUE
-                                        ELSE
-                                            /\ \A inst \in dep_write_instances : LET commitList == IsMajorityCommitted(inst) IN (* retrieving the replicas where the instance is committed or executed or discarded *)
-                                                /\ Cardinality(commitList) >= (Cardinality(Replicas) \div 2) + 1
-                                                
-  DependentWriteInstances(deps_list, replica) == (* finding only dependent causal write commands *) (* return {<<"a", 1>>, <<"b", 0>>} *)
-    LET 
-        RECURSIVE depWriteInstance(_,_,_)
-            depWriteInstance(dlist, r, fdlist) ==
-                IF dlist = {}
-                THEN fdlist
-                ELSE
-                    LET
-                        dep == CHOOSE x \in dlist: TRUE
-                        rec1 == {rec: rec \in cmdLog[r]}
-                        rec2 == {rec \in rec1:  rec.inst = dep /\ rec.cmd.op.type = "w" /\ rec.consistency \in {"causal"}} 
-                        inst == {rec.inst: rec \in rec2} IN
-                        depWriteInstance(dlist \ {dep}, r, fdlist \cup inst)           
-    IN
-        depWriteInstance(deps_list, replica, {})
-        
-        
-IsMajorityCommitted(inst) == (* finding in how many replicas the instance is committed *)
-    LET 
-        RECURSIVE majorityCommitted(_, _, _)
-        majorityCommitted(i, r, flist) ==
-            IF r = {}
-            THEN flist
-            ELSE
-                LET
-                    replica == CHOOSE x \in r: TRUE
-                    rec1 == {rec: rec \in cmdLog[replica]}
-                    rec2 == {rec \in rec1: rec.inst = i /\ rec.status \in {"causally-committed", "strongly-committed", "executed", "discarded"}}
-                    inst2 == {rec.inst: rec \in rec2} IN
-                    majorityCommitted(i, r \ {replica}, flist \cup inst2)
-    IN 
-        majorityCommitted(inst, Replicas, {})                                                      *)                                 
+                                 
                       
                                                                        
 GlobalOrderingOfRead == (* once a strong read, read any write (strong/weak), all later strong read must observe that write *) 
@@ -2050,5 +2005,5 @@ Termination == <>((\A r \in Replicas:
 
 =============================================================================
 \* Modification History
-\* Last modified Fri Mar 01 20:22:07 EST 2024 by santamariashithil
+\* Last modified Fri Mar 01 20:53:39 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil
