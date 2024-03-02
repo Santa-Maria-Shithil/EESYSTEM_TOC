@@ -120,7 +120,7 @@ Message ==
         ctxid: Ctx_id \cup {0}, commit_order: Nat,  clk: Nat]
         
         
-  \cup  [type: {"prepare"}, src: Replicas, dst: Replicas, inst: Instances, ballot: Nat \X Replicas]
+  \cup  [type: {"prepare"}, inst: Instances ,  ballot: Nat \X Replicas, src: Replicas, dst: Replicas]
   
   \cup  [type: {"pre-accept-reply"}, inst: Instances, ballot: Nat \X Replicas,
         deps: SUBSET Instances,  seq: Nat, consistency: Consistency_level \cup {"not-seen"}, 
@@ -187,7 +187,7 @@ TypeOK ==
                                        execution_order_list: SUBSET {Nat \X Instances},
                                        commit_order : Nat (* 0 means not committed *)
                                        ]]
-    /\ proposed \in SUBSET Commands
+   (* /\ proposed \in SUBSET Commands
     /\ executed \in [Replicas -> SUBSET (Nat \X Commands)]
     /\ sentMsg \in SUBSET Message
     /\ crtInst \in [Replicas -> Nat]
@@ -197,7 +197,7 @@ TypeOK ==
                                            Nat)]
     /\ ballots \in Nat
     /\ preparing \in [Replicas -> SUBSET Instances]
-    /\ clk \in [Replicas -> Nat]
+    /\ clk \in [Replicas -> Nat]*)
    
     
 vars == << cmdLog, proposed, executed, sentMsg, crtInst, leaderOfInst, 
@@ -1369,7 +1369,8 @@ PrepareFinalize(replica, i, Q) ==
                                   consistency |-> acc.consistency,
                                   ctxid |-> acc.ctxid,
                                   execution_order |-> 0,
-                                  execution_order_list |-> {} ]}]
+                                  execution_order_list |-> {},
+                                  commit_order |-> acc.commit_order ]}]
                          /\ preparing' = [preparing EXCEPT ![replica] = @ \ {i}]
                          /\ leaderOfInst' = [leaderOfInst EXCEPT ![replica] = @ \cup {i}]
                          /\ UNCHANGED << proposed, executed, crtInst, committed, ballots>>
@@ -1397,6 +1398,7 @@ PrepareFinalize(replica, i, Q) ==
                                 /\ cmdLog' = [cmdLog EXCEPT ![replica] = (@ \ {rec}) \cup
                                         {[inst  |-> i,
                                           status|-> "accepted",
+                                          state |-> "done",
                                           ballot|-> rec.ballot,
                                           cmd   |-> pac.cmd,
                                           deps  |-> pac.deps,
@@ -1404,7 +1406,8 @@ PrepareFinalize(replica, i, Q) ==
                                           consistency |-> pac.consistency,
                                           ctxid |-> pac.ctxid,
                                           execution_order |-> 0,
-                                          execution_order_list |-> {} ]}]
+                                          execution_order_list |-> {},
+                                          commit_order |-> pac.commit_order ]}]
                                  /\ preparing' = [preparing EXCEPT ![replica] = @ \ {i}]
                                  /\ leaderOfInst' = [leaderOfInst EXCEPT ![replica] = @ \cup {i}]
                                  /\ UNCHANGED << proposed, executed, crtInst, committed, ballots >>
@@ -1438,7 +1441,7 @@ PrepareFinalize(replica, i, Q) ==
                                \/ \E pl \in preaccepts : pl.src = i[1]
                                \/ Cardinality(preaccepts) < Cardinality(Q) \div 2
                             /\ preaccepts # {}
-                            /\ LET pac == CHOOSE pac \in preaccepts : pac.cmd # [op |-> [key |-> "", type |-> ""]] IN
+                            /\ LET pac == CHOOSE pac \in preaccepts : TRUE IN
                                 /\ StartPhase1(pac.cmd, replica, Q, i, rec.ballot, replies, newClk, pac.consistency,pac.ctxid)
                                 /\ preparing' = [preparing EXCEPT ![replica] = @ \ {i}]
                                 /\ UNCHANGED << proposed, executed, crtInst, committed, ballots>>)
@@ -1818,9 +1821,9 @@ CommandLeaderAction ==
             \/ (\E Q \in FastQuorums(cleader) : Phase1Fast(cleader, inst, Q))
             \/ (\E Q \in SlowQuorums(cleader) : Phase1Slow(cleader, inst, Q))
             \/ (\E Q \in SlowQuorums(cleader) : Phase2Finalize(cleader, inst, Q))
-           (* \/ (\E Q \in SlowQuorums(cleader) : FinalizeTryPreAccept(cleader, inst, Q))*)) 
-    (*\/ (\E replica \in Replicas: 
-            \E inst \in cmdLog[replica]: ExecuteCommand(replica, inst))*)
+            \/ (\E Q \in SlowQuorums(cleader) : FinalizeTryPreAccept(cleader, inst, Q))) 
+    \/ (\E replica \in Replicas: 
+            \E inst \in cmdLog[replica]: ExecuteCommand(replica, inst))
     
     
   
@@ -1835,11 +1838,11 @@ ReplicaAction ==
          \/ \E i \in Instances : 
             /\ crtInst[i[1]] > i[2] 
             /\ \E Q \in SlowQuorums(replica) : SendPrepare(replica, i, Q)
-         (*\/ ReplyPrepare(replica)
+         \/ ReplyPrepare(replica)
          \/ \E i \in preparing[replica] :
             \E Q \in SlowQuorums(replica) : PrepareFinalize(replica, i, Q)
          \/ ReplyTryPreaccept(replica)
-         \/ \E inst \in cmdLog[replica]: ExecuteCommand(replica, inst)*)
+         \/ \E inst \in cmdLog[replica]: ExecuteCommand(replica, inst)
          )
 
 
@@ -1851,10 +1854,10 @@ Next ==
     \/ CommandLeaderAction
     \/ ReplicaAction
     \/ (* Disjunct to prevent deadlock on termination *)
-      (*((\A r \in Replicas:
-            \A inst \in cmdLog[r]: inst.status = "causally-committed" \/ inst.status = "strongly-committed") /\ UNCHANGED vars)*)
       ((\A r \in Replicas:
-            \A inst \in cmdLog[r]: inst.status = "executed" \/ inst.status = "discarded") /\ UNCHANGED vars)
+            \A inst \in cmdLog[r]: inst.status = "causally-committed" \/ inst.status = "strongly-committed") /\ UNCHANGED vars)
+      (*((\A r \in Replicas:
+            \A inst \in cmdLog[r]: inst.status = "executed" \/ inst.status = "discarded") /\ UNCHANGED vars)*)
 
 
 (***************************************************************************)
@@ -2038,14 +2041,14 @@ posed only after γ is committed by any replica), then every replica will execut
 (* Termination Property                                                    *)
 (***************************************************************************)
 
-(*Termination == <>((\A r \in Replicas:
-            \A inst \in cmdLog[r]: inst.status = "causally-committed" \/ inst.status = "strongly-committed"))*)
 Termination == <>((\A r \in Replicas:
-            \A inst \in cmdLog[r]: inst.status = "executed" \/ inst.status = "discarded"))
+            \A inst \in cmdLog[r]: inst.status = "causally-committed" \/ inst.status = "strongly-committed"))
+(*Termination == <>((\A r \in Replicas:
+            \A inst \in cmdLog[r]: inst.status = "executed" \/ inst.status = "discarded"))*)
                                        
     
 
 =============================================================================
 \* Modification History
-\* Last modified Fri Mar 01 17:16:12 EST 2024 by santamariashithil
+\* Last modified Fri Mar 01 19:43:07 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil
