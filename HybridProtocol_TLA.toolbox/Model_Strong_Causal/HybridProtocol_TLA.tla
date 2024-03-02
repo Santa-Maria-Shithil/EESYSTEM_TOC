@@ -187,9 +187,9 @@ TypeOK ==
                                        execution_order_list: SUBSET {Nat \X Instances},
                                        commit_order : Nat (* 0 means not committed *)
                                        ]]
-   (* /\ proposed \in SUBSET Commands
+    /\ proposed \in SUBSET Commands
     /\ executed \in [Replicas -> SUBSET (Nat \X Commands)]
-    /\ sentMsg \in SUBSET Message
+    (*/\ sentMsg \in SUBSET Message
     /\ crtInst \in [Replicas -> Nat]
     /\ leaderOfInst \in [Replicas -> SUBSET Instances]
     /\ committed \in [Instances -> SUBSET ((Commands \cup {[op |-> [key |-> "", type |-> ""]]}) \X
@@ -2050,5 +2050,5 @@ Termination == <>((\A r \in Replicas:
 
 =============================================================================
 \* Modification History
-\* Last modified Fri Mar 01 19:43:07 EST 2024 by santamariashithil
+\* Last modified Fri Mar 01 20:01:15 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil
