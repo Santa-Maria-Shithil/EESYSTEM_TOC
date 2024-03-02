@@ -12,7 +12,7 @@
     <stringAttribute key="distributedTLC" value="off"/>
     <stringAttribute key="distributedTLCVMArgs" value="-Djava.rmi.server.hostname=130.245.173.103"/>
     <intAttribute key="fpBits" value="1"/>
-    <intAttribute key="fpIndex" value="96"/>
+    <intAttribute key="fpIndex" value="130"/>
     <booleanAttribute key="fpIndexRandom" value="true"/>
     <intAttribute key="maxHeapSize" value="40"/>
     <intAttribute key="maxSetSize" value="1000000"/>
@@ -23,7 +23,7 @@
     <intAttribute key="modelBehaviorSpecType" value="1"/>
     <stringAttribute key="modelBehaviorVars" value="sentMsg, executed, crtInst, clk, ballots, cmdLog, leaderOfInst, committed, proposed, preparing"/>
     <stringAttribute key="modelComments" value=""/>
-    <booleanAttribute key="modelCorrectnessCheckDeadlock" value="false"/>
+    <booleanAttribute key="modelCorrectnessCheckDeadlock" value="true"/>
     <listAttribute key="modelCorrectnessInvariants">
         <listEntry value="1TypeOK"/>
         <listEntry value="0Nontriviality"/>
@@ -36,7 +36,7 @@
         <listEntry value="0RealTimeOrderingOfStrong"/>
     </listAttribute>
     <listAttribute key="modelCorrectnessProperties">
-        <listEntry value="1Termination"/>
+        <listEntry value="0Termination"/>
     </listAttribute>
     <intAttribute key="modelEditorOpenTabs" value="12"/>
     <stringAttribute key="modelExpressionEval" value=""/>

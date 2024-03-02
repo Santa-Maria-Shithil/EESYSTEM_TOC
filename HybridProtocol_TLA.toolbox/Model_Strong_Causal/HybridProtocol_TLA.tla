@@ -189,7 +189,7 @@ TypeOK ==
                                        ]]
     /\ proposed \in SUBSET Commands
     /\ executed \in [Replicas -> SUBSET (Nat \X Commands)]
-    (*/\ sentMsg \in SUBSET Message
+    /\ sentMsg \in SUBSET Message
     /\ crtInst \in [Replicas -> Nat]
     /\ leaderOfInst \in [Replicas -> SUBSET Instances]
     /\ committed \in [Instances -> SUBSET ((Commands \cup {[op |-> [key |-> "", type |-> ""]]}) \X
@@ -197,7 +197,7 @@ TypeOK ==
                                            Nat)]
     /\ ballots \in Nat
     /\ preparing \in [Replicas -> SUBSET Instances]
-    /\ clk \in [Replicas -> Nat]*)
+    /\ clk \in [Replicas -> Nat]
    
     
 vars == << cmdLog, proposed, executed, sentMsg, crtInst, leaderOfInst, 
@@ -2050,5 +2050,5 @@ Termination == <>((\A r \in Replicas:
 
 =============================================================================
 \* Modification History
-\* Last modified Fri Mar 01 20:01:15 EST 2024 by santamariashithil
+\* Last modified Fri Mar 01 20:22:07 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil
