@@ -2015,8 +2015,8 @@ posed only after γ is committed by any replica), then every replica will execut
 (* Termination Property                                                    *)
 (***************************************************************************)
 
-Termination == <>((\A r \in Replicas:
-            \A inst \in cmdLog[r]: inst.status = "causally-committed" \/ inst.status = "strongly-committed"))
+(*Termination == <>((\A r \in Replicas:
+            \A inst \in cmdLog[r]: inst.status = "causally-committed" \/ inst.status = "strongly-committed"))*)
 Termination == <>((\A r \in Replicas:
             \A inst \in cmdLog[r]: inst.status = "executed" \/ inst.status = "discarded"))
                                        
@@ -2024,5 +2024,5 @@ Termination == <>((\A r \in Replicas:
 
 =============================================================================
 \* Modification History
-\* Last modified Mon Mar 04 14:39:47 EST 2024 by santamariashithil
+\* Last modified Mon Mar 04 15:01:18 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil
