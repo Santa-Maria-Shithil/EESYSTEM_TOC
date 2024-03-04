@@ -1853,9 +1853,9 @@ ReplicaAction ==
 Next == 
     \/ CommandLeaderAction
     \/ ReplicaAction
-    (*\/ (* Disjunct to prevent deadlock on termination *)
+    \/ (* Disjunct to prevent deadlock on termination *)
      ((\A r \in Replicas:
-            \A inst \in cmdLog[r]: inst.status = "causally-committed" \/ inst.status = "strongly-committed") /\ UNCHANGED vars)*)
+            \A inst \in cmdLog[r]: inst.status = "causally-committed" \/ inst.status = "strongly-committed") /\ UNCHANGED vars)
       (*\A r \in Replicas:
             \A inst \in cmdLog[r]: inst.status = "executed" \/ inst.status = "discarded") /\ UNCHANGED vars)*)
 
@@ -2005,5 +2005,5 @@ Termination == <>((\A r \in Replicas:
 
 =============================================================================
 \* Modification History
-\* Last modified Mon Mar 04 18:39:15 EST 2024 by santamariashithil
+\* Last modified Mon Mar 04 18:40:44 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil
