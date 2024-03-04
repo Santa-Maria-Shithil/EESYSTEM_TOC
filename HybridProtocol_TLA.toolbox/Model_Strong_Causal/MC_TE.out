@@ -2,7 +2,7 @@
 TLC2 Version 2.16 of 31 December 2020 (rev: cdddf55)
 @!@!@ENDMSG 2262 @!@!@
 @!@!@STARTMSG 2187:0 @!@!@
-Running breadth-first search Model-Checking with fp 67 and seed -8696522254406268230 with 6 workers on 8 cores with 1943MB heap and 4368MB offheap memory [pid: 2551] (Mac OS X 10.16 x86_64, AdoptOpenJDK 14.0.1 x86_64, OffHeapDiskFPSet, DiskStateQueue).
+Running breadth-first search Model-Checking with fp 30 and seed 1719055585995647270 with 6 workers on 8 cores with 1943MB heap and 4368MB offheap memory [pid: 2859] (Mac OS X 10.16 x86_64, AdoptOpenJDK 14.0.1 x86_64, OffHeapDiskFPSet, DiskStateQueue).
 @!@!@ENDMSG 2187 @!@!@
 @!@!@STARTMSG 2220:0 @!@!@
 Starting SANY...
@@ -23,35 +23,36 @@ Semantic processing of module MC
 SANY finished.
 @!@!@ENDMSG 2219 @!@!@
 @!@!@STARTMSG 2185:0 @!@!@
-Starting... (2024-03-04 16:03:54)
+Starting... (2024-03-04 16:44:25)
 @!@!@ENDMSG 2185 @!@!@
 @!@!@STARTMSG 2189:0 @!@!@
 Computing initial states...
 @!@!@ENDMSG 2189 @!@!@
 @!@!@STARTMSG 2190:0 @!@!@
-Finished computing initial states: 1 distinct state generated at 2024-03-04 16:03:56.
+Finished computing initial states: 1 distinct state generated at 2024-03-04 16:44:26.
 @!@!@ENDMSG 2190 @!@!@
 @!@!@STARTMSG 2200:0 @!@!@
-Progress(7) at 2024-03-04 16:03:59: 43,722 states generated (43,722 s/min), 29,635 distinct states found (29,635 ds/min), 26,460 states left on queue.
+Progress(9) at 2024-03-04 16:44:29: 18,628 states generated (18,628 s/min), 12,489 distinct states found (12,489 ds/min), 6,159 states left on queue.
 @!@!@ENDMSG 2200 @!@!@
+@!@!@STARTMSG 2193:0 @!@!@
+Model checking completed. No error has been found.
+  Estimates of the probability that TLC did not check all reachable states
+  because two distinct states had the same fingerprint:
+  calculated (optimistic):  val = 8.5E-10
+  based on the actual fingerprints:  val = 3.9E-10
+@!@!@ENDMSG 2193 @!@!@
 @!@!@STARTMSG 2200:0 @!@!@
-Progress(9) at 2024-03-04 16:04:59: 4,931,684 states generated (4,887,962 s/min), 2,429,452 distinct states found (2,399,817 ds/min), 1,916,256 states left on queue.
+Progress(15) at 2024-03-04 16:44:36: 250,202 states generated (1,165,718 s/min), 121,069 distinct states found (564,073 ds/min), 0 states left on queue.
 @!@!@ENDMSG 2200 @!@!@
-@!@!@STARTMSG 2200:0 @!@!@
-Progress(10) at 2024-03-04 16:05:59: 9,740,902 states generated (4,809,218 s/min), 4,635,838 distinct states found (2,206,386 ds/min), 3,547,960 states left on queue.
-@!@!@ENDMSG 2200 @!@!@
-@!@!@STARTMSG 2200:0 @!@!@
-Progress(10) at 2024-03-04 16:06:59: 14,380,742 states generated (4,639,840 s/min), 6,735,058 distinct states found (2,099,220 ds/min), 5,044,151 states left on queue.
-@!@!@ENDMSG 2200 @!@!@
-@!@!@STARTMSG 2200:0 @!@!@
-Progress(10) at 2024-03-04 16:07:59: 18,869,912 states generated (4,489,170 s/min), 8,780,582 distinct states found (2,045,524 ds/min), 6,505,673 states left on queue.
-@!@!@ENDMSG 2200 @!@!@
-@!@!@STARTMSG 2200:0 @!@!@
-Progress(10) at 2024-03-04 16:08:59: 23,493,049 states generated (4,623,137 s/min), 10,803,231 distinct states found (2,022,649 ds/min), 7,920,010 states left on queue.
-@!@!@ENDMSG 2200 @!@!@
-@!@!@STARTMSG 2200:0 @!@!@
-Progress(10) at 2024-03-04 16:09:59: 28,114,760 states generated (4,621,711 s/min), 12,891,105 distinct states found (2,087,874 ds/min), 9,422,447 states left on queue.
-@!@!@ENDMSG 2200 @!@!@
-@!@!@STARTMSG 2200:0 @!@!@
-Progress(11) at 2024-03-04 16:10:59: 32,423,582 states generated (4,308,822 s/min), 14,774,469 distinct states found (1,883,364 ds/min), 10,689,585 states left on queue.
-@!@!@ENDMSG 2200 @!@!@
+@!@!@STARTMSG 2199:0 @!@!@
+250202 states generated, 121069 distinct states found, 0 states left on queue.
+@!@!@ENDMSG 2199 @!@!@
+@!@!@STARTMSG 2194:0 @!@!@
+The depth of the complete state graph search is 15.
+@!@!@ENDMSG 2194 @!@!@
+@!@!@STARTMSG 2268:0 @!@!@
+The average outdegree of the complete state graph is 1 (minimum is 0, the maximum 18 and the 95th percentile is 3).
+@!@!@ENDMSG 2268 @!@!@
+@!@!@STARTMSG 2186:0 @!@!@
+Finished in 12894ms at (2024-03-04 16:44:36)
+@!@!@ENDMSG 2186 @!@!@
