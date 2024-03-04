@@ -2,7 +2,7 @@
 <launchConfiguration type="org.lamport.tla.toolbox.tool.tlc.modelCheck">
     <stringAttribute key="TLCCmdLineParameters" value=""/>
     <intAttribute key="collectCoverage" value="0"/>
-    <stringAttribute key="configurationName" value="Model_Strong_Causal_SnapShot_1709582286871"/>
+    <stringAttribute key="configurationName" value="Model_Strong_Causal_SnapShot_1709586226322"/>
     <booleanAttribute key="deferLiveness" value="false"/>
     <intAttribute key="dfidDepth" value="100"/>
     <booleanAttribute key="dfidMode" value="false"/>
@@ -12,7 +12,7 @@
     <stringAttribute key="distributedTLC" value="off"/>
     <stringAttribute key="distributedTLCVMArgs" value="-Djava.rmi.server.hostname=130.245.173.103"/>
     <intAttribute key="fpBits" value="1"/>
-    <intAttribute key="fpIndex" value="111"/>
+    <intAttribute key="fpIndex" value="93"/>
     <booleanAttribute key="fpIndexRandom" value="true"/>
     <intAttribute key="maxHeapSize" value="40"/>
     <intAttribute key="maxSetSize" value="1000000"/>
@@ -23,7 +23,7 @@
     <intAttribute key="modelBehaviorSpecType" value="1"/>
     <stringAttribute key="modelBehaviorVars" value="sentMsg, executed, crtInst, clk, ballots, cmdLog, leaderOfInst, committed, proposed, preparing"/>
     <stringAttribute key="modelComments" value=""/>
-    <booleanAttribute key="modelCorrectnessCheckDeadlock" value="true"/>
+    <booleanAttribute key="modelCorrectnessCheckDeadlock" value="false"/>
     <listAttribute key="modelCorrectnessInvariants">
         <listEntry value="1TypeOK"/>
         <listEntry value="1Nontriviality"/>
