@@ -1841,8 +1841,8 @@ CommandLeaderAction ==
             \/ (\E Q \in SlowQuorums(cleader) : Phase1Slow(cleader, inst, Q))
             \/ (\E Q \in SlowQuorums(cleader) : Phase2Finalize(cleader, inst, Q))
             \/ (\E Q \in SlowQuorums(cleader) : FinalizeTryPreAccept(cleader, inst, Q))) 
-   (* \/ (\E replica \in Replicas: 
-            \E inst \in cmdLog[replica]: ((inst.status \in {"causally-committed","strongly-committed"}) /\ ExecuteCommand(replica, inst)))*)
+    \/ (\E replica \in Replicas: 
+            \E inst \in cmdLog[replica]: ((inst.status \in {"causally-committed","strongly-committed"}) /\ ExecuteCommand(replica, inst)))
     
     
   
@@ -1861,7 +1861,7 @@ ReplicaAction ==
          \/ \E i \in preparing[replica] :
             \E Q \in SlowQuorums(replica) : PrepareFinalize(replica, i, Q)
          \/ ReplyTryPreaccept(replica)
-         (*\/ \E inst \in cmdLog[replica]: ((inst.status \in {"causally-committed","strongly-committed"}) /\ ExecuteCommand(replica, inst))*)
+         \/ \E inst \in cmdLog[replica]: ((inst.status \in {"causally-committed","strongly-committed"}) /\ ExecuteCommand(replica, inst))
          )
 
 
@@ -1872,11 +1872,11 @@ ReplicaAction ==
 Next == 
     \/ CommandLeaderAction
     \/ ReplicaAction
-    (*\/ (* Disjunct to prevent deadlock on termination *)
-     (\A r \in Replicas:
-            \A inst \in cmdLog[r]: inst.status = "causally-committed" \/ inst.status = "strongly-committed") /\ UNCHANGED vars)
+    \/ (* Disjunct to prevent deadlock on termination *)
+     (*((\A r \in Replicas:
+            \A inst \in cmdLog[r]: inst.status = "causally-committed" \/ inst.status = "strongly-committed") /\ UNCHANGED vars)*)
       ((\A r \in Replicas:
-            \A inst \in cmdLog[r]: inst.status = "executed" \/ inst.status = "discarded") /\ UNCHANGED vars)*)
+            \A inst \in cmdLog[r]: inst.status = "executed" \/ inst.status = "discarded") /\ UNCHANGED vars)
 
 
 (***************************************************************************)
@@ -2024,5 +2024,5 @@ Termination == <>((\A r \in Replicas:
 
 =============================================================================
 \* Modification History
-\* Last modified Mon Mar 04 15:46:27 EST 2024 by santamariashithil
+\* Last modified Mon Mar 04 15:01:18 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil
