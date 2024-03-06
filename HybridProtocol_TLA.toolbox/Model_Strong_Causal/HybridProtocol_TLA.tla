@@ -1877,7 +1877,7 @@ Next ==
     \/ ReplicaAction
     \/ (* Disjunct to prevent deadlock on termination *)
      ((\A r \in Replicas:
-            \A inst \in cmdLog[r]: inst.status = "executed" \/ inst.status = "discarded") /\ UNCHANGED vars)
+            \A inst \in cmdLog[r]: inst.status = "causally-committed" \/ inst.status = "strongly-committed") /\ UNCHANGED vars)
       (*\A r \in Replicas:
             \A inst \in cmdLog[r]: inst.status = "executed" \/ inst.status = "discarded") /\ UNCHANGED vars)*)
 
@@ -2004,7 +2004,7 @@ posed only after γ is committed by any replica), then every replica will execut
 (***************************************************************************)
 
 Termination == <>((\A r \in Replicas:
-            \A inst \in cmdLog[r]: inst.status = "executed" \/ inst.status = "discarded"))
+            \A inst \in cmdLog[r]: inst.status = "causally-committed" \/ inst.status = "strongly-committed"))
 (*Termination == <>((\A r \in Replicas:
             \A inst \in cmdLog[r]: inst.status = "executed" \/ inst.status = "discarded"))*)
                                        
@@ -2012,5 +2012,5 @@ Termination == <>((\A r \in Replicas:
 
 =============================================================================
 \* Modification History
-\* Last modified Tue Mar 05 21:05:27 EST 2024 by santamariashithil
+\* Last modified Tue Mar 05 21:07:40 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil
