@@ -1830,25 +1830,26 @@ OrderingInstancesSecondLevel(scc) ==
  
   
 ExecuteCommand(replica, i) == 
-     \E rec \in cmdLog[replica]:
-        /\ rec.inst = i
-        /\ rec.status = "causally-committed" \/ rec.status = "strongly-committed"
-        /\ LET scc_set == FinalSCC(replica,i) (*finding all scc *) IN 
-            /\ cmdLog' = [cmdLog EXCEPT ![replica] = (@ \ i) \cup
-                            {[inst   |-> rec.inst,
-                              status |-> "executed",
-                              state  |-> rec.state,
-                              ballot |-> rec.ballot,
-                              cmd    |-> rec.cmd,
-                              deps   |-> rec.deps,
-                              seq    |-> rec.seq,
-                              consistency |-> rec.consistency,
-                              ctxid |-> rec.ctxid,
-                              execution_order |-> 1,
-                              execution_order_list |-> 0,
-                              commit_order |-> rec.commit_order]}]
-            /\UNCHANGED <<proposed, executed, sentMsg, crtInst, leaderOfInst,
-                    committed, ballots, preparing, clk>>        
+        LET  rec == {r \in cmdLog[replica] : r.inst = i /\ r.status \in {"causally-committed","strongly-committed"}} IN 
+            IF Cardinality(rec) = 0 THEN 
+                /\UNCHANGED <<cmdLog, proposed, executed, sentMsg, crtInst, leaderOfInst,
+                        committed, ballots, preparing, clk>>
+            ELSE  
+                /\ cmdLog' = [cmdLog EXCEPT ![replica] = (@ \ i) \cup
+                                {[inst   |-> rec.inst,
+                                  status |-> "executed",
+                                  state  |-> rec.state,
+                                  ballot |-> rec.ballot,
+                                  cmd    |-> rec.cmd,
+                                  deps   |-> rec.deps,
+                                  seq    |-> rec.seq,
+                                  consistency |-> rec.consistency,
+                                  ctxid |-> rec.ctxid,
+                                  execution_order |-> 1,
+                                  execution_order_list |-> 0,
+                                  commit_order |-> rec.commit_order]}]
+                /\UNCHANGED <<proposed, executed, sentMsg, crtInst, leaderOfInst,
+                        committed, ballots, preparing, clk>>        
 
 (***************************************************************************)
 (* Action groups                                                           *)
@@ -2032,5 +2033,5 @@ Termination == <>((\A r \in Replicas:
 
 =============================================================================
 \* Modification History
-\* Last modified Tue Mar 05 21:13:07 EST 2024 by santamariashithil
+\* Last modified Tue Mar 05 21:30:51 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil
