@@ -1913,7 +1913,23 @@ Stability == (* For any replica, the set of committed commands at any time is a 
                         /\ rec2.inst = i
                         /\ rec2.cmd = C
                         /\ rec2.status \in {"causally-committed", "strongly-committed", "executed", "discarded"}))
-       
+
+
+(*ExecutionConsistency ==  \A replica1 \in Replicas:(* All the operations should be executed in the same order in all the replicas *) (* As checking against all replicas and all instacnes, will take a longer time to execute. Can be optimized a bit to execute faster *)
+                            \A rec1 \in cmdLog[replica1]:
+                                /\ rec1.status \in {"causally-committed", "strongly-committed", "executed", "discarded"}
+                                /\ LET scc_set1 == FinalSCC(replica1,rec1.inst) IN (* picked a specific inntance for a specific replica and calculated and ordered it's scc *)
+                                    /\ \A scc1 \in scc_set1: 
+                                        /\LET ordered_scc1 == OrderingInstancesFirstLevel(scc1) IN
+                                            /\ \A replica2 \in (Replicas \ replica1): 
+                                                /\ \A rec2 \in cmdLog[replica2]: 
+                                                    /\ rec2.inst = rec1.inst
+                                                    /\ rec2.status \in  {"causally-committed", "strongly-committed", "executed", "discarded"}
+                                                    /\ LET scc_set2 == FinalSCC(replica2,rec2.inst) IN (* picked the same instance as rec1.inst for all other replicas. Calculated and ordered the scc. *)
+                                                        /\ \E scc2 \in scc_set2:
+                                                            /\ LET ordered_scc2 == OrderingInstancesFirstLevel(scc1) IN
+                                                                /\ ordered_scc1 = ordered_scc2 (*finally checking whether the scc order for a specific instance over all the replicas are same or not *)
+ *)       
 
 SameSessionCausality ==  (* whether the same session causal order is maintaining or not *)
                 \A replica1 \in Replicas: 
@@ -1988,10 +2004,9 @@ RealTimeOrderingOfStrong  == (* If two interfering strong commands γ and δ are
 posed only after γ is committed by any replica), then every replica will execute γ before δ.*) (* this holds only for strong commands *)
     \A replica \in Replicas:
         \A rec1, rec2 \in cmdLog[replica]:
-            IF rec1.consistency \in {"strong"} /\ rec2.consistency \in {"strong"} THEN 
-                /\ rec1.commit_order >= rec2.commit_order => rec1.execution_order >= rec2.execution_order
-            ELSE
-                TRUE
+            (/\ rec1.consistency \in {"strong"}
+            /\ rec2.consistency \in {"strong"}) =>
+                (/\ rec1.commit_order > rec2.commit_order => rec1.execution_order > rec2.execution_order)
     
 
 (***************************************************************************)
@@ -2012,5 +2027,5 @@ Termination == <>((\A r \in Replicas:
 
 =============================================================================
 \* Modification History
-\* Last modified Tue Mar 05 20:56:15 EST 2024 by santamariashithil
+\* Last modified Tue Mar 05 20:51:32 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil

@@ -391,7 +391,7 @@ MaxCommitOrder ==  (* finding the max commit order among all the replicas *)
         depWriteInstance(deps_list, replica, {})
         
         
-(*IsMajorityCommitted(inst) == (* finding in how many replicas the instance is committed *)
+IsMajorityCommitted(inst) == (* finding in how many replicas the instance is committed *)
     LET 
         RECURSIVE majorityCommitted(_, _, _)
         majorityCommitted(i, r, flist) ==
@@ -405,27 +405,7 @@ MaxCommitOrder ==  (* finding the max commit order among all the replicas *)
                     inst2 == {rec.inst: rec \in rec2} IN
                     majorityCommitted(i, r \ {replica}, flist \cup inst2)
     IN 
-        majorityCommitted(inst, Replicas, {})*)
-        
-        
-IsMajorityCommitted(inst) ==
-    LET 
-        RECURSIVE majorityCommitted(_, _, _,_)
-        majorityCommitted(i, r, flist, count) ==
-            IF r = {}
-            THEN count
-            ELSE
-                LET
-                    replica == CHOOSE x \in r: TRUE
-                    rec1 == {rec: rec \in cmdLog[replica]}
-                    rec2 == {rec \in rec1: rec.inst = i /\ rec.status \in {"causally-committed", "strongly-committed", "executed", "discarded"}}
-                    inst2 == {rec.inst: rec \in rec2} IN
-                    IF Cardinality(inst2) # 0 THEN 
-                    majorityCommitted(i, r \ {replica}, flist \cup inst2, count+1)
-                    ELSE 
-                    majorityCommitted(i, r \ {replica}, flist \cup inst2, count)
-    IN 
-        majorityCommitted(inst, Replicas, {}, 0)
+        majorityCommitted(inst, Replicas, {})
         
         
 CheckStrongRead(rec) ==  IF rec.cmd.op.type = "r" /\ rec.consistency \in {"strong"} /\ rec.status \in {"strongly-committed", "executed"} THEN
@@ -437,9 +417,9 @@ CheckDependentWrite(rec, replica) == LET deps_list == rec.deps
                                         dep_write_instances ==  DependentWriteInstances(deps_list, replica) IN  (* retrieving the dependent causal write commnads for a specific strong read command *)
                                         IF Cardinality(dep_write_instances) = 0 THEN TRUE
                                         ELSE 
-                                            /\ \A inst \in dep_write_instances : LET noOfCommit == IsMajorityCommitted(inst) IN (* retrieving the replicas where the instance is committed or executed or discarded *)
-                                                /\ noOfCommit >= ((Cardinality(Replicas) \div 2) + 1)
-                                                
+                                            /\ \A inst \in dep_write_instances : LET commitList == IsMajorityCommitted(inst) IN (* retrieving the replicas where the instance is committed or executed or discarded *)
+                                                (*/\ Cardinality(commitList) >= ((Cardinality(Replicas) \div 2) + 1)*)
+                                                /\ Cardinality(commitList) >= 1
                             
 (***************************************************************************)
 (* Actions                                                                 *)
@@ -1843,7 +1823,7 @@ CommandLeaderAction ==
             \/ (\E Q \in FastQuorums(cleader) : Phase1Fast(cleader, inst, Q))
             \/ (\E Q \in SlowQuorums(cleader) : Phase1Slow(cleader, inst, Q))
             \/ (\E Q \in SlowQuorums(cleader) : Phase2Finalize(cleader, inst, Q))
-            (*\/ (\E Q \in SlowQuorums(cleader) : FinalizeTryPreAccept(cleader, inst, Q))*))
+            \/ (\E Q \in SlowQuorums(cleader) : FinalizeTryPreAccept(cleader, inst, Q))) 
     \/ (\E replica \in Replicas: 
             \E inst \in cmdLog[replica]: ExecuteCommand(replica, inst))
     
@@ -1857,13 +1837,13 @@ ReplicaAction ==
         (\/ Phase1Reply(replica)
          \/ \E cmsg \in sentMsg : (cmsg.type = "commit" /\ Commit(replica, cmsg))
          \/ Phase2Reply(replica)
-         (*\/ \E i \in Instances : 
+         \/ \E i \in Instances : 
             /\ crtInst[i[1]] > i[2] 
             /\ \E Q \in SlowQuorums(replica) : SendPrepare(replica, i, Q)
          \/ ReplyPrepare(replica)
          \/ \E i \in preparing[replica] :
             \E Q \in SlowQuorums(replica) : PrepareFinalize(replica, i, Q)
-         \/ ReplyTryPreaccept(replica)*)
+         \/ ReplyTryPreaccept(replica)
          \/ \E inst \in cmdLog[replica]: ExecuteCommand(replica, inst)
          )
 
@@ -1913,7 +1893,23 @@ Stability == (* For any replica, the set of committed commands at any time is a 
                         /\ rec2.inst = i
                         /\ rec2.cmd = C
                         /\ rec2.status \in {"causally-committed", "strongly-committed", "executed", "discarded"}))
-       
+
+
+(*ExecutionConsistency ==  \A replica1 \in Replicas:(* All the operations should be executed in the same order in all the replicas *) (* As checking against all replicas and all instacnes, will take a longer time to execute. Can be optimized a bit to execute faster *)
+                            \A rec1 \in cmdLog[replica1]:
+                                /\ rec1.status \in {"causally-committed", "strongly-committed", "executed", "discarded"}
+                                /\ LET scc_set1 == FinalSCC(replica1,rec1.inst) IN (* picked a specific inntance for a specific replica and calculated and ordered it's scc *)
+                                    /\ \A scc1 \in scc_set1: 
+                                        /\LET ordered_scc1 == OrderingInstancesFirstLevel(scc1) IN
+                                            /\ \A replica2 \in (Replicas \ replica1): 
+                                                /\ \A rec2 \in cmdLog[replica2]: 
+                                                    /\ rec2.inst = rec1.inst
+                                                    /\ rec2.status \in  {"causally-committed", "strongly-committed", "executed", "discarded"}
+                                                    /\ LET scc_set2 == FinalSCC(replica2,rec2.inst) IN (* picked the same instance as rec1.inst for all other replicas. Calculated and ordered the scc. *)
+                                                        /\ \E scc2 \in scc_set2:
+                                                            /\ LET ordered_scc2 == OrderingInstancesFirstLevel(scc1) IN
+                                                                /\ ordered_scc1 = ordered_scc2 (*finally checking whether the scc order for a specific instance over all the replicas are same or not *)
+ *)       
 
 SameSessionCausality ==  (* whether the same session causal order is maintaining or not *)
                 \A replica1 \in Replicas: 
@@ -1988,10 +1984,9 @@ RealTimeOrderingOfStrong  == (* If two interfering strong commands γ and δ are
 posed only after γ is committed by any replica), then every replica will execute γ before δ.*) (* this holds only for strong commands *)
     \A replica \in Replicas:
         \A rec1, rec2 \in cmdLog[replica]:
-            IF rec1.consistency \in {"strong"} /\ rec2.consistency \in {"strong"} THEN 
-                /\ rec1.commit_order >= rec2.commit_order => rec1.execution_order >= rec2.execution_order
-            ELSE
-                TRUE
+            (/\ rec1.consistency \in {"strong"}
+            /\ rec2.consistency \in {"strong"}) =>
+                (/\ rec1.commit_order > rec2.commit_order => rec1.execution_order > rec2.execution_order)
     
 
 (***************************************************************************)
@@ -2012,5 +2007,5 @@ Termination == <>((\A r \in Replicas:
 
 =============================================================================
 \* Modification History
-\* Last modified Tue Mar 05 20:56:15 EST 2024 by santamariashithil
+\* Last modified Tue Mar 05 20:08:48 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil
