@@ -1835,21 +1835,66 @@ ExecuteCommand(replica, i) ==
                 /\UNCHANGED <<cmdLog, proposed, executed, sentMsg, crtInst, leaderOfInst,
                         committed, ballots, preparing, clk>>
             ELSE  
-                /\ cmdLog' = [cmdLog EXCEPT ![replica] = (@ \ i) \cup
-                                {[inst   |-> rec.inst,
-                                  status |-> "executed",
-                                  state  |-> rec.state,
-                                  ballot |-> rec.ballot,
-                                  cmd    |-> rec.cmd,
-                                  deps   |-> rec.deps,
-                                  seq    |-> rec.seq,
-                                  consistency |-> rec.consistency,
-                                  ctxid |-> rec.ctxid,
-                                  execution_order |-> 1,
-                                  execution_order_list |-> 0,
-                                  commit_order |-> rec.commit_order]}]
-                /\UNCHANGED <<proposed, executed, sentMsg, crtInst, leaderOfInst,
-                        committed, ballots, preparing, clk>>        
+            /\ LET scc_set == FinalSCC(replica,i) (*finding all scc *)IN
+                /\ \A scc \in scc_set: LET firstlevelordering ==  OrderingInstancesFirstLevel(scc) IN (*ordering based on seq number *)
+                 \A instant \in OrderingInstancesSecondLevel(firstlevelordering): (*ordering based on instance number to gurantee the session causality *)
+                    \E rec2 \in cmdLog[instant[2][1]]:
+                        /\rec2.inst=instant[2][2]
+                        /\ LET max_execution_order_inst == FindMaxExecutionOrder(replica)
+                              max_execution_order == max_execution_order_inst.execution_order (* Finding max execution order from the cmdLog *) IN
+                                /\ IF rec2.cmd.op.type = "r" THEN  (*checking whether the operation is read or write*)
+                                    /\cmdLog' = [cmdLog EXCEPT ![instant[2][1]] = (@ \ instant[2][2]) \cup
+                                                    {[inst   |-> rec2.inst,
+                                                      status |-> "executed",
+                                                      state  |-> rec2.state,
+                                                      ballot |-> rec2.ballot,
+                                                      cmd    |-> rec2.cmd,
+                                                      deps   |-> rec2.deps,
+                                                      seq    |-> rec2.seq,
+                                                      consistency |-> rec2.consistency,
+                                                      ctxid |-> rec2.ctxid,
+                                                      execution_order |-> (max_execution_order+1),
+                                                      execution_order_list |-> instant,
+                                                      commit_order |-> rec2.commit_order]}]
+                                    /\UNCHANGED <<proposed, executed, sentMsg, crtInst, leaderOfInst,
+                                            committed, ballots, preparing, clk>>
+                                   
+                                   ELSE 
+                                    LET 
+                                        recs == {rec3 \in cmdLog[replica]: rec3.state = "executed" /\ rec3.cmd.op.key = rec2.cmd.op.key /\ rec3.cmd.op.type = rec2.cmd.op.key} (* finding the instance that has the same key as the instance that we are going to execute *)
+                                        seq == {rec4.seq: rec4 \in recs} (* finding the seq number of the last write *) IN
+                                            IF rec2.seq > seq THEN
+                                                /\cmdLog' = [cmdLog EXCEPT ![instant[1]] = (@ \ instant[2]) \cup
+                                                    {[inst   |-> rec2.inst,
+                                                      status |-> "executed", (* latest write win *)
+                                                      state  |-> rec2.state,
+                                                      ballot |-> rec2.ballot,
+                                                      cmd    |-> rec2.cmd,
+                                                      deps   |-> rec2.deps,
+                                                      seq    |-> rec2.seq,
+                                                      consistency |-> rec2.consistency,
+                                                      ctxid |-> rec2.ctxid,
+                                                      execution_order |-> (max_execution_order+1),
+                                                      execution_order_list |-> instant,
+                                                      commit_order |-> rec2.commit_order  ]}]
+                                               /\UNCHANGED <<proposed, executed, sentMsg, crtInst, leaderOfInst,
+                                                 committed, ballots, preparing, clk>>
+                                            ELSE
+                                                /\cmdLog' = [cmdLog EXCEPT ![instant[1]] = (@ \ instant[2]) \cup
+                                                    {[inst   |-> rec2.inst,
+                                                      status |-> "discarded",
+                                                      state  |-> rec2.state,
+                                                      ballot |-> rec2.ballot,
+                                                      cmd    |-> rec2.cmd,
+                                                      deps   |-> rec2.deps,
+                                                      seq    |-> rec2.seq,
+                                                      consistency |-> rec2.consistency,
+                                                      ctxid |-> rec2.ctxid,
+                                                      execution_order |-> (max_execution_order+1),
+                                                      execution_order_list |-> instant,
+                                                      commit_order |-> rec2.commit_order  ]}]
+                                               /\UNCHANGED <<proposed, executed, sentMsg, crtInst, leaderOfInst,
+                                                 committed, ballots, preparing, clk>>    
 
 (***************************************************************************)
 (* Action groups                                                           *)
@@ -2033,5 +2078,5 @@ Termination == <>((\A r \in Replicas:
 
 =============================================================================
 \* Modification History
-\* Last modified Tue Mar 05 21:30:51 EST 2024 by santamariashithil
+\* Last modified Tue Mar 05 21:38:38 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil

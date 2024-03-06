@@ -1763,7 +1763,7 @@ OrderingInstancesSecondLevel(scc) ==
 (***************************************************************************)
 
 
-ExecuteCommand(replica, i) == 
+(*ExecuteCommand(replica, i) == 
      \E rec \in cmdLog[replica]:
         /\ rec.inst = i
         /\ rec.status = "causally-committed" \/ rec.status = "strongly-committed"
@@ -1826,9 +1826,31 @@ ExecuteCommand(replica, i) ==
                                                       execution_order_list |-> instant,
                                                       commit_order |-> rec2.commit_order  ]}]
                                                /\UNCHANGED <<proposed, executed, sentMsg, crtInst, leaderOfInst,
-                                                 committed, ballots, preparing, clk>> 
+                                                 committed, ballots, preparing, clk>> *)
  
-           
+  
+ExecuteCommand(replica, i) == 
+        LET  rec == {r \in cmdLog[replica] : r.inst = i /\ r.status \in {"causally-committed","strongly-committed"}} IN 
+            IF Cardinality(rec) = 0 THEN 
+                /\UNCHANGED <<cmdLog, proposed, executed, sentMsg, crtInst, leaderOfInst,
+                        committed, ballots, preparing, clk>>
+            ELSE  
+            /\ LET scc_set == FinalSCC(replica,i) (*finding all scc *)IN
+                /\ cmdLog' = [cmdLog EXCEPT ![replica] = (@ \ i) \cup
+                                {[inst   |-> rec.inst,
+                                  status |-> "executed",
+                                  state  |-> rec.state,
+                                  ballot |-> rec.ballot,
+                                  cmd    |-> rec.cmd,
+                                  deps   |-> rec.deps,
+                                  seq    |-> rec.seq,
+                                  consistency |-> rec.consistency,
+                                  ctxid |-> rec.ctxid,
+                                  execution_order |-> 1,
+                                  execution_order_list |-> 0,
+                                  commit_order |-> rec.commit_order]}]
+                /\UNCHANGED <<proposed, executed, sentMsg, crtInst, leaderOfInst,
+                        committed, ballots, preparing, clk>>        
 
 (***************************************************************************)
 (* Action groups                                                           *)
@@ -1877,7 +1899,7 @@ Next ==
     \/ ReplicaAction
     \/ (* Disjunct to prevent deadlock on termination *)
      ((\A r \in Replicas:
-            \A inst \in cmdLog[r]: inst.status = "causally-committed" \/ inst.status = "strongly-committed") /\ UNCHANGED vars)
+            \A inst \in cmdLog[r]: inst.status = "executed" \/ inst.status = "discarded") /\ UNCHANGED vars)
       (*\A r \in Replicas:
             \A inst \in cmdLog[r]: inst.status = "executed" \/ inst.status = "discarded") /\ UNCHANGED vars)*)
 
@@ -2004,7 +2026,7 @@ posed only after γ is committed by any replica), then every replica will execut
 (***************************************************************************)
 
 Termination == <>((\A r \in Replicas:
-            \A inst \in cmdLog[r]: inst.status = "causally-committed" \/ inst.status = "strongly-committed"))
+            \A inst \in cmdLog[r]: inst.status = "executed" \/ inst.status = "discarded"))
 (*Termination == <>((\A r \in Replicas:
             \A inst \in cmdLog[r]: inst.status = "executed" \/ inst.status = "discarded"))*)
                                        
@@ -2012,5 +2034,5 @@ Termination == <>((\A r \in Replicas:
 
 =============================================================================
 \* Modification History
-\* Last modified Tue Mar 05 20:56:15 EST 2024 by santamariashithil
+\* Last modified Tue Mar 05 21:37:13 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil

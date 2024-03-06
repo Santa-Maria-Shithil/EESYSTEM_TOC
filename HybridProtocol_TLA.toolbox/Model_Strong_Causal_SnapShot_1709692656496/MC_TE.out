@@ -2,7 +2,7 @@
 TLC2 Version 2.16 of 31 December 2020 (rev: cdddf55)
 @!@!@ENDMSG 2262 @!@!@
 @!@!@STARTMSG 2187:0 @!@!@
-Running breadth-first search Model-Checking with fp 117 and seed -5687179158714250198 with 6 workers on 8 cores with 1943MB heap and 4368MB offheap memory [pid: 14661] (Mac OS X 10.16 x86_64, AdoptOpenJDK 14.0.1 x86_64, OffHeapDiskFPSet, DiskStateQueue).
+Running breadth-first search Model-Checking with fp 53 and seed 3996409713342881366 with 6 workers on 8 cores with 1943MB heap and 4368MB offheap memory [pid: 15348] (Mac OS X 10.16 x86_64, AdoptOpenJDK 14.0.1 x86_64, OffHeapDiskFPSet, DiskStateQueue).
 @!@!@ENDMSG 2187 @!@!@
 @!@!@STARTMSG 2220:0 @!@!@
 Starting SANY...
@@ -23,7 +23,7 @@ Semantic processing of module MC
 SANY finished.
 @!@!@ENDMSG 2219 @!@!@
 @!@!@STARTMSG 2185:0 @!@!@
-Starting... (2024-03-05 20:56:25)
+Starting... (2024-03-05 21:37:19)
 @!@!@ENDMSG 2185 @!@!@
 @!@!@STARTMSG 2212:0 @!@!@
 Implied-temporal checking--satisfiability problem has 1 branches.
@@ -32,38 +32,38 @@ Implied-temporal checking--satisfiability problem has 1 branches.
 Computing initial states...
 @!@!@ENDMSG 2189 @!@!@
 @!@!@STARTMSG 2190:0 @!@!@
-Finished computing initial states: 1 distinct state generated at 2024-03-05 20:56:27.
+Finished computing initial states: 1 distinct state generated at 2024-03-05 21:37:20.
 @!@!@ENDMSG 2190 @!@!@
 @!@!@STARTMSG 2192:0 @!@!@
-Checking temporal properties for the current state space with 4563 total distinct states at (2024-03-05 20:56:30)
+Checking temporal properties for the current state space with 5158 total distinct states at (2024-03-05 21:37:23)
 @!@!@ENDMSG 2192 @!@!@
 @!@!@STARTMSG 2267:0 @!@!@
-Finished checking temporal properties in 00s at 2024-03-05 20:56:30
+Finished checking temporal properties in 00s at 2024-03-05 21:37:23
 @!@!@ENDMSG 2267 @!@!@
 @!@!@STARTMSG 2200:0 @!@!@
-Progress(9) at 2024-03-05 20:56:30: 13,652 states generated (13,652 s/min), 9,071 distinct states found (9,071 ds/min), 4,527 states left on queue.
+Progress(9) at 2024-03-05 21:37:23: 53,945 states generated (53,945 s/min), 10,321 distinct states found (10,321 ds/min), 5,157 states left on queue.
 @!@!@ENDMSG 2200 @!@!@
 @!@!@STARTMSG 2200:0 @!@!@
-Progress(15) at 2024-03-05 20:56:36: 250,202 states generated, 121,069 distinct states found, 0 states left on queue.
+Progress(15) at 2024-03-05 21:37:31: 1,490,738 states generated, 121,069 distinct states found, 0 states left on queue.
 @!@!@ENDMSG 2200 @!@!@
 @!@!@STARTMSG 2192:0 @!@!@
-Checking temporal properties for the complete state space with 121069 total distinct states at (2024-03-05 20:56:36)
+Checking temporal properties for the complete state space with 121069 total distinct states at (2024-03-05 21:37:31)
 @!@!@ENDMSG 2192 @!@!@
 @!@!@STARTMSG 2267:0 @!@!@
-Finished checking temporal properties in 00s at 2024-03-05 20:56:36
+Finished checking temporal properties in 00s at 2024-03-05 21:37:31
 @!@!@ENDMSG 2267 @!@!@
 @!@!@STARTMSG 2193:0 @!@!@
 Model checking completed. No error has been found.
   Estimates of the probability that TLC did not check all reachable states
   because two distinct states had the same fingerprint:
-  calculated (optimistic):  val = 8.5E-10
-  based on the actual fingerprints:  val = 2.7E-9
+  calculated (optimistic):  val = 9.0E-9
+  based on the actual fingerprints:  val = 1.6E-10
 @!@!@ENDMSG 2193 @!@!@
 @!@!@STARTMSG 2200:0 @!@!@
-Progress(15) at 2024-03-05 20:56:40: 250,202 states generated (930,637 s/min), 121,069 distinct states found (450,321 ds/min), 0 states left on queue.
+Progress(15) at 2024-03-05 21:37:35: 1,490,738 states generated (5,067,377 s/min), 121,069 distinct states found (411,542 ds/min), 0 states left on queue.
 @!@!@ENDMSG 2200 @!@!@
 @!@!@STARTMSG 2199:0 @!@!@
-250202 states generated, 121069 distinct states found, 0 states left on queue.
+1490738 states generated, 121069 distinct states found, 0 states left on queue.
 @!@!@ENDMSG 2199 @!@!@
 @!@!@STARTMSG 2194:0 @!@!@
 The depth of the complete state graph search is 15.
@@ -72,5 +72,5 @@ The depth of the complete state graph search is 15.
 The average outdegree of the complete state graph is 1 (minimum is 0, the maximum 18 and the 95th percentile is 3).
 @!@!@ENDMSG 2268 @!@!@
 @!@!@STARTMSG 2186:0 @!@!@
-Finished in 16146ms at (2024-03-05 20:56:40)
+Finished in 17665ms at (2024-03-05 21:37:35)
 @!@!@ENDMSG 2186 @!@!@
