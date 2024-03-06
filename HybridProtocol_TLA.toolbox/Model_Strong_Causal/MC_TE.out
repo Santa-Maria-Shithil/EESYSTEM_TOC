@@ -2,7 +2,7 @@
 TLC2 Version 2.16 of 31 December 2020 (rev: cdddf55)
 @!@!@ENDMSG 2262 @!@!@
 @!@!@STARTMSG 2187:0 @!@!@
-Running breadth-first search Model-Checking with fp 24 and seed -5480324523375236306 with 6 workers on 8 cores with 1943MB heap and 4368MB offheap memory [pid: 15904] (Mac OS X 10.16 x86_64, AdoptOpenJDK 14.0.1 x86_64, OffHeapDiskFPSet, DiskStateQueue).
+Running breadth-first search Model-Checking with fp 97 and seed 6511215183709686882 with 6 workers on 8 cores with 1943MB heap and 4368MB offheap memory [pid: 16094] (Mac OS X 10.16 x86_64, AdoptOpenJDK 14.0.1 x86_64, OffHeapDiskFPSet, DiskStateQueue).
 @!@!@ENDMSG 2187 @!@!@
 @!@!@STARTMSG 2220:0 @!@!@
 Starting SANY...
@@ -23,7 +23,7 @@ Semantic processing of module MC
 SANY finished.
 @!@!@ENDMSG 2219 @!@!@
 @!@!@STARTMSG 2185:0 @!@!@
-Starting... (2024-03-05 22:19:24)
+Starting... (2024-03-05 22:51:36)
 @!@!@ENDMSG 2185 @!@!@
 @!@!@STARTMSG 2212:0 @!@!@
 Implied-temporal checking--satisfiability problem has 1 branches.
@@ -32,14 +32,14 @@ Implied-temporal checking--satisfiability problem has 1 branches.
 Computing initial states...
 @!@!@ENDMSG 2189 @!@!@
 @!@!@STARTMSG 2190:0 @!@!@
-Finished computing initial states: 1 distinct state generated at 2024-03-05 22:19:26.
+Finished computing initial states: 1 distinct state generated at 2024-03-05 22:51:38.
 @!@!@ENDMSG 2190 @!@!@
 @!@!@STARTMSG 2192:0 @!@!@
-Checking temporal properties for the current state space with 181 total distinct states at (2024-03-05 22:19:29)
+Checking temporal properties for the current state space with 918 total distinct states at (2024-03-05 22:51:41)
 @!@!@ENDMSG 2192 @!@!@
 @!@!@STARTMSG 2267:0 @!@!@
-Finished checking temporal properties in 00s at 2024-03-05 22:19:29
+Finished checking temporal properties in 00s at 2024-03-05 22:51:41
 @!@!@ENDMSG 2267 @!@!@
 @!@!@STARTMSG 2200:0 @!@!@
-Progress(5) at 2024-03-05 22:19:29: 20,960 states generated (20,960 s/min), 12,440 distinct states found (12,440 ds/min), 13,724 states left on queue.
+Progress(6) at 2024-03-05 22:51:42: 20,646 states generated (20,646 s/min), 8,761 distinct states found (8,761 ds/min), 7,880 states left on queue.
 @!@!@ENDMSG 2200 @!@!@

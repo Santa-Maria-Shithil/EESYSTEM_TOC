@@ -1761,15 +1761,16 @@ OrderingInstancesSecondLevel(scc) ==
 (***************************************************************************)
 (* Command Execution Actions                                               *)
 (***************************************************************************)
-
-
-(*ExecuteCommand(replica, i) == 
-     \E rec \in cmdLog[replica]:
-        /\ rec.inst = i
-        /\ rec.status = "causally-committed" \/ rec.status = "strongly-committed"
-        /\ LET scc_set == FinalSCC(replica,i) (*finding all scc *)IN 
-            /\ \A scc \in scc_set: LET firstlevelordering ==  OrderingInstancesFirstLevel(scc) IN (*ordering based on seq number *)
-                \A instant \in OrderingInstancesSecondLevel(firstlevelordering): (*ordering based on instance number to gurantee the session causality *)
+ 
+ExecuteCommand(replica, i) == 
+        LET  rec == {r \in cmdLog[replica] : r.inst = i /\ r.status \in {"causally-committed","strongly-committed"}} IN 
+            IF Cardinality(rec) = 0 THEN 
+                /\UNCHANGED <<cmdLog, proposed, executed, sentMsg, crtInst, leaderOfInst,
+                        committed, ballots, preparing, clk>>
+            ELSE  
+            /\ LET scc_set == FinalSCC(replica,i) (*finding all scc *)IN
+                /\ \A scc \in scc_set: LET firstlevelordering ==  OrderingInstancesFirstLevel(scc) IN (*ordering based on seq number *)
+                 \A instant \in OrderingInstancesSecondLevel(firstlevelordering): (*ordering based on instance number to gurantee the session causality *)
                     \E rec2 \in cmdLog[instant[2][1]]:
                         /\rec2.inst=instant[2][2]
                         /\ LET max_execution_order_inst == FindMaxExecutionOrder(replica)
@@ -1826,26 +1827,7 @@ OrderingInstancesSecondLevel(scc) ==
                                                       execution_order_list |-> instant,
                                                       commit_order |-> rec2.commit_order  ]}]
                                                /\UNCHANGED <<proposed, executed, sentMsg, crtInst, leaderOfInst,
-                                                 committed, ballots, preparing, clk>> *)
- 
-  
-ExecuteCommand(replica, i) == 
-        LET  rec == {r \in cmdLog[replica] : r.inst = i} IN  
-            /\ cmdLog' = [cmdLog EXCEPT ![replica] = (@ \ i) \cup
-                            {[inst   |-> rec.inst,
-                              status |-> "executed",
-                              state  |-> rec.state,
-                              ballot |-> rec.ballot,
-                              cmd    |-> rec.cmd,
-                              deps   |-> rec.deps,
-                              seq    |-> rec.seq,
-                              consistency |-> rec.consistency,
-                              ctxid |-> rec.ctxid,
-                              execution_order |-> 1,
-                              execution_order_list |-> 0,
-                              commit_order |-> rec.commit_order]}]
-            /\UNCHANGED <<proposed, executed, sentMsg, crtInst, leaderOfInst,
-                    committed, ballots, preparing, clk>>        
+                                                 committed, ballots, preparing, clk>>    
 
 (***************************************************************************)
 (* Action groups                                                           *)
@@ -1862,7 +1844,7 @@ CommandLeaderAction ==
             \/ (\E Q \in SlowQuorums(cleader) : Phase2Finalize(cleader, inst, Q))
             (*\/ (\E Q \in SlowQuorums(cleader) : FinalizeTryPreAccept(cleader, inst, Q))*))
     \/ (\E replica \in Replicas: 
-            \E inst \in cmdLog[replica]: inst.status \in {"causally-committed","strongly-committed"} /\ ExecuteCommand(replica, inst))
+            \E inst \in cmdLog[replica]: ExecuteCommand(replica, inst))
     
     
   
@@ -1881,7 +1863,7 @@ ReplicaAction ==
          \/ \E i \in preparing[replica] :
             \E Q \in SlowQuorums(replica) : PrepareFinalize(replica, i, Q)
          \/ ReplyTryPreaccept(replica)*)
-         \/ \E inst \in cmdLog[replica]: inst.status \in {"causally-committed","strongly-committed"} /\ ExecuteCommand(replica, inst)
+         \/ \E inst \in cmdLog[replica]: ExecuteCommand(replica, inst)
          )
 
 
@@ -2029,5 +2011,5 @@ Termination == <>((\A r \in Replicas:
 
 =============================================================================
 \* Modification History
-\* Last modified Tue Mar 05 21:26:15 EST 2024 by santamariashithil
+\* Last modified Tue Mar 05 21:40:22 EST 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil
