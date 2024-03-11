@@ -1988,7 +1988,7 @@ posed only after γ is committed by any replica), then every replica will execut
     \A replica \in Replicas:
         \A rec1, rec2 \in cmdLog[replica]:
             IF rec1.consistency \in {"strong"} /\ rec2.consistency \in {"strong"} THEN 
-                /\ rec1.commit_order >= rec2.commit_order => rec1.execution_order >= rec2.execution_order
+                /\ rec1.commit_order > rec2.commit_order => rec1.execution_order > rec2.execution_order
             ELSE
                 TRUE
     
@@ -2011,5 +2011,5 @@ Termination == <>((\A r \in Replicas:
 
 =============================================================================
 \* Modification History
-\* Last modified Tue Mar 05 21:40:22 EST 2024 by santamariashithil
+\* Last modified Mon Mar 11 11:15:06 EDT 2024 by santamariashithil
 \* Created Thu Nov 30 14:15:52 EST 2023 by santamariashithil
